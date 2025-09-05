@@ -29,10 +29,12 @@ The system is composed of the following core components:
 - Maintains system state:
   - **Balances**
   - **Open Orders**
+  - **Closed Orders**
 - Processes:
   - Trade creation
   - Trade closing
   - Balance updates
+  - Exisiting balance
 
 ### 5. Backend (REST API Layer)
 Provides REST APIs for client interaction:
@@ -66,11 +68,11 @@ Provides REST APIs for client interaction:
 
 ## Technology Stack
 
-- **Node.js / Python / Go** (customizable for poller, engine, backend)
-- **WebSockets** for live market data
-- **Message Queue** (e.g., Redis, RabbitMQ, Kafka)
+- **Node.js / Typescript** (customizable for poller, engine, backend)
+- **WebSockets** for live market data from backpack.
+- **Message Queue** (e.g., Redis, Kafka)
 - **REST APIs** (Express.js, FastAPI, or similar)
-- **Database** (PostgreSQL / MongoDB for persistence)
+- **Database** (PostgreSQL / Prisma)
 
 ---
 
@@ -78,5 +80,6 @@ Provides REST APIs for client interaction:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-org/crypto-trading-system.git
-   cd crypto-trading-system
+   git clone https://github.com/shashank-poola/contest-super30.git
+   cd contest-super30
+   ```
