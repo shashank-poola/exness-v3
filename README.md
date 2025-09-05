@@ -1,31 +1,82 @@
-# shadcn/ui monorepo template
+## Crypto Trading System
 
-This template is for creating a monorepo with shadcn/ui.
+This project implements a modular trading system that integrates with **Backpack Exchange** via WebSocket. The architecture is designed around a **poller**, **queue**, and **execution engine**, providing a scalable and reliable way to handle real-time market data and trading operations.
 
-## Usage
+---
 
-```bash
-pnpm dlx shadcn@latest init
-```
+## System Architecture
 
-## Adding components
+The system is composed of the following core components:
 
-To add components to your app, run the following command at the root of your `web` app:
+### 1. Backpack (Exchange Data Source)
+- Source of live cryptocurrency market data via WebSocket.
+- Provides price feeds, order book updates, and trade execution results.
+- Data of SOL, BTC, ETH.
 
-```bash
-pnpm dlx shadcn@latest add button -c apps/web
-```
+### 2. Poller
+- Subscribes to Backpack WebSocket channels.
+- Normalizes and forwards market data/events into the system.
+- Pushes processed events into the **queue**.
 
-This will place the ui components in the `packages/ui/src/components` directory.
+### 3. Queue
+- Message queue for decoupling data ingestion and processing.
+- Ensures reliable communication between the **Poller**, **Engine**, and **Backend**.
+- Supports horizontal scaling.
 
-## Tailwind
+### 4. Engine
+- Core trading logic and order execution.
+- Consumes messages from the queue.
+- Maintains system state:
+  - **Balances**
+  - **Open Orders**
+- Processes:
+  - Trade creation
+  - Trade closing
+  - Balance updates
 
-Your `tailwind.config.ts` and `globals.css` are already set up to use the components from the `ui` package.
+### 5. Backend (REST API Layer)
+Provides REST APIs for client interaction:
 
-## Using components
+- **Authentication**
+  - `POST /api/v1/signup`
+  - `POST /api/v1/signin`
+  - `GET /api/v1/signin/post?token=123`
 
-To use the components in your app, import them from the `ui` package.
+- **Trading**
+  - `POST /api/v1/trade/create`
+  - `POST /api/v1/trade/close`
 
-```tsx
-import { Button } from "@workspace/ui/components/button"
-```
+- **Balances**
+  - `GET /api/v1/balance/usd`
+  - `GET /api/v1/balance/`
+
+- **Assets**
+  - `GET /api/v1/supportedAssets`
+
+---
+
+## Data Flow
+
+1. **Backpack** streams market data →  
+2. **Poller** receives and pushes normalized events into the **Queue** →  
+3. **Engine** consumes queue messages, updates balances/open orders, and executes logic →  
+4. **Backend** APIs expose system state and allow trade operations.  
+
+---
+
+## Technology Stack
+
+- **Node.js / Python / Go** (customizable for poller, engine, backend)
+- **WebSockets** for live market data
+- **Message Queue** (e.g., Redis, RabbitMQ, Kafka)
+- **REST APIs** (Express.js, FastAPI, or similar)
+- **Database** (PostgreSQL / MongoDB for persistence)
+
+---
+
+## Setup & Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-org/crypto-trading-system.git
+   cd crypto-trading-system
