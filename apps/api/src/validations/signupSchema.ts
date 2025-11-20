@@ -1,6 +1,6 @@
-import z from 'zod';
+import { z } from 'zod';
 
 export const signupSchema = z.object({
   email: z.email('Invalid email format'),
-  password: z.password('Invalid password')
+  password: z.string().min(6, 'Invalid password')
 });

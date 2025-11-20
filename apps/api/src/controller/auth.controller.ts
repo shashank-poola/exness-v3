@@ -1,99 +1,117 @@
 import dbClient from '@exness-v3/db';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import type { Request, Response } from 'express';
 
 import { createUserInEngine } from '../services/engine.service';
-import { sendEmail } from '../utils';
-import { signupSchema } from '../validations/signupSchema';
+import { signupSchema } from '../validations/signupSchema.js';
+
+// -------------------- SIGNUP --------------------
 
 export async function signupHandler(req: Request, res: Response) {
   try {
-    const { success, data, error } = signupSchema.safeParse(req.body);
+    const parsed = signupSchema.safeParse(req.body);
 
-    if (!success) {
-      return res.status(400).json({ error: error.flatten().fieldErrors });
+    if (!parsed.success) {
+      return res.status(400).json({ error: parsed.error.flatten().fieldErrors });
     }
 
-    const { email } = data;
-    const token = jwt.sign(data, process.env.JWT_SECRET!, {
-      expiresIn: '5m',
+    const { email, password } = parsed.data;
+
+    // Check existing user by email only
+    const existing = await dbClient.user.findFirst({
+      where: { email }
     });
 
-    let user = await dbClient.user.findFirst({
-      where: {
+    if (existing) {
+      return res.status(400).json({ error: 'User already exists' });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create new user
+    const user = await dbClient.user.create({
+      data: {
         email,
+        password: hashedPassword,
+        lastLoggedIn: new Date(),
+        balance: 5000,
       },
     });
-    console.log(user);
-    if (!user) {
-      console.log('in not user');
-      user = await dbClient.user.create({
-        data: {
-          email: email,
-          lastLoggedIn: new Date(),
-          balance: 5000,
-        },
-      });
-    }
+
+    // Optional internal service
     createUserInEngine(user);
 
-    if (process.env.NODE_ENV === 'production') {
-      const { error } = await sendEmail(email, token);
-      if (error) {
-        res.status(400).json({ error });
-      }
-    } else {
-      const url =
-        process.env.API_BASE_URL + '/auth/signin/verify?token=' + token;
-      console.log(url);
-    }
-
-    res.status(201).json({ message: 'Email Sent' });
-  } catch (err: any) {
-    console.log(err);
-    res.status(500).json({ message: 'Interal server error' });
-  }
-}
-
-export async function signInVerify(req: Request, res: Response) {
-  try {
-    console.log('in signInVerify');
-    const token = req.query.token?.toString();
-
-    if (!token) {
-      console.log('Token not found');
-      res.status(400).json({
-        message: 'Verification token not found in params',
-      });
-      return;
-    }
-    console.log('token', token);
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET!);
-    console.log('decodedToken', decodedToken);
-    if (!decodedToken) {
-      res.status(400).json({ message: 'Invalid token' });
-      return;
-    }
-
-    const { email } = decodedToken as { email: string };
-
-    const sessionToken = jwt.sign({ email }, process.env.JWT_SECRET!, {
+    // Issue JWT (return in response body, NOT cookies)
+    const token = jwt.sign({ email }, process.env.JWT_SECRET!, {
       expiresIn: '2d',
     });
 
-    res.cookie('token', sessionToken, {
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
-      domain: '.localhost',
-      maxAge: 2 * 24 * 60 * 60 * 1000,
+    return res.status(201).json({
+      message: 'Signup successful',
+      token,
+      user: {
+        email: user.email,
+        balance: user.balance,
+      },
     });
-    console.log('in signInVerify redirect');
-    res.redirect(process.env.CORS_ORIGIN! + '/trade');
-    // res.status(200).json({ message: 'Login successful' });
-    // res.redirect("http://localhost:3000/trade");
-  } catch (err: any) {
-    console.log(err);
-    res.status(500).json({ message: 'Interal server error' });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+
+// -------------------- SIGNIN --------------------
+
+export async function signinHandler(req: Request, res: Response) {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    // Fetch user
+    const user = await dbClient.user.findFirst({
+      where: { email },
+    });
+
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Validate password
+    const isValid = await bcrypt.compare(password, user.password);
+
+    if (!isValid) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Update login timestamp
+    await dbClient.user.update({
+      where: { id: user.id },
+      data: { lastLoggedIn: new Date() },
+    });
+
+    // Generate token
+    const token = jwt.sign({ email }, process.env.JWT_SECRET!, {
+      expiresIn: '2d',
+    });
+
+    return res.status(200).json({
+      message: 'Login successful',
+      token,
+      user: {
+        email: user.email,
+        balance: user.balance,
+      },
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Internal server error' });
   }
 }

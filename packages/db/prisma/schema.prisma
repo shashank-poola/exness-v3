@@ -16,7 +16,7 @@ datasource db {
 model User {
   id             String          @id @default(uuid())
   email          String          @unique
-  passwordHash   String
+  password       String
   lastLoggedIn   DateTime
   balance        Int
   existingTrades ExistingTrade[]
