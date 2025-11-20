@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/primsa"
 }
 
 datasource db {
@@ -15,6 +14,27 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  email String @unique
+  id             String          @id @default(uuid())
+  email          String          @unique
+  passwordHash   String
+  lastLoggedIn   DateTime
+  balance        Int
+  existingTrades ExistingTrade[]
+}
+
+model ExistingTrade {
+  id         String   @id @default(uuid())
+  openPrice  Float
+  closePrice Float
+  leverage   Float
+  pnl        Float
+  slippage   Float
+  quantity   Float
+  side       String
+  asset      String
+  liquidated Boolean
+  userId     String
+  reason     String?
+  user       User     @relation(fields: [userId], references: [id])
+  createdAt  DateTime @default(now())
 }
