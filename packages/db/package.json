@@ -1,8 +1,18 @@
 {
-  "name": "db",
+  "name": "@exness-v3/db",
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "exports": {
+    ".": "./index.ts"
+  },
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "postinstall": "prisma generate"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
