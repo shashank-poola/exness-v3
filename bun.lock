@@ -47,6 +47,7 @@
       "name": "pooler",
       "dependencies": {
         "@exness-v3/redis": "workspace:*",
+        "dotenv": "^16.4.7",
         "ws": "^8.18.0",
       },
       "devDependencies": {

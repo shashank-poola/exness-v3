@@ -1,14 +1,26 @@
+import 'dotenv/config';
 import { publisher } from '@exness-v3/redis/pubsub';
 import { PriceUpdatePusher } from '@exness-v3/redis/streams';
 
-const ws = new WebSocket('wss://ws.backpack.exchange/');
+let assets: Record<string, {}> = {};
+let redisConnected = false;
 
+// connecting to redis channel
 (async () => {
-  await publisher.connect();
-  await PriceUpdatePusher.connect();
+  try {
+    console.log('Connecting to Redis...');
+    await publisher.connect();
+    await PriceUpdatePusher.connect();
+    console.log('✅ Connected to Redis');
+    redisConnected = true;
+  } catch (error) {
+    console.error('❌ Failed to connect to Redis:', error);
+    console.error('Make sure Redis is running on localhost:6379');
+    process.exit(1);
+  }
 })();
 
-let assets: Record<string, {}> = {};
+const ws = new WebSocket('wss://ws.backpack.exchange/');
 
 const message = {
   method: 'SUBSCRIBE',
@@ -43,7 +55,7 @@ ws.onclose = () => {
 };
 
 setInterval(() => {
-  if (Object.keys(assets).length === 0) {
+  if (!redisConnected || Object.keys(assets).length === 0) {
     return;
   }
   const data = {
