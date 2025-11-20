@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* TradeX Design System - Modern Trading Platform */
+
+@layer base {
+  :root {
+    /* Black & White Theme */
+    --background: 0 0% 100%;         /* White */
+    --foreground: 0 0% 0%;           /* Black */
+    --surface: 0 0% 100%;
+    
+    /* Trading Colors */
+    --success: 142 71% 45%;          /* Green for buy */
+    --success-foreground: 0 0% 100%;
+    --danger: 0 84% 60%;             /* Red for sell */
+    --danger-foreground: 0 0% 100%;
+    
+    /* Brand Colors */
+    --primary: 0 0% 0%;              /* Black */
+    --primary-foreground: 0 0% 100%;
+    --primary-dark: 0 0% 20%;
+    
+    /* Component Colors */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    
+    --accent: 0 0% 0%;
+    --accent-foreground: 0 0% 100%;
+    
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 0%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 0 0% 90%;
+    --input: 0 0% 95%;
+    --ring: 0 0% 0%;
+    
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 217 33% 12%;
+    --foreground: 197 100% 97%;
+    --surface: 217 33% 17%;
+    
+    --card: 217 33% 17%;
+    --card-foreground: 197 100% 97%;
+    
+    --muted: 217 33% 20%;
+    --muted-foreground: 217 10% 65%;
+    
+    --border: 217 20% 25%;
+    --input: 217 20% 20%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* Heading Font */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* Trading colors */
+  .text-success {
+    color: hsl(var(--success));
+  }
+  
+  .text-danger {
+    color: hsl(var(--danger));
+  }
+
+  .bg-success {
+    background-color: hsl(var(--success));
+  }
+
+  .bg-danger {
+    background-color: hsl(var(--danger));
+  }
+}
