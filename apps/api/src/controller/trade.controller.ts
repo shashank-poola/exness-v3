@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { RedisSubscriber } from '../services/redis.service';
+import { RedisSubscriber } from '../services/redis.service.js';
 import { closeOrderSchema, openOrderSchema } from '../validations/orderSchema.js';
 import { randomUUID } from 'crypto';
 import dbClient from '@exness-v3/db';
