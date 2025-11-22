@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { getUserBalanceFromEngine } from '../services/engine.service';
+import { getUserBalanceFromEngine } from '../services/engine.service.js';
 
 export async function getUserBalance(req: Request, res: Response) {
   try {

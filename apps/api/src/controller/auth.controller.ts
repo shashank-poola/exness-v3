@@ -3,10 +3,10 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import type { Request, Response } from 'express';
 
-import { createUserInEngine } from '../services/engine.service';
+import { createUserInEngine } from '../services/engine.service.js';
 import { signupSchema } from '../validations/signupSchema.js';
 
-// -------------------- SIGNUP --------------------
+
 
 export async function signupHandler(req: Request, res: Response) {
   try {

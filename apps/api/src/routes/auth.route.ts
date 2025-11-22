@@ -1,6 +1,6 @@
 import express from 'express';
 import { signInVerify, signupHandler } from '../controller/auth.controller.js';
-import { authMiddleware } from '../middleware/authMiddleware';
+import { authMiddleware } from '../middleware/auth.middleware.js';
 
 const authRouter = express();
 
