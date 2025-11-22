@@ -8,8 +8,8 @@ export async function handleGetUserBalance(
   requestId: string
 ) {
   try {
-    const { email } = payload;
-    const user = users[email];
+    const { email, password } = payload;
+    const user = users[email, password];
 
     if (!user) {
       console.log(`Attempted to close trade for non-existent user: ${email}`);
@@ -37,12 +37,13 @@ export async function handleUserCreation(
   requestId: string
 ) {
   try {
-    const isUserExisting = users[payload.email];
+    const isUserExisting = users[payload.email, payload.password];
 
     if (!isUserExisting) {
       const newUser: User = {
         id: payload.id,
         email: payload.email,
+        password: payload.password,
         balance: {
           amount: payload.balance,
           currency: 'USD',
