@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import mainRouter from './routes';
+import mainRouter from './routes/index.js';
 import cookieParser from 'cookie-parser';
 
 const PORT = process.env.PORT || 4000;

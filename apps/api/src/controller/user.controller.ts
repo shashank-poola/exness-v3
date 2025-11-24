@@ -10,12 +10,12 @@ export async function getUserBalance(req: Request, res: Response) {
       return;
     }
 
-    const balance = await getUserBalanceFromEngine(req.user);
+    const balance = await getUserBalanceFromEngine(email, password);
     res.status(200).json({
       balance: balance,
     });
   } catch (err: any) {
     console.log(err);
-    res.status(500).json({ message: 'Interal server error' });
+    res.status(500).json({ message: 'Internal server error' });
   }
 }

@@ -5,7 +5,7 @@ import { authMiddleware } from '../middleware/auth.middleware.js';
 const authRouter = express();
 
 authRouter.post('/signup', signupHandler);
-authRouter.get('/signin', signInVerify)
+authRouter.post('/signin', signInVerify)
 
 
 authRouter.get('/health', authMiddleware ,(req, res) => {
