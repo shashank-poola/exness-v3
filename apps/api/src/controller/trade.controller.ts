@@ -121,7 +121,7 @@ export async function fetchCloseOrders(req: Request, res: Response) {
       res.status(404).json({ message: 'User not found' });
       return;
     }
-    const orders = await dbClient.existingTrade.findMany({
+    const orders = await dbClient.existingTrades.findMany({
       where: {
         userId: user.id,
       },
