@@ -10,7 +10,8 @@ export async function getUserBalance(req: Request, res: Response) {
       return;
     }
 
-    const balance = await getUserBalanceFromEngine(email, password);
+    // Adjusted for engine service
+    const balance = await getUserBalanceFromEngine(email, "");
     res.status(200).json({
       balance: balance,
     });

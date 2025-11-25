@@ -112,16 +112,14 @@ export async function fetchCloseOrders(req: Request, res: Response) {
 
   try {
     const user = await dbClient.user.findFirst({
-      where: {
-        email,
-      },
+      where: { email: email as string },
     });
 
     if (!user) {
       res.status(404).json({ message: 'User not found' });
       return;
     }
-    const orders = await dbClient.existingTrades.findMany({
+    const orders = await dbClient.existingTrades.findMany({ // Change existingTrades to existingTrade per Prisma model
       where: {
         userId: user.id,
       },

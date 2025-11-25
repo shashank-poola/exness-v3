@@ -1,6 +1,6 @@
 import prisma from '@exness-v3/db';
-import { prices, users } from '../memoryDb';
-import { calculatePnl, closeOrder } from '../utils/liquidation-utils';
+import { prices, users } from './memoryDb.js';
+import { calculatePnl, closeOrder } from '../utils/liquidation.utils.js';
 import { sendAcknowledgement } from '../utils/send-ack';
 
 import type { PriceStore, Trade } from '../types';
@@ -8,7 +8,7 @@ import type {
   CloseOrderPayload,
   FetchOpenOrdersPayload,
   OpenTradePayload,
-} from '../types/handler.types';
+} from '../types/handler.type.js';
 
 export async function handlePriceUpdateEntry(payload: PriceStore) {
   // update in memory price
@@ -178,7 +178,7 @@ export async function handleCloseTrade(
       return;
     }
     const tradeToClose = user.trades.find(
-      (trade) => trade.id === orderId && trade.status === 'OPEN'
+      (trade: any) => trade.id === orderId && trade.status === 'OPEN'
     );
 
     if (!tradeToClose) {
@@ -240,7 +240,7 @@ export async function handleCloseTrade(
       },
     });
 
-    user.trades = user.trades.filter((trade) => trade.id !== orderId);
+    user.trades = user.trades.filter((trade: any) => trade.id !== orderId);
 
     await sendAcknowledgement(requestId, 'TRADE_CLOSE_ACKNOWLEDGEMENT', {
       status: 'success',
@@ -270,7 +270,7 @@ export async function handleFetchOpenOrders(
       return;
     }
 
-    const orders = user.trades.filter((trade) => trade.status === 'OPEN');
+    const orders = user.trades.filter((trade: any) => trade.status === 'OPEN');
     await sendAcknowledgement(requestId, 'TRADE_FETCH_ACKNOWLEDGEMENT', {
       status: 'success',
       orders: orders,

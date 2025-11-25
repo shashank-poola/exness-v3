@@ -35,9 +35,10 @@ export async function signupHandler(req: Request, res: Response) {
       data: {
         email,
         password: hashedPassword,
-        lastLoggedIn: new Date(),
         balance: 5000,
+        lastLoggedIn: new Date(),
       },
+      select: { id: true, email: true, balance: true, password: true },
     });
 
     // Optional internal service
@@ -74,9 +75,10 @@ export async function signInVerify(req: Request, res: Response) {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    // Fetch user
+    // Fetch user with balance for validation and response
     const user = await dbClient.user.findFirst({
       where: { email },
+      select: { id: true, email: true, password: true, balance: true },
     });
 
     if (!user) {

@@ -14,9 +14,10 @@ export async function closeOrder(
   }
 
   const [closedTrade] = user.trades.splice(tradeIndex, 1);
-
-  const { asset, side, openPrice, quantity, margin, leverage, slippage } =
-    closedTrade;
+  if (!closedTrade) {
+    throw new Error('Tried to close a trade that does not exist');
+  }
+  const { asset, side, openPrice, quantity, margin, leverage, slippage } = closedTrade;
 
   const closePrice =
     side === 'LONG'
