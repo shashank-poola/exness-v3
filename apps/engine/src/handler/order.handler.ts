@@ -1,5 +1,5 @@
 import prisma from '@exness-v3/db';
-import { prices, users } from './memoryDb.js';
+import { prices, users } from '../../memoryDb.js';
 import { calculatePnl, closeOrder } from '../utils/liquidation.utils.js';
 import { sendAcknowledgement } from '../utils/send-ack';
 
@@ -11,6 +11,7 @@ import type {
 } from '../types/handler.type.js';
 
 export async function handlePriceUpdateEntry(payload: PriceStore) {
+  
   // update in memory price
   Object.assign(prices, payload);
 

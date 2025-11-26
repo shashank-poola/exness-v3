@@ -1,6 +1,6 @@
-import { users } from '../memoryDb';
+import { users } from '../../memoryDb';
 import type { User } from '../types';
-import type { UserPayload, UserCreated } from '../types/handler.types';
+import type { UserPayload, UserCreated } from '../types/handler.type';
 import { sendAcknowledgement } from '../utils/send-ack';
 
 export async function handleGetUserBalance(
@@ -9,7 +9,7 @@ export async function handleGetUserBalance(
 ) {
   try {
     const { email, password } = payload;
-    const user = users[email, password];
+    const user = users[email];
 
     if (!user) {
       console.log(`Attempted to close trade for non-existent user: ${email}`);
@@ -37,13 +37,12 @@ export async function handleUserCreation(
   requestId: string
 ) {
   try {
-    const isUserExisting = users[payload.email, payload.password];
+    const isUserExisting = users[payload.email];
 
     if (!isUserExisting) {
       const newUser: User = {
         id: payload.id,
         email: payload.email,
-        password: payload.password,
         balance: {
           amount: payload.balance,
           currency: 'USD',

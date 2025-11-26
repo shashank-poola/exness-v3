@@ -18,6 +18,7 @@ export interface OpenTradePayload {
 
 export interface UserPayload {
   email: string;
+  password: string;
 }
 
 export interface FetchOpenOrdersPayload {

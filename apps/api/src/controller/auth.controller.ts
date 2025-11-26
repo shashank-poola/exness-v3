@@ -38,7 +38,7 @@ export async function signupHandler(req: Request, res: Response) {
         balance: 5000,
         lastLoggedIn: new Date(),
       },
-      select: { id: true, email: true, balance: true, password: true },
+      select: { id: true, email: true, balance: true, password: true, lastLoggedIn: true },
     });
 
     // Optional internal service

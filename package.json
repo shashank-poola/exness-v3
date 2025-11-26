@@ -24,6 +24,7 @@
     "node": ">=20"
   },
   "dependencies": {
+    "@prisma/client": "6.19.0",
     "@types/cors": "^2.8.19",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
