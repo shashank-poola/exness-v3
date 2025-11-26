@@ -1,13 +1,18 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import mainRouter from './routes/index.js';
 import cookieParser from 'cookie-parser';
+import { httpPusher } from '@exness-v3/redis/streams';
 
 const PORT = process.env.PORT || 3000;
 
 const app = express();
 
 const FE_URL = process.env.CORS_ORIGIN || 'http://localhost:5173';
+
+// Connect Redis once at startup
+await httpPusher.connect();
 
 app.use(express.json());
 app.use(

@@ -5,10 +5,6 @@ import { randomUUID } from 'crypto';
 import dbClient from '@exness-v3/db';
 import { httpPusher } from '@exness-v3/redis/streams';
 
-(async () => {
-  await httpPusher.connect();
-})();
-
 export const CREATE_ORDER_QUEUE = 'stream:engine';
 
 const redisSubscriber = RedisSubscriber.getInstance();
