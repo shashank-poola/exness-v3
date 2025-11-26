@@ -18,11 +18,16 @@ export async function authMiddleware(
     // Expect header: Authorization: Bearer <token>
     const authHeader = req.headers.authorization;
 
+    console.log('Auth header received:', authHeader);
+
     if (!authHeader) {
       return res.status(401).json({ error: "Authorization header missing" });
     }
 
     const [type, token] = authHeader.split(" ");
+
+    console.log('Token type:', type);
+    console.log('Token (first 20 chars):', token?.substring(0, 20));
 
     if (type !== "Bearer" || !token) {
       return res.status(401).json({ error: "Invalid authorization format" });
@@ -33,12 +38,14 @@ export async function authMiddleware(
       email: string;
     };
 
+    console.log('Token verified successfully for:', payload.email);
+
     // Attach to request
     req.user = payload.email;
 
     next();
   } catch (err) {
-    console.error(err);
+    console.error('JWT Verification Error:', err);
     return res.status(401).json({ error: "Invalid or expired token" });
   }
 }

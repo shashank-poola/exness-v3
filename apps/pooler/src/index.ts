@@ -51,7 +51,15 @@ ws.onmessage = async (event) => {
 };
 
 ws.onclose = () => {
-  console.log('WebSocket Closed');
+  console.log('WebSocket Closed - Attempting reconnect in 5s...');
+  setTimeout(() => {
+    console.log('Reconnecting...');
+    process.exit(1); // Let process manager restart
+  }, 5000);
+};
+
+ws.onerror = (error) => {
+  console.error('WebSocket Error:', error);
 };
 
 setInterval(() => {

@@ -90,6 +90,7 @@ async function startEngine() {
       const msg = response[0].messages[0];
       lastItemReadId = msg.id;
 
+      console.log('message', msg.message);
       await processMessage(msg);
       await saveSnapshot();
     }
