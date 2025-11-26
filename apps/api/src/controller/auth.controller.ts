@@ -98,7 +98,7 @@ export async function signInVerify(req: Request, res: Response) {
       data: { lastLoggedIn: new Date() },
     });
 
-    // Generate token
+    // it will generate a jwt token
     const token = jwt.sign({ email }, process.env.JWT_SECRET!, {
       expiresIn: '2d',
     });
