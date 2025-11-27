@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { getUserBalanceFromEngine } from '../services/engine.service.js';
+import dbClient from '@exness-v3/db';
 
 export async function getUserBalance(req: Request, res: Response) {
   try {
@@ -10,10 +11,19 @@ export async function getUserBalance(req: Request, res: Response) {
       return;
     }
 
-    // Adjusted for engine service
-    const balance = await getUserBalanceFromEngine(email, "");
+    // Get balance directly from database
+    const user = await dbClient.user.findFirst({
+      where: { email: email as string },
+      select: { balance: true, email: true },
+    });
+
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
     res.status(200).json({
-      balance: balance,
+      balance: Number(user.balance) || 5000, // Ensure it's a number, default to 5000
     });
   } catch (err: any) {
     console.log(err);

@@ -44,7 +44,7 @@ const TradingPage = () => {
     // Update price display
     setPrices((prev) => {
       const current = prev[msg.symbol] || { ask: 0, bid: 0, time: Date.now() };
-      return {
+      const newPrices = {
         ...prev,
         [msg.symbol]: {
           ask: msg.type === 'ASK' ? msg.price : current.ask,
@@ -52,10 +52,20 @@ const TradingPage = () => {
           time: msg.time,
         },
       };
-    });
 
-    // Update candlestick data for chart
-    processPriceTick(msg);
+      // Only update candlesticks when we have both ASK and BID
+      // Use mid-price for more accurate candlestick representation
+      const symbolPrices = newPrices[msg.symbol];
+      if (symbolPrices.ask > 0 && symbolPrices.bid > 0) {
+        const midPrice = (symbolPrices.ask + symbolPrices.bid) / 2;
+        processPriceTick({
+          ...msg,
+          price: midPrice,
+        });
+      }
+
+      return newPrices;
+    });
   });
 
   const cryptoPrices = [
@@ -138,7 +148,7 @@ const TradingPage = () => {
           
           <div className="flex items-center gap-4">
             <span className="text-sm font-extrabold">
-              BALANCE: ${balance?.balance?.toFixed(2) || '0.00'}
+              BALANCE: ${balance?.balance ? Number(balance.balance).toFixed(2) : '0.00'}
             </span>
           </div>
         </div>
@@ -157,7 +167,7 @@ const TradingPage = () => {
               }`}
             >
               <span className={`font-bold text-sm ${crypto.color}`}>{crypto.icon}</span>
-              <span className="text-xs font-medium">{crypto.symbol}</span>
+              <span className="text-xs font-medium font-extrabold">{crypto.symbol}</span>
               <div className="flex items-center gap-1">
                 <span className="text-[10px] px-1.5 py-0.5 bg-green-100 border border-green-300 rounded font-medium">
                   BID: {formatPrice(price?.bid)}
@@ -204,26 +214,105 @@ const TradingPage = () => {
           <div className="mt-4">
             <Tabs value={ordersTab} onValueChange={setOrdersTab}>
               <TabsList className="bg-transparent border-b border-gray-200 rounded-none w-full justify-start h-auto p-0">
-                <TabsTrigger 
-                  value="open" 
+                <TabsTrigger
+                  value="open"
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-black data-[state=active]:bg-transparent px-4 py-2"
                 >
-                  Open Orders (0)
+                  Open Orders ({openOrders.length})
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="all" 
+                <TabsTrigger
+                  value="all"
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-black data-[state=active]:bg-transparent px-4 py-2"
                 >
-                  All Orders (0)
+                  All Orders ({openOrders.length})
                 </TabsTrigger>
               </TabsList>
-              
-              <TabsContent value="open" className="py-12 text-center">
-                <p className="text-gray-400 text-sm">No open orders found</p>
+
+              <TabsContent value="open" className="py-4">
+                {openOrders.length === 0 ? (
+                  <p className="text-gray-400 text-sm text-center py-8">No open orders found</p>
+                ) : (
+                  <div className="space-y-2">
+                    {openOrders.map((order: any) => (
+                      <div key={order.id} className="border border-gray-200 rounded p-4 flex items-center justify-between">
+                        <div className="flex-1 grid grid-cols-6 gap-4 text-sm">
+                          <div>
+                            <span className="text-gray-500 text-xs font-bold">Asset</span>
+                            <p className="font-extrabold">{order.asset.replace('_', '/')}</p>
+                          </div>
+                          <div>
+                            <span className="text-gray-500 text-xs font-bold">Side</span>
+                            <p className={`font-extrabold ${order.side === 'LONG' ? 'text-green-600' : 'text-red-600'}`}>
+                              {order.side}
+                            </p>
+                          </div>
+                          <div>
+                            <span className="text-gray-500 text-xs font-bold">Size</span>
+                            <p className="font-extrabold">{order.quantity}</p>
+                          </div>
+                          <div>
+                            <span className="text-gray-500 text-xs font-bold">Entry Price</span>
+                            <p className="font-extrabold">${order.openPrice?.toFixed(2) || 'N/A'}</p>
+                          </div>
+                          <div>
+                            <span className="text-gray-500 text-xs font-bold">Leverage</span>
+                            <p className="font-extrabold">{order.leverage}x</p>
+                          </div>
+                          <div className="flex items-end">
+                            <button
+                              onClick={() => closeOrder.mutate({ orderId: order.id })}
+                              disabled={closeOrder.isPending}
+                              className="bg-red-500 text-white px-4 py-2 rounded text-xs font-bold hover:bg-red-600 disabled:opacity-50"
+                            >
+                              {closeOrder.isPending ? 'CLOSING...' : 'CLOSE'}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </TabsContent>
-              
-              <TabsContent value="all" className="py-12 text-center">
-                <p className="text-gray-400 text-sm">No orders found</p>
+
+              <TabsContent value="all" className="py-4">
+                {openOrders.length === 0 ? (
+                  <p className="text-gray-400 text-sm text-center py-8">No orders found</p>
+                ) : (
+                  <div className="space-y-2">
+                    {openOrders.map((order: any) => (
+                      <div key={order.id} className="border border-gray-200 rounded p-4">
+                        <div className="grid grid-cols-6 gap-4 text-sm">
+                          <div>
+                            <span className="text-gray-500 text-xs font-bold">Asset</span>
+                            <p className="font-extrabold">{order.asset.replace('_', '/')}</p>
+                          </div>
+                          <div>
+                            <span className="text-gray-500 text-xs font-bold">Side</span>
+                            <p className={`font-extrabold ${order.side === 'LONG' ? 'text-green-600' : 'text-red-600'}`}>
+                              {order.side}
+                            </p>
+                          </div>
+                          <div>
+                            <span className="text-gray-500 text-xs font-bold">Size</span>
+                            <p className="font-extrabold">{order.quantity}</p>
+                          </div>
+                          <div>
+                            <span className="text-gray-500 text-xs font-bold">Entry Price</span>
+                            <p className="font-extrabold">${order.openPrice?.toFixed(2) || 'N/A'}</p>
+                          </div>
+                          <div>
+                            <span className="text-gray-500 text-xs font-bold">Leverage</span>
+                            <p className="font-extrabold">{order.leverage}x</p>
+                          </div>
+                          <div>
+                            <span className="text-gray-500 text-xs font-bold">Status</span>
+                            <p className="font-extrabold text-orange-600">OPEN</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </TabsContent>
             </Tabs>
           </div>
@@ -346,49 +435,6 @@ const TradingPage = () => {
                     >
                       {createOrder.isPending ? 'SELLING...' : 'SELL'}
                     </button>
-                  </div>
-                </div>
-
-                {/* Existing Positions */}
-                <div className="border-t border-gray-200 pt-4 mt-4">
-                  <h3 className="text-xs font-extrabold mb-2">OPEN POSITIONS ({openOrders.length})</h3>
-                  <div className="space-y-3">
-                    {openOrders.length === 0 ? (
-                      <p className="text-xs text-gray-400 text-center py-4">No open positions</p>
-                    ) : (
-                      openOrders.map((order: any) => (
-                        <div key={order.id} className="border border-gray-200 rounded p-3">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs font-extrabold">{order.asset.replace('_', '/')}</span>
-                            <span className={`text-xs font-extrabold ${order.side === 'LONG' ? 'text-green-600' : 'text-red-600'}`}>
-                              {order.side}
-                            </span>
-                          </div>
-                          <div className="grid grid-cols-2 gap-2 text-[10px]">
-                            <div>
-                              <span className="text-gray-500 font-bold">Size:</span>
-                              <span className="ml-1 font-extrabold">{order.quantity}</span>
-                            </div>
-                            <div>
-                              <span className="text-gray-500 font-bold">Entry:</span>
-                              <span className="ml-1 font-extrabold">${order.openPrice?.toFixed(2)}</span>
-                            </div>
-                            <div>
-                              <span className="text-gray-500 font-bold">Leverage:</span>
-                              <span className="ml-1 font-extrabold">{order.leverage}x</span>
-                            </div>
-                            <div>
-                              <button
-                                onClick={() => closeOrder.mutate({ orderId: order.id })}
-                                className="text-xs bg-red-500 text-white px-2 py-1 rounded font-bold hover:bg-red-600"
-                              >
-                                CLOSE
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    )}
                   </div>
                 </div>
               </div>

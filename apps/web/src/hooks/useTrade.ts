@@ -50,10 +50,16 @@ export function useOpenOrders() {
   return useQuery({
     queryKey: ['openOrders'],
     queryFn: async () => {
-      const response = await api.get('/trade/get-open-orders');
-      return response.data;
+      try {
+        const response = await api.get('/trade/get-open-orders');
+        return response.data;
+      } catch (error) {
+        console.error('Failed to fetch open orders:', error);
+        return { orders: [] }; // Return empty orders on error
+      }
     },
     refetchInterval: 3000, // Refetch every 3 seconds
+    retry: 1, // Only retry once
   });
 }
 
@@ -61,9 +67,15 @@ export function useBalance() {
   return useQuery({
     queryKey: ['balance'],
     queryFn: async () => {
-      const response = await api.get('/balance/me');
-      return response.data;
+      try {
+        const response = await api.get('/balance/me');
+        return response.data;
+      } catch (error) {
+        console.error('Failed to fetch balance:', error);
+        return { balance: 0 }; // Return 0 balance on error
+      }
     },
     refetchInterval: 5000, // Refetch every 5 seconds
+    retry: 1, // Only retry once
   });
 }
