@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import tradexLogo from "@/assets/tradex-logo.png";
+import { TradingChart } from "@/components/TradingChart";
+import { useWebSocket } from "@/hooks/useWebSocket";
+import { getSymbolPrice, PriceData } from "@/lib/price-store";
 
 const TradingPage = () => {
   const [activeTab, setActiveTab] = useState("positions");
@@ -13,29 +16,53 @@ const TradingPage = () => {
   const [leverage, setLeverage] = useState(1);
   const [volume, setVolume] = useState("1.00");
 
+  // Live prices state
+  const [prices, setPrices] = useState<Record<string, PriceData>>({});
+
+  // Connect to WebSocket for real-time prices
+  useWebSocket((msg) => {
+    setPrices((prev) => {
+      const current = prev[msg.symbol] || { ask: 0, bid: 0, time: Date.now() };
+      return {
+        ...prev,
+        [msg.symbol]: {
+          ask: msg.type === 'ASK' ? msg.price : current.ask,
+          bid: msg.type === 'BID' ? msg.price : current.bid,
+          time: msg.time,
+        },
+      };
+    });
+  });
+
   const cryptoPrices = [
-    { 
-      symbol: "BTC", 
-      icon: "₿", 
-      bid: "$107,425.00", 
-      ask: "$107,435.00", 
-      color: "text-orange-500" 
+    {
+      symbol: "BTC",
+      binanceSymbol: "BTCUSDT",
+      icon: "₿",
+      color: "text-orange-500"
     },
-    { 
-      symbol: "ETH", 
-      icon: "♦", 
-      bid: "$3,663.20", 
-      ask: "$3,667.80", 
-      color: "text-gray-700" 
+    {
+      symbol: "ETH",
+      binanceSymbol: "ETHUSDT",
+      icon: "♦",
+      color: "text-gray-700"
     },
-    { 
-      symbol: "SOL", 
-      icon: "◎", 
-      bid: "$169.95", 
-      ask: "$170.01", 
-      color: "text-purple-500" 
+    {
+      symbol: "SOL",
+      binanceSymbol: "SOLUSDT",
+      icon: "◎",
+      color: "text-purple-500"
     },
   ];
+
+  // Helper function to format price
+  const formatPrice = (price: number | undefined) => {
+    if (!price) return "$0.00";
+    return `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
+  // Get current price for selected crypto
+  const selectedPrice = prices[`${selectedCrypto}USDT`] || { ask: 0, bid: 0, time: 0 };
 
   return (
     <div className="h-screen bg-white flex flex-col overflow-hidden">
@@ -60,24 +87,29 @@ const TradingPage = () => {
 
       {/* Ticker Bar */}
       <div className="border-b border-gray-200 px-6 py-3 flex items-center gap-8 bg-gray-50">
-        {cryptoPrices.map((crypto) => (
-          <button 
-            key={crypto.symbol} 
-            onClick={() => setSelectedCrypto(crypto.symbol)}
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-          >
-            <span className={`font-bold text-sm ${crypto.color}`}>{crypto.icon}</span>
-            <span className="text-xs font-medium">{crypto.symbol}</span>
-            <div className="flex items-center gap-1">
-              <span className="text-[10px] px-1.5 py-0.5 bg-green-100 border border-green-300 rounded font-medium">
-                BID: {crypto.bid}
-              </span>
-              <span className="text-[10px] px-1.5 py-0.5 bg-red-100 border border-red-300 rounded font-medium">
-                ASK: {crypto.ask}
-              </span>
-            </div>
-          </button>
-        ))}
+        {cryptoPrices.map((crypto) => {
+          const price = prices[crypto.binanceSymbol];
+          return (
+            <button
+              key={crypto.symbol}
+              onClick={() => setSelectedCrypto(crypto.symbol)}
+              className={`flex items-center gap-2 hover:opacity-80 transition-opacity ${
+                selectedCrypto === crypto.symbol ? 'opacity-100 scale-105' : 'opacity-70'
+              }`}
+            >
+              <span className={`font-bold text-sm ${crypto.color}`}>{crypto.icon}</span>
+              <span className="text-xs font-medium">{crypto.symbol}</span>
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] px-1.5 py-0.5 bg-green-100 border border-green-300 rounded font-medium">
+                  BID: {formatPrice(price?.bid)}
+                </span>
+                <span className="text-[10px] px-1.5 py-0.5 bg-red-100 border border-red-300 rounded font-medium">
+                  ASK: {formatPrice(price?.ask)}
+                </span>
+              </div>
+            </button>
+          );
+        })}
       </div>
 
       {/* Main Content */}
@@ -104,13 +136,9 @@ const TradingPage = () => {
             <span className="text-sm font-extrabold">TRADING {selectedCrypto}/USD</span>
           </div>
 
-          {/* Chart Placeholder */}
-          <Card className="flex-1 p-6 bg-white border border-gray-200">
-            <div className="h-full flex items-center justify-center text-gray-400 text-sm">
-              Chart visualization would go here
-              <br />
-              (Multiple colored lines tracking model performance over time)
-            </div>
+          {/* TradingView Chart */}
+          <Card className="flex-1 p-0 bg-white border border-gray-200 overflow-hidden">
+            <TradingChart symbol={`${selectedCrypto}USDT`} interval={selectedTimeframe} />
           </Card>
 
           {/* Orders Section */}
@@ -167,13 +195,13 @@ const TradingPage = () => {
                   <div className="flex-1 bg-green-100 border-2 border-green-300 rounded p-2 text-center">
                     <div className="text-[10px] font-extrabold text-gray-600 mb-1">BID</div>
                     <div className="text-sm font-extrabold text-green-600">
-                      {cryptoPrices.find(c => c.symbol === selectedCrypto)?.bid}
+                      {formatPrice(selectedPrice.bid)}
                     </div>
                   </div>
                   <div className="flex-1 bg-red-100 border-2 border-red-300 rounded p-2 text-center">
                     <div className="text-[10px] font-extrabold text-gray-600 mb-1">ASK</div>
                     <div className="text-sm font-extrabold text-red-600">
-                      {cryptoPrices.find(c => c.symbol === selectedCrypto)?.ask}
+                      {formatPrice(selectedPrice.ask)}
                     </div>
                   </div>
                 </div>
@@ -213,6 +241,15 @@ const TradingPage = () => {
 
                   <div>
                     <label className="text-xs font-extrabold mb-1 block">Take Profit (Optional)</label>
+                    <input
+                      type="text"
+                      placeholder="Not set"
+                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm font-bold"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-extrabold mb-1 block">Slippage (Optional)</label>
                     <input
                       type="text"
                       placeholder="Not set"
