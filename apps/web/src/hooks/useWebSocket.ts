@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { setSymbolPrice } from '@/lib/price-store';
 
 export interface TradeMessage {
@@ -16,7 +16,19 @@ let listeners: ((msg: TradeMessage) => void)[] = [];
 const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8080';
 
 export function useWebSocket(onMessage: (msg: TradeMessage) => void) {
+  // Store the latest callback in a ref to avoid reconnections
+  const callbackRef = useRef(onMessage);
+
   useEffect(() => {
+    callbackRef.current = onMessage;
+  }, [onMessage]);
+
+  useEffect(() => {
+    // Wrapper function that calls the latest callback
+    const stableCallback = (msg: TradeMessage) => {
+      callbackRef.current(msg);
+    };
+
     // Create socket only once
     if (!ws) {
       console.log('🔌 Connecting to WebSocket:', WS_URL);
@@ -108,11 +120,11 @@ export function useWebSocket(onMessage: (msg: TradeMessage) => void) {
     }
 
     // Register listener for this hook call
-    listeners.push(onMessage);
+    listeners.push(stableCallback);
 
     // Cleanup when component unmounts
     return () => {
-      listeners = listeners.filter((cb) => cb !== onMessage);
+      listeners = listeners.filter((cb) => cb !== stableCallback);
 
       // If no more listeners, close connection
       if (listeners.length === 0 && ws) {
@@ -120,7 +132,7 @@ export function useWebSocket(onMessage: (msg: TradeMessage) => void) {
         ws = null;
       }
     };
-  }, [onMessage]);
+  }, []);
 }
 
 function mapPairToUiSymbol(pair: string): string {

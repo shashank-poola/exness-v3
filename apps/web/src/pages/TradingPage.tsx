@@ -76,7 +76,7 @@ const TradingPage = () => {
           <nav className="flex items-center gap-8">
             <Link to="/" className="text-sm font-extrabold hover:opacity-70">HOME</Link>
             <Link to="/docs" className="text-sm font-extrabold hover:opacity-70">DOCS</Link>
-            <Link to="/docs" className="text-sm font-extrabold hover:opacity-70">MARKETPLACE</Link>
+            <Link to="/trade" className="text-sm font-extrabold hover:opacity-70">MARKETPLACE</Link>
           </nav>
           
           <div className="flex items-center gap-4">
