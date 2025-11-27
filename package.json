@@ -26,11 +26,13 @@
   "dependencies": {
     "@prisma/client": "6.19.0",
     "@types/cors": "^2.8.19",
+    "axios": "^1.13.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^7.0.0",
+    "web": "^0.0.2",
     "zod": "^4.1.12"
   }
 }

@@ -1,18 +1,42 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import tradexLogo from "@/assets/tradex-logo.png";
+import { useSignup, useSignin } from "@/hooks/useAuth";
 
 const AuthPage = () => {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const signup = useSignup();
+  const signin = useSignin();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle authentication logic here
-    console.log(isLogin ? "Login" : "Signup", { email, password });
+
+    try {
+      if (isLogin) {
+        // Login
+        await signin.mutateAsync({ email, password });
+        alert("Login successful!");
+        navigate("/trade");
+      } else {
+        // Signup - requires name field for backend
+        await signup.mutateAsync({
+          email,
+          password,
+          name: email.split('@')[0] // Use email username as name
+        });
+        alert("Signup successful!");
+        navigate("/trade");
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error || error.message || "Authentication failed";
+      alert(errorMessage);
+    }
   };
 
   return (
@@ -67,9 +91,14 @@ const AuthPage = () => {
 
             <Button
               type="submit"
+              disabled={signup.isPending || signin.isPending}
               className="w-full py-6 text-base font-extrabold rounded-full"
             >
-              {isLogin ? "LOGIN" : "SIGN UP"}
+              {signup.isPending || signin.isPending
+                ? "LOADING..."
+                : isLogin
+                ? "LOGIN"
+                : "SIGN UP"}
             </Button>
           </form>
 

@@ -13,6 +13,8 @@ export interface TradeMessage {
 // Keep a shared connection outside the hook
 let ws: WebSocket | null = null;
 let listeners: ((msg: TradeMessage) => void)[] = [];
+let reconnectTimeout: NodeJS.Timeout | null = null;
+let closeTimeout: NodeJS.Timeout | null = null;
 const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8080';
 
 export function useWebSocket(onMessage: (msg: TradeMessage) => void) {
@@ -35,7 +37,7 @@ export function useWebSocket(onMessage: (msg: TradeMessage) => void) {
       ws = new WebSocket(WS_URL);
 
       ws.onopen = () => {
-        console.log('✅ WebSocket connected');
+        console.log('✅ WebSocket connected, listeners:', listeners.length);
       };
 
       ws.onmessage = (event) => {
@@ -106,30 +108,51 @@ export function useWebSocket(onMessage: (msg: TradeMessage) => void) {
       ws.onclose = () => {
         console.log('🔌 WebSocket closed');
         ws = null;
-        listeners = [];
 
-        // Auto-reconnect after 3 seconds
-        setTimeout(() => {
-          console.log('🔄 Reconnecting...');
-          if (listeners.length > 0) {
-            // Only reconnect if there are active listeners
-            ws = null; // Reset to trigger reconnection
+        // Don't clear listeners - they're still mounted!
+        // Auto-reconnect after 3 seconds if there are still listeners
+        if (reconnectTimeout) clearTimeout(reconnectTimeout);
+        reconnectTimeout = setTimeout(() => {
+          if (listeners.length > 0 && !ws) {
+            console.log('🔄 Reconnecting...');
+            // Trigger reconnection by setting ws to null (it already is)
+            // The next component that needs it will recreate it
           }
         }, 3000);
       };
     }
 
+    // Cancel any pending close timeout since we have an active listener
+    if (closeTimeout) {
+      console.log('✅ Cancelled pending close (new listener added)');
+      clearTimeout(closeTimeout);
+      closeTimeout = null;
+    }
+
     // Register listener for this hook call
     listeners.push(stableCallback);
+    console.log('📝 Listener registered, total listeners:', listeners.length);
 
     // Cleanup when component unmounts
     return () => {
       listeners = listeners.filter((cb) => cb !== stableCallback);
+      console.log('🗑️ Listener removed, remaining listeners:', listeners.length);
 
-      // If no more listeners, close connection
+      // If no more listeners, schedule socket close after a delay
+      // This prevents rapid close/reconnect cycles during component remounts
       if (listeners.length === 0 && ws) {
-        ws.close();
-        ws = null;
+        console.log('⏳ Scheduling WebSocket close in 1 second...');
+        if (closeTimeout) clearTimeout(closeTimeout);
+        closeTimeout = setTimeout(() => {
+          // Double-check there are still no listeners
+          if (listeners.length === 0 && ws) {
+            console.log('🔌 Closing WebSocket (no active listeners)');
+            ws.close();
+            ws = null;
+          } else {
+            console.log('✅ Close cancelled - listeners exist:', listeners.length);
+          }
+        }, 1000); // Wait 1 second before closing
       }
     };
   }, []);

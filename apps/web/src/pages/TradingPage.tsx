@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -7,20 +7,41 @@ import tradexLogo from "@/assets/tradex-logo.png";
 import { TradingChart } from "@/components/TradingChart";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { getSymbolPrice, PriceData } from "@/lib/price-store";
+import { processPriceTick } from "@/lib/candlestick-store";
+import { useBalance, useCreateOrder, useCloseOrder, useOpenOrders } from "@/hooks/useTrade";
+import { isAuthenticated, getUserEmail } from "@/hooks/useAuth";
 
 const TradingPage = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("positions");
   const [ordersTab, setOrdersTab] = useState("open");
   const [selectedCrypto, setSelectedCrypto] = useState("BTC");
   const [selectedTimeframe, setSelectedTimeframe] = useState("1m");
   const [leverage, setLeverage] = useState(1);
   const [volume, setVolume] = useState("1.00");
+  const [takeProfit, setTakeProfit] = useState("");
+  const [stopLoss, setStopLoss] = useState("");
+  const [slippage, setSlippage] = useState("1");
+
+  // Check authentication
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      navigate('/auth');
+    }
+  }, [navigate]);
+
+  // Backend hooks
+  const { data: balance } = useBalance();
+  const { data: openOrdersData } = useOpenOrders();
+  const createOrder = useCreateOrder();
+  const closeOrder = useCloseOrder();
 
   // Live prices state
   const [prices, setPrices] = useState<Record<string, PriceData>>({});
 
   // Connect to WebSocket for real-time prices
   useWebSocket((msg) => {
+    // Update price display
     setPrices((prev) => {
       const current = prev[msg.symbol] || { ask: 0, bid: 0, time: Date.now() };
       return {
@@ -32,6 +53,9 @@ const TradingPage = () => {
         },
       };
     });
+
+    // Update candlestick data for chart
+    processPriceTick(msg);
   });
 
   const cryptoPrices = [
@@ -64,6 +88,39 @@ const TradingPage = () => {
   // Get current price for selected crypto
   const selectedPrice = prices[`${selectedCrypto}USDT`] || { ask: 0, bid: 0, time: 0 };
 
+  // Handle buy/sell
+  const handleTrade = async (side: 'LONG' | 'SHORT') => {
+    const asset = `${selectedCrypto}_USDC`;
+    const currentPrice = side === 'LONG' ? selectedPrice.ask : selectedPrice.bid;
+
+    if (!currentPrice || currentPrice === 0) {
+      alert('Price not available. Please wait for price data.');
+      return;
+    }
+
+    try {
+      await createOrder.mutateAsync({
+        asset,
+        side,
+        quantity: parseFloat(volume),
+        leverage,
+        tradeOpeningPrice: currentPrice,
+        stopLoss: stopLoss ? parseFloat(stopLoss) : undefined,
+        takeProfit: takeProfit ? parseFloat(takeProfit) : undefined,
+        slippage: parseFloat(slippage),
+      });
+
+      alert(`${side} order placed successfully!`);
+      // Reset form
+      setTakeProfit('');
+      setStopLoss('');
+    } catch (error: any) {
+      alert(`Failed to place order: ${error.response?.data?.message || error.message}`);
+    }
+  };
+
+  const openOrders = openOrdersData?.orders || [];
+
   return (
     <div className="h-screen bg-white flex flex-col overflow-hidden">
       {/* Header */}
@@ -80,7 +137,9 @@ const TradingPage = () => {
           </nav>
           
           <div className="flex items-center gap-4">
-            <span className="text-sm font-extrabold">BALANCE: $10,000.00</span>
+            <span className="text-sm font-extrabold">
+              BALANCE: ${balance?.balance?.toFixed(2) || '0.00'}
+            </span>
           </div>
         </div>
       </header>
@@ -242,17 +301,21 @@ const TradingPage = () => {
                   <div>
                     <label className="text-xs font-extrabold mb-1 block">Take Profit (Optional)</label>
                     <input
-                      type="text"
+                      type="number"
+                      value={takeProfit}
+                      onChange={(e) => setTakeProfit(e.target.value)}
                       placeholder="Not set"
                       className="w-full px-3 py-2 border border-gray-300 rounded text-sm font-bold"
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs font-extrabold mb-1 block">Slippage (Optional)</label>
+                    <label className="text-xs font-extrabold mb-1 block">Slippage (%)</label>
                     <input
-                      type="text"
-                      placeholder="Not set"
+                      type="number"
+                      value={slippage}
+                      onChange={(e) => setSlippage(e.target.value)}
+                      placeholder="1"
                       className="w-full px-3 py-2 border border-gray-300 rounded text-sm font-bold"
                     />
                   </div>
@@ -260,74 +323,72 @@ const TradingPage = () => {
                   <div>
                     <label className="text-xs font-extrabold mb-1 block">Stop Loss (Optional)</label>
                     <input
-                      type="text"
+                      type="number"
+                      value={stopLoss}
+                      onChange={(e) => setStopLoss(e.target.value)}
                       placeholder="Not set"
                       className="w-full px-3 py-2 border border-gray-300 rounded text-sm font-bold"
                     />
                   </div>
 
                   <div className="flex gap-2">
-                    <button className="flex-1 py-3 bg-black text-white text-sm font-extrabold rounded-full hover:bg-gray-800 transition-colors">
-                      BUY
+                    <button
+                      onClick={() => handleTrade('LONG')}
+                      disabled={createOrder.isPending}
+                      className="flex-1 py-3 bg-black text-white text-sm font-extrabold rounded-full hover:bg-gray-800 transition-colors disabled:opacity-50"
+                    >
+                      {createOrder.isPending ? 'BUYING...' : 'BUY'}
                     </button>
-                    <button className="flex-1 py-3 bg-white border-2 border-black text-black text-sm font-extrabold rounded-full hover:bg-gray-50 transition-colors">
-                      SELL
+                    <button
+                      onClick={() => handleTrade('SHORT')}
+                      disabled={createOrder.isPending}
+                      className="flex-1 py-3 bg-white border-2 border-black text-black text-sm font-extrabold rounded-full hover:bg-gray-50 transition-colors disabled:opacity-50"
+                    >
+                      {createOrder.isPending ? 'SELLING...' : 'SELL'}
                     </button>
                   </div>
                 </div>
 
                 {/* Existing Positions */}
                 <div className="border-t border-gray-200 pt-4 mt-4">
+                  <h3 className="text-xs font-extrabold mb-2">OPEN POSITIONS ({openOrders.length})</h3>
                   <div className="space-y-3">
-                    <div className="border border-gray-200 rounded p-3">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-extrabold">BTC/USD</span>
-                        <span className="text-xs text-green-600 font-extrabold">LONG</span>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2 text-[10px]">
-                        <div>
-                          <span className="text-gray-500 font-bold">Size:</span>
-                          <span className="ml-1 font-extrabold">0.5 BTC</span>
+                    {openOrders.length === 0 ? (
+                      <p className="text-xs text-gray-400 text-center py-4">No open positions</p>
+                    ) : (
+                      openOrders.map((order: any) => (
+                        <div key={order.id} className="border border-gray-200 rounded p-3">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-extrabold">{order.asset.replace('_', '/')}</span>
+                            <span className={`text-xs font-extrabold ${order.side === 'LONG' ? 'text-green-600' : 'text-red-600'}`}>
+                              {order.side}
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-[10px]">
+                            <div>
+                              <span className="text-gray-500 font-bold">Size:</span>
+                              <span className="ml-1 font-extrabold">{order.quantity}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500 font-bold">Entry:</span>
+                              <span className="ml-1 font-extrabold">${order.openPrice?.toFixed(2)}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500 font-bold">Leverage:</span>
+                              <span className="ml-1 font-extrabold">{order.leverage}x</span>
+                            </div>
+                            <div>
+                              <button
+                                onClick={() => closeOrder.mutate({ orderId: order.id })}
+                                className="text-xs bg-red-500 text-white px-2 py-1 rounded font-bold hover:bg-red-600"
+                              >
+                                CLOSE
+                              </button>
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <span className="text-gray-500 font-bold">Entry:</span>
-                          <span className="ml-1 font-extrabold">$107,000</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-500 font-bold">Current:</span>
-                          <span className="ml-1 font-extrabold">$107,430</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-500 font-bold">P&L:</span>
-                          <span className="ml-1 font-extrabold text-green-600">+$215.00</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="border border-gray-200 rounded p-3">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-extrabold">ETH/USD</span>
-                        <span className="text-xs text-red-600 font-extrabold">SHORT</span>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2 text-[10px]">
-                        <div>
-                          <span className="text-gray-500 font-bold">Size:</span>
-                          <span className="ml-1 font-extrabold">2.0 ETH</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-500 font-bold">Entry:</span>
-                          <span className="ml-1 font-extrabold">$3,680</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-500 font-bold">Current:</span>
-                          <span className="ml-1 font-extrabold">$3,665</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-500 font-bold">P&L:</span>
-                          <span className="ml-1 font-extrabold text-green-600">+$30.00</span>
-                        </div>
-                      </div>
-                    </div>
+                      ))
+                    )}
                   </div>
                 </div>
               </div>
