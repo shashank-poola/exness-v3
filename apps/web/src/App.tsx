@@ -15,7 +15,8 @@ const App = () => (
         <Route path="/" element={<LandingPage />} />
         <Route path="/trade" element={<TradingPage />} />
         <Route path="/docs" element={<DocsPage />} />
-        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/signin" element={<AuthPage />} />
+        <Route path="/signup" element={<AuthPage />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

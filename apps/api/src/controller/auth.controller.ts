@@ -35,7 +35,7 @@ export async function signupHandler(req: Request, res: Response) {
       data: {
         email,
         password: hashedPassword,
-        balance: 5000,
+        balance: 10000,
         lastLoggedIn: new Date(),
       },
       select: { id: true, email: true, balance: true, password: true, lastLoggedIn: true },

@@ -9,7 +9,8 @@ import { useWebSocket } from "@/hooks/useWebSocket";
 import { getSymbolPrice, PriceData } from "@/lib/price-store";
 import { processPriceTick } from "@/lib/candlestick-store";
 import { useBalance, useCreateOrder, useCloseOrder, useOpenOrders } from "@/hooks/useTrade";
-import { isAuthenticated, getUserEmail } from "@/hooks/useAuth";
+import { isAuthenticated, getUserEmail, useLogout } from "@/hooks/useAuth";
+import { User, LogOut } from "lucide-react";
 
 const TradingPage = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const TradingPage = () => {
   const [takeProfit, setTakeProfit] = useState("");
   const [stopLoss, setStopLoss] = useState("");
   const [slippage, setSlippage] = useState("1");
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
 
   // Check authentication
   useEffect(() => {
@@ -35,6 +37,7 @@ const TradingPage = () => {
   const { data: openOrdersData } = useOpenOrders();
   const createOrder = useCreateOrder();
   const closeOrder = useCloseOrder();
+  const logout = useLogout();
 
   // Live prices state
   const [prices, setPrices] = useState<Record<string, PriceData>>({});
@@ -95,6 +98,14 @@ const TradingPage = () => {
     return `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
+  // Helper function to truncate email
+  const truncateEmail = (email: string | null) => {
+    if (!email) return "user@example.com";
+    const [localPart, domain] = email.split("@");
+    if (localPart.length <= 3) return email;
+    return `${localPart.substring(0, 3)}...@${domain}`;
+  };
+
   // Get current price for selected crypto
   const selectedPrice = prices[`${selectedCrypto}USDT`] || { ask: 0, bid: 0, time: 0 };
 
@@ -143,13 +154,39 @@ const TradingPage = () => {
           <nav className="flex items-center gap-8">
             <Link to="/" className="text-sm font-extrabold hover:opacity-70">HOME</Link>
             <Link to="/docs" className="text-sm font-extrabold hover:opacity-70">DOCS</Link>
-            <Link to="/trade" className="text-sm font-extrabold hover:opacity-70">MARKETPLACE</Link>
+            <Link to="/trade" className="text-sm font-extrabold hover:opacity-70">TRADE</Link>
           </nav>
-          
+
           <div className="flex items-center gap-4">
             <span className="text-sm font-extrabold">
               BALANCE: ${balance?.balance ? Number(balance.balance).toFixed(2) : '0.00'}
             </span>
+
+            {/* User Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowUserDropdown(!showUserDropdown)}
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              >
+                <User className="w-5 h-5" />
+              </button>
+
+              {showUserDropdown && (
+                <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <div className="p-3 border-b border-gray-200">
+                    <p className="text-xs text-gray-500 font-bold mb-1">EMAIL</p>
+                    <p className="text-sm font-extrabold truncate">{truncateEmail(getUserEmail())}</p>
+                  </div>
+                  <button
+                    onClick={() => logout()}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm font-extrabold hover:bg-gray-50 transition-colors text-red-600"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    LOGOUT
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>

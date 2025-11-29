@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import tradexLogo from "@/assets/tradex-logo.png";
+import logoImage from "@/assets/logo.png";
 import { useSignup, useSignin } from "@/hooks/useAuth";
 
 const AuthPage = () => {
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(true);
+  const location = useLocation();
+  const [isLogin, setIsLogin] = useState(location.pathname === "/signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -40,24 +41,18 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Navigation */}
-      <nav className="px-6 lg:px-12 py-6">
-        <div className="max-w-7xl mx-auto">
-          <Link to="/" className="flex items-center gap-3">
-            <img src={tradexLogo} alt="TradeX" className="h-8" />
-          </Link>
-        </div>
-      </nav>
-
+    <div className="min-h-screen bg-white flex flex-col" style={{ fontFamily: 'Inter, sans-serif' }}>
       {/* Auth Form */}
-      <div className="flex-1 flex items-center justify-center px-6">
+      <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-heading font-bold mb-2">
+            <Link to="/" className="inline-block mb-8">
+              <img src={logoImage} alt="TradeX" className="h-12 mx-auto" />
+            </Link>
+            <h1 className="text-4xl font-bold mb-2">
               {isLogin ? "Welcome Back" : "Create Account"}
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-gray-600">
               {isLogin
                 ? "Login to continue trading"
                 : "Sign up to start trading"}
@@ -103,14 +98,15 @@ const AuthPage = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <button
-              onClick={() => setIsLogin(!isLogin)}
+            <Link
+              to={isLogin ? "/signup" : "/signin"}
               className="text-sm font-bold hover:underline"
+              onClick={() => setIsLogin(!isLogin)}
             >
               {isLogin
                 ? "Don't have an account? Sign up"
                 : "Already have an account? Login"}
-            </button>
+            </Link>
           </div>
         </div>
       </div>

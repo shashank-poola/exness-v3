@@ -23,7 +23,7 @@ export async function getUserBalance(req: Request, res: Response) {
     }
 
     res.status(200).json({
-      balance: Number(user.balance) || 5000, // Ensure it's a number, default to 5000
+      balance: Number(user.balance) || 10000, // Ensure it's a number, default to 10000
     });
   } catch (err: any) {
     console.log(err);
