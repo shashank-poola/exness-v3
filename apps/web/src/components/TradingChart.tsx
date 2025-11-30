@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { createChart, IChartApi, ISeriesApi, CandlestickSeriesPartialOptions } from 'lightweight-charts';
 import { getCandlesticks } from '@/lib/candlestick-store';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface TradingChartProps {
   symbol: string;
@@ -22,6 +23,7 @@ function getTickSize(interval: string): number {
 }
 
 export function TradingChart({ symbol, interval }: TradingChartProps) {
+  const { theme } = useTheme();
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const candlestickSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
@@ -32,25 +34,26 @@ export function TradingChart({ symbol, interval }: TradingChartProps) {
     // Get dynamic tick size based on timeframe
     const tickSize = getTickSize(interval);
 
-    // Create chart with white background (like reference image)
+    // Create chart with theme-aware colors
+    const isDark = theme === 'dark';
     const chart = createChart(chartContainerRef.current, {
       layout: {
-        background: { color: '#FFFFFF' },
-        textColor: '#191919',
+        background: { color: isDark ? '#000000' : '#FFFFFF' },
+        textColor: isDark ? '#D1D4DC' : '#191919',
       },
       grid: {
-        vertLines: { color: '#E6E6E6' },
-        horzLines: { color: '#E6E6E6' },
+        vertLines: { color: isDark ? '#2B2B43' : '#E6E6E6' },
+        horzLines: { color: isDark ? '#2B2B43' : '#E6E6E6' },
       },
       width: chartContainerRef.current.clientWidth,
       height: chartContainerRef.current.clientHeight,
       timeScale: {
         timeVisible: true,
         secondsVisible: true,
-        borderColor: '#D1D4DC',
+        borderColor: isDark ? '#2B2B43' : '#D1D4DC',
       },
       rightPriceScale: {
-        borderColor: '#D1D4DC',
+        borderColor: isDark ? '#2B2B43' : '#D1D4DC',
         ticksVisible: true,
         minimumWidth: 80,
       },
@@ -98,7 +101,7 @@ export function TradingChart({ symbol, interval }: TradingChartProps) {
         chartRef.current.remove();
       }
     };
-  }, [symbol, interval]);
+  }, [symbol, interval, theme]);
 
   // Update chart data periodically
   useEffect(() => {

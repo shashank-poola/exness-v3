@@ -31,9 +31,62 @@ const TIMEFRAME_MS: TimeframeMs = {
 // Store candles per symbol and timeframe
 const candleStore: Record<string, Record<string, Candlestick[]>> = {};
 
+// LocalStorage key for persisting candles
+const STORAGE_KEY = 'tradex_candlestick_store';
+
+// Load candles from localStorage on initialization
+function loadCandlesFromStorage() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      Object.assign(candleStore, parsed);
+      console.log('Loaded candlestick data from localStorage');
+    }
+  } catch (error) {
+    console.error('Failed to load candlestick data:', error);
+  }
+}
+
+// Save candles to localStorage
+function saveCandlesToStorage() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(candleStore));
+  } catch (error) {
+    console.error('Failed to save candlestick data:', error);
+  }
+}
+
+// Initialize by loading from storage
+loadCandlesFromStorage();
+
+// Save to localStorage when page becomes hidden (laptop sleep, tab switch, etc.)
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      saveCandlesToStorage();
+      console.log('Saved candlestick data (page hidden)');
+    }
+  });
+
+  // Also save before page unload
+  window.addEventListener('beforeunload', () => {
+    saveCandlesToStorage();
+  });
+}
+
 // Get the candle timestamp (start of the candle period)
 function getCandleTime(timestamp: number, intervalMs: number): number {
   return Math.floor(timestamp / intervalMs) * intervalMs;
+}
+
+// Throttle saving to avoid excessive localStorage writes
+let saveTimeout: NodeJS.Timeout | null = null;
+function scheduleSave() {
+  if (saveTimeout) clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => {
+    saveCandlesToStorage();
+  }, 5000); // Save every 5 seconds max
 }
 
 export function updateCandlestick(
@@ -75,11 +128,17 @@ export function updateCandlestick(
     if (candles.length > 1000) {
       candles.shift();
     }
+
+    // Schedule save after new candle creation
+    scheduleSave();
   } else if (lastCandle.time === candleTimeSec) {
     // Update existing candle
     lastCandle.high = Math.max(lastCandle.high, price);
     lastCandle.low = Math.min(lastCandle.low, price);
     lastCandle.close = price;
+
+    // Schedule save after update
+    scheduleSave();
   }
 }
 

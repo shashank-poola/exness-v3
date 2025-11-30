@@ -31,13 +31,17 @@ export function useWebSocket(onMessage: (msg: TradeMessage) => void) {
       callbackRef.current(msg);
     };
 
-    // Create socket only once
-    if (!ws) {
-      console.log('🔌 Connecting to WebSocket:', WS_URL);
+    // Function to create/reconnect WebSocket
+    const connectWebSocket = () => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        return; // Already connected
+      }
+
+      console.log('Connecting to WebSocket:', WS_URL);
       ws = new WebSocket(WS_URL);
 
       ws.onopen = () => {
-        console.log('✅ WebSocket connected, listeners:', listeners.length);
+        console.log('WebSocket connected, listeners:', listeners.length);
       };
 
       ws.onmessage = (event) => {
@@ -97,16 +101,16 @@ export function useWebSocket(onMessage: (msg: TradeMessage) => void) {
             return;
           }
         } catch (err) {
-          console.error('❌ WS parse error:', err);
+          console.error('WS parse error:', err);
         }
       };
 
       ws.onerror = (error) => {
-        console.error('❌ WebSocket error:', error);
+        console.error('WebSocket error:', error);
       };
 
       ws.onclose = () => {
-        console.log('🔌 WebSocket closed');
+        console.log('WebSocket closed');
         ws = null;
 
         // Don't clear listeners - they're still mounted!
@@ -114,43 +118,60 @@ export function useWebSocket(onMessage: (msg: TradeMessage) => void) {
         if (reconnectTimeout) clearTimeout(reconnectTimeout);
         reconnectTimeout = setTimeout(() => {
           if (listeners.length > 0 && !ws) {
-            console.log('🔄 Reconnecting...');
-            // Trigger reconnection by setting ws to null (it already is)
-            // The next component that needs it will recreate it
+            console.log('Reconnecting WebSocket...');
+            connectWebSocket();
           }
         }, 3000);
       };
-    }
+    };
+
+    // Handle page visibility changes (laptop sleep/wake)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // Page became visible - reconnect if needed
+        console.log('Page visible - checking WebSocket connection...');
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+          console.log('Reconnecting after page wake...');
+          connectWebSocket();
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Initial connection
+    connectWebSocket();
 
     // Cancel any pending close timeout since we have an active listener
     if (closeTimeout) {
-      console.log('✅ Cancelled pending close (new listener added)');
+      console.log('Cancelled pending close (new listener added)');
       clearTimeout(closeTimeout);
       closeTimeout = null;
     }
 
     // Register listener for this hook call
     listeners.push(stableCallback);
-    console.log('📝 Listener registered, total listeners:', listeners.length);
+    console.log('Listener registered, total listeners:', listeners.length);
 
     // Cleanup when component unmounts
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       listeners = listeners.filter((cb) => cb !== stableCallback);
-      console.log('🗑️ Listener removed, remaining listeners:', listeners.length);
+      console.log('Listener removed, remaining listeners:', listeners.length);
 
       // If no more listeners, schedule socket close after a delay
       // This prevents rapid close/reconnect cycles during component remounts
       if (listeners.length === 0 && ws) {
-        console.log('⏳ Scheduling WebSocket close in 1 second...');
+        console.log('Scheduling WebSocket close in 1 second...');
         if (closeTimeout) clearTimeout(closeTimeout);
         closeTimeout = setTimeout(() => {
           // Double-check there are still no listeners
           if (listeners.length === 0 && ws) {
-            console.log('🔌 Closing WebSocket (no active listeners)');
+            console.log('Closing WebSocket (no active listeners)');
             ws.close();
             ws = null;
           } else {
-            console.log('✅ Close cancelled - listeners exist:', listeners.length);
+            console.log('Close cancelled - listeners exist:', listeners.length);
           }
         }, 1000); // Wait 1 second before closing
       }

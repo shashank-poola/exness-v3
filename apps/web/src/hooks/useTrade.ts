@@ -41,6 +41,7 @@ export function useCloseOrder() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['openOrders'] });
+      queryClient.invalidateQueries({ queryKey: ['closedOrders'] });
       queryClient.invalidateQueries({ queryKey: ['balance'] });
     },
   });
@@ -61,6 +62,35 @@ export function useOpenOrders() {
     refetchInterval: 3000, // Refetch every 3 seconds
     retry: 1, // Only retry once
   });
+}
+
+export function useClosedOrders() {
+  return useQuery({
+    queryKey: ['closedOrders'],
+    queryFn: async () => {
+      try {
+        const response = await api.get('/trade/get-close-orders');
+        return response.data;
+      } catch (error) {
+        console.error('Failed to fetch closed orders:', error);
+        return { orders: [] }; // Return empty orders on error
+      }
+    },
+    refetchInterval: 5000, // Refetch every 5 seconds
+    retry: 1, // Only retry once
+  });
+}
+
+export function useAllOrders() {
+  const { data: openOrders } = useOpenOrders();
+  const { data: closedOrders } = useClosedOrders();
+
+  const allOrders = [
+    ...(openOrders?.orders || []),
+    ...(closedOrders?.orders || [])
+  ];
+
+  return { orders: allOrders };
 }
 
 export function useBalance() {
