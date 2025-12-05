@@ -42,7 +42,7 @@ export function useLogout() {
   return () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userEmail');
-    window.location.href = '/auth';
+    window.location.href = '/';
   };
 }
 

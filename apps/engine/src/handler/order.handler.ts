@@ -162,6 +162,7 @@ export async function handleOpenTrade(
   }
 }
 
+// Handles close trade in engine
 export async function handleCloseTrade(
   payload: CloseOrderPayload,
   requestId: string

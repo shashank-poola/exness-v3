@@ -15,6 +15,7 @@ export async function authMiddleware(
   next: NextFunction
 ) {
   try {
+    
     // Expect header: Authorization: Bearer <token>
     const authHeader = req.headers.authorization;
 

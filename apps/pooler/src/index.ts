@@ -11,10 +11,10 @@ let redisConnected = false;
     console.log('Connecting to Redis...');
     await publisher.connect();
     await PriceUpdatePusher.connect();
-    console.log('✅ Connected to Redis');
+    console.log('Connected to Redis');
     redisConnected = true;
   } catch (error) {
-    console.error('❌ Failed to connect to Redis:', error);
+    console.error('Failed to connect to Redis:', error);
     console.error('Make sure Redis is running on localhost:6379');
     process.exit(1);
   }

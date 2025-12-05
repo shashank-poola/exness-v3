@@ -11,7 +11,7 @@ const app = express();
 
 const FE_URL = process.env.CORS_ORIGIN || 'http://localhost:5173';
 
-// Connect Redis once at startup
+// Connect Redis once at starting up
 await httpPusher.connect();
 
 app.use(express.json());

@@ -7,7 +7,6 @@ import { Github } from "lucide-react";
 const LandingPage = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col" style={{ fontFamily: 'Inter, sans-serif' }}>
-      {/* Navigation */}
       <nav className="px-6 lg:px-12 py-6 bg-black rounded-b-3xl">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center">

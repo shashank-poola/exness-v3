@@ -2,11 +2,8 @@ import dbClient from '@exness-v3/db';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import type { Request, Response } from 'express';
-
 import { createUserInEngine } from '../services/engine.service.js';
 import { signupSchema } from '../validations/signupSchema.js';
-
-
 
 export async function signupHandler(req: Request, res: Response) {
   try {
@@ -41,10 +38,10 @@ export async function signupHandler(req: Request, res: Response) {
       select: { id: true, email: true, balance: true, password: true, lastLoggedIn: true },
     });
 
-    // Optional internal service
+    // Engine server for user authentication
     createUserInEngine(user);
 
-    // Issue JWT (return in response body, NOT cookies)
+    // Issue JWT (return in response body)
     const token = jwt.sign({ email }, process.env.JWT_SECRET!, {
       expiresIn: '2d',
     });
@@ -64,9 +61,7 @@ export async function signupHandler(req: Request, res: Response) {
   }
 }
 
-
-// -------------------- SIGNIN --------------------
-
+// SIGNUP
 export async function signInVerify(req: Request, res: Response) {
   try {
     const { email, password } = req.body;
