@@ -5,7 +5,8 @@ import { ArrowUpRight } from "lucide-react";
 import tradexLogoImage from "@/assets/tradex-logo.png";
 import heroBgImage from "@/assets/hero-bg.png";
 import backgroundTradexImage from "@/assets/background-tradex.png";
-import demoImage from "@/assets/demo.png";
+import demo1Image from "@/assets/demoimage.png";
+import whiteLogoImage from "@/assets/whitelogo.png";
 import { useEffect, useRef, useState } from 'react';
 
 const LandingPage = () => {
@@ -56,7 +57,7 @@ const LandingPage = () => {
                 </div>
 
                 {/* Navigation links in center - capsule shape */}
-                <div className="hidden md:flex items-center gap-1 px-4 py-2 border-2 border-black rounded-full">
+                <div className="landing-heading hidden md:flex items-center gap-1 px-4 py-2 border-2 border-black rounded-half">
                   <Link
                     to="/"
                     className="text-black text-sm font-bold hover:bg-black hover:text-white px-3 py-1 rounded-full transition-colors"
@@ -100,15 +101,8 @@ const LandingPage = () => {
             className="h-14 mx-auto mb-4"
           />
 
-          {/* Main heading - black text with Playfair Display */}
-          <h1
-            className="text-4xl md:text-5xl lg:text-8xl xl:text-8xl font-black text-black mb-12 tracking-tight leading-tight text-center"
-            style={{
-              fontFamily: 'Playfair Display, serif',
-              fontWeight: 700,
-              letterSpacing: '-0.02em'
-            }}
-          >
+          {/* Main heading - black text with Halo Grotesk */}
+          <h1 className="landing-heading text-4xl md:text-5xl lg:text-8xl xl:text-8xl font-black text-black mb-12 tracking-tight leading-tight text-center">
             One Platform
             <br />
             Infinite Trades
@@ -128,7 +122,7 @@ const LandingPage = () => {
 
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold text-black mb-4 font-serif" style={{ fontFamily: 'Playfair Display' }}>
+            <h2 className="landing-heading text-4xl md:text-5xl font-bold text-black mb-4">
               A High-Performance Trading Platform
             </h2>
             <p className="text-lg text-gray-600">
@@ -146,7 +140,7 @@ const LandingPage = () => {
             }`}
           >
             <img
-              src={demoImage}
+              src={demo1Image}
               alt="Trading Platform Demo"
               className="w-full max-w-5xl rounded-lg shadow-2xl"
               style={{ border: 'none', outline: 'none' }}
@@ -154,6 +148,101 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
+      {/* Footer Section */}
+      <footer className="bg-black text-white py-16 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Logo and description */}
+            <div className="col-span-1 md:col-span-2">
+              <img src={whiteLogoImage} alt="TradeX" className="h-8 mb-4" />
+              <p className="text-gray-400 mb-6 max-w-md">
+                Your trusted platform for global trading. Execute trades with precision and confidence on markets worldwide.
+              </p>
+              <div className="flex space-x-4">
+                <a href="https://x.com/shashankpoola" className="text-gray-400 hover:text-white transition-colors">
+                  X
+                </a>
+                <a href="https://github.com/shashank-poola/exness-v3" className="text-gray-400 hover:text-white transition-colors">
+                  Github
+                </a>
+              </div>
+            </div>
+
+            {/* Products */}
+            <div>
+              <h3 className="landing-heading font-semibold text-lg mb-4">Products</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link to="/trade" className="text-gray-400 hover:text-white transition-colors">
+                    Trading Platform
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/docs" className="text-gray-400 hover:text-white transition-colors">
+                    Documentation
+                  </Link>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    API Access
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    Mobile App
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Company */}
+            <div>
+              <h3 className="landing-heading font-semibold text-lg mb-4">Company</h3>
+              <ul className="space-y-2">
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    About Us
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    Careers
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    Blog
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    Contact
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom section */}
+          <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p className="text-gray-400 text-sm mb-4 md:mb-0">
+              © 2025 TradeX Platform. All rights reserved.
+            </p>
+            <div className="flex space-x-6 text-sm">
+              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                Privacy Policy
+              </a>
+              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                Terms of Service
+              </a>
+              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                Cookie Policy
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };

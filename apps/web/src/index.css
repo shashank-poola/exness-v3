@@ -1,5 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
 
+/* Halo Grotesk Font for Landing Page */
+@font-face {
+  font-family: 'Halo Grotesk';
+  src: url('/fonts/HaloGrotesk-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -76,6 +85,12 @@
   /* Heading Font */
   h1, h2, h3, h4, h5, h6 {
     font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* Halo Grotesk font for Landing Page headings only */
+  .landing-heading {
+    font-family: 'Halo Grotesk', sans-serif;
+    font-weight: 400;
   }
 
   /* Trading colors */
