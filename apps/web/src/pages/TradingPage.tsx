@@ -283,29 +283,31 @@ const TradingPage = () => {
                 ) : (
                   <div className="space-y-2">
                     {openOrders.map((order: any) => (
-                      <div key={order.id} className="border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded p-4 flex items-center justify-between">
-                        <div className="flex-1 grid grid-cols-6 gap-4 text-sm">
-                          <div>
-                            <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Asset</span>
-                            <p className="font-extrabold dark:text-white">{order.asset.replace('_', '/')}</p>
-                          </div>
-                          <div>
-                            <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Side</span>
-                            <p className={`font-extrabold ${order.side === 'LONG' ? 'text-green-600' : 'text-red-600'}`}>
-                              {order.side}
-                            </p>
-                          </div>
-                          <div>
-                            <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Size</span>
-                            <p className="font-extrabold dark:text-white">{order.quantity}</p>
-                          </div>
-                          <div>
-                            <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Entry Price</span>
-                            <p className="font-extrabold dark:text-white">${order.openPrice?.toFixed(2) || 'N/A'}</p>
-                          </div>
-                          <div>
-                            <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Leverage</span>
-                            <p className="font-extrabold dark:text-white">{order.leverage}x</p>
+                      <div key={order.id} className="border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex-1 grid grid-cols-5 gap-4 text-sm">
+                            <div>
+                              <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Asset</span>
+                              <p className="font-extrabold dark:text-white">{order.asset.replace('_', '/')}</p>
+                            </div>
+                            <div>
+                              <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Side</span>
+                              <p className={`font-extrabold ${order.side === 'LONG' ? 'text-green-600' : 'text-red-600'}`}>
+                                {order.side}
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Size</span>
+                              <p className="font-extrabold dark:text-white">{order.quantity}</p>
+                            </div>
+                            <div>
+                              <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Entry Price</span>
+                              <p className="font-extrabold dark:text-white">${order.openPrice?.toFixed(2) || 'N/A'}</p>
+                            </div>
+                            <div>
+                              <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Leverage</span>
+                              <p className="font-extrabold dark:text-white">{order.leverage}x</p>
+                            </div>
                           </div>
                           <div className="flex items-end">
                             <button
@@ -315,6 +317,28 @@ const TradingPage = () => {
                             >
                               {closeOrder.isPending ? 'CLOSING...' : 'CLOSE'}
                             </button>
+                          </div>
+                        </div>
+
+                        {/* Additional Details Row for Open Orders */}
+                        <div className="grid grid-cols-3 gap-4 text-sm pt-3 border-t border-gray-200 dark:border-gray-700">
+                          <div>
+                            <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Slippage</span>
+                            <p className="font-extrabold dark:text-white">
+                              {order.slippage ? `${(order.slippage * 100).toFixed(2)}%` : 'N/A'}
+                            </p>
+                          </div>
+                          <div>
+                            <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Stop Loss</span>
+                            <p className="font-extrabold dark:text-white">
+                              {order.stopLoss ? `$${order.stopLoss.toFixed(2)}` : 'Not set'}
+                            </p>
+                          </div>
+                          <div>
+                            <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Take Profit</span>
+                            <p className="font-extrabold dark:text-white">
+                              {order.takeProfit ? `$${order.takeProfit.toFixed(2)}` : 'Not set'}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -328,44 +352,93 @@ const TradingPage = () => {
                   <p className="text-gray-400 dark:text-gray-500 text-sm text-center py-8">No orders found</p>
                 ) : (
                   <div className="space-y-2">
-                    {allOrders.map((order: any) => (
-                      <div key={order.id} className="border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded p-4">
-                        <div className="grid grid-cols-6 gap-4 text-sm">
-                          <div>
-                            <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Asset</span>
-                            <p className="font-extrabold dark:text-white">{order.asset.replace('_', '/')}</p>
+                    {allOrders.map((order: any) => {
+                      // Determine if this is a closed order (from database) or open order (from engine)
+                      const isClosedOrder = order.closePrice !== undefined || order.liquidated !== undefined || order.reason !== undefined;
+                      const status = isClosedOrder ? 'CLOSED' : (order.status || 'OPEN');
+
+                      return (
+                        <div key={order.id} className="border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded p-4">
+                          <div className="grid grid-cols-6 gap-4 text-sm">
+                            <div>
+                              <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Asset</span>
+                              <p className="font-extrabold dark:text-white">{order.asset.replace('_', '/')}</p>
+                            </div>
+                            <div>
+                              <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Side</span>
+                              <p className={`font-extrabold ${order.side === 'LONG' ? 'text-green-600' : 'text-red-600'}`}>
+                                {order.side}
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Size</span>
+                              <p className="font-extrabold dark:text-white">{order.quantity}</p>
+                            </div>
+                            <div>
+                              <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Entry/Exit</span>
+                              <p className="font-extrabold dark:text-white text-xs">
+                                ${order.openPrice?.toFixed(2) || 'N/A'}
+                                {isClosedOrder && (
+                                  <>
+                                    <br />
+                                    <span className="text-gray-500">→ ${order.closePrice?.toFixed(2) || 'N/A'}</span>
+                                  </>
+                                )}
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Leverage</span>
+                              <p className="font-extrabold dark:text-white">{order.leverage}x</p>
+                            </div>
+                            <div>
+                              <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Status</span>
+                              <p className={`font-extrabold ${
+                                status === 'OPEN' ? 'text-green-600' :
+                                status === 'CLOSED' ? 'text-gray-600 dark:text-gray-400' :
+                                'text-red-600'
+                              }`}>
+                                {status}
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Side</span>
-                            <p className={`font-extrabold ${order.side === 'LONG' ? 'text-green-600' : 'text-red-600'}`}>
-                              {order.side}
-                            </p>
+
+                          {/* Additional Details Row */}
+                          <div className="grid grid-cols-4 gap-4 text-sm mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                            <div>
+                              <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">P&L</span>
+                              <p className={`font-extrabold ${order.pnl && order.pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {order.pnl ? `${order.pnl >= 0 ? '+' : ''}$${order.pnl.toFixed(2)}` : 'N/A'}
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Slippage</span>
+                              <p className="font-extrabold dark:text-white">
+                                {order.slippage ? `${(order.slippage * 100).toFixed(2)}%` : 'N/A'}
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Stop Loss</span>
+                              <p className="font-extrabold dark:text-white">
+                                {order.stopLoss ? `$${order.stopLoss.toFixed(2)}` : 'Not set'}
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Take Profit</span>
+                              <p className="font-extrabold dark:text-white">
+                                {order.takeProfit ? `$${order.takeProfit.toFixed(2)}` : 'Not set'}
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Size</span>
-                            <p className="font-extrabold dark:text-white">{order.quantity}</p>
-                          </div>
-                          <div>
-                            <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Entry Price</span>
-                            <p className="font-extrabold dark:text-white">${order.openPrice?.toFixed(2) || 'N/A'}</p>
-                          </div>
-                          <div>
-                            <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Leverage</span>
-                            <p className="font-extrabold dark:text-white">{order.leverage}x</p>
-                          </div>
-                          <div>
-                            <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Status</span>
-                            <p className={`font-extrabold ${
-                              order.status === 'OPEN' ? 'text-green-600' :
-                              order.status === 'CLOSED' ? 'text-gray-600 dark:text-gray-400' :
-                              'text-red-600'
-                            }`}>
-                              {order.status || 'OPEN'}
-                            </p>
-                          </div>
+
+                          {/* Close Reason for Closed Orders */}
+                          {isClosedOrder && order.reason && (
+                            <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                              <span className="font-bold">Reason:</span> {order.reason}
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </TabsContent>

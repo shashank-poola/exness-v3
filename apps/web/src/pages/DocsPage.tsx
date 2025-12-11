@@ -1,45 +1,52 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import logoImage from "@/assets/logo.png";
+import tradexLogoImage from "@/assets/tradex-logo.png";
+import { ArrowUpRight } from "lucide-react";
 
 const DocsPage = () => {
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>
       {/* Navigation */}
-      <nav className="px-6 lg:px-12 py-6 bg-black rounded-b-3xl sticky top-0 z-50">
+      <nav className="px-6 lg:px-12 py-4 bg-white bg-opacity-95 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-200">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center">
-            <Link to="/" className="flex items-center gap-3 group">
-              <img src={logoImage} alt="TradeX" className="h-10 transition-transform group-hover:scale-105" />
-            </Link>
+            {/* TradeX logo on left */}
+            <div className="flex items-center">
+              <img src={tradexLogoImage} alt="TradeX" className="h-10" />
+            </div>
 
-            <div className="hidden md:flex items-center gap-8">
+            {/* Navigation links in center - individual borders */}
+            <div className="landing-heading hidden md:flex items-center gap-2">
               <Link
                 to="/"
-                className="text-sm font-medium text-white hover:opacity-70 transition-opacity"
+                className="text-black text-sm font-bold hover:bg-black hover:text-white px-3 py-1 rounded-full transition-colors border border-black"
               >
-                HOME
+                Home
               </Link>
               <Link
                 to="/docs"
-                className="text-sm font-medium text-white hover:opacity-70 transition-opacity"
+                className="text-black text-sm font-bold hover:bg-black hover:text-white px-3 py-1 rounded-full transition-colors border border-black"
               >
-                DOCS
+                Documentation
               </Link>
               <Link
                 to="/trade"
-                className="text-sm font-medium text-white hover:opacity-70 transition-opacity"
+                className="text-black text-sm font-bold hover:bg-black hover:text-white px-3 py-1 rounded-full transition-colors border border-black"
               >
-                TRADE
+                Trade
               </Link>
             </div>
 
+            {/* Sign up button on right - black with arrow */}
             <Button
               asChild
-              className="rounded-full px-8 h-11 bg-white text-black hover:bg-gray-100 font-semibold text-sm"
+              className="px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm font-medium rounded-full flex items-center gap-2 border border-black"
             >
-              <Link to="/signin">LOGIN</Link>
+              <Link to="/signin">
+                Sign up
+                <ArrowUpRight className="w-4 h-4" />
+              </Link>
             </Button>
           </div>
         </div>

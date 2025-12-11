@@ -49,20 +49,15 @@ export async function createOrder(req: Request, res: Response) {
       }),
     };
 
-    console.log('Sending CREATE_ORDER to Redis stream:', requestId);
     const streamId = await httpPusher.xAdd(CREATE_ORDER_QUEUE, '*', payload);
-    console.log('Message sent to stream, ID:', streamId);
 
-    console.log('Waiting for engine response...');
     const { tradeDetails } = await redisSubscriber.waitForMessage(requestId);
-    console.log('Got response from engine:', tradeDetails);
 
     res.status(201).json({
       message: 'Order placed',
       trade: tradeDetails,
     });
   } catch (err: any) {
-    console.log(err);
     res.status(500).json({
       message: 'Something went wrong',
       engine: err,

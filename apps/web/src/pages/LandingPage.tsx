@@ -56,23 +56,23 @@ const LandingPage = () => {
                   <img src={tradexLogoImage} alt="TradeX" className="h-10" />
                 </div>
 
-                {/* Navigation links in center - capsule shape */}
-                <div className="landing-heading hidden md:flex items-center gap-1 px-4 py-2 border-2 border-black rounded-half">
+                {/* Navigation links in center - individual borders */}
+                <div className="landing-heading hidden md:flex items-center gap-2">
                   <Link
                     to="/"
-                    className="text-black text-sm font-bold hover:bg-black hover:text-white px-3 py-1 rounded-full transition-colors"
+                    className="text-black text-sm font-bold hover:bg-black hover:text-white px-3 py-1 rounded-full transition-colors border border-black"
                   >
                     Home
                   </Link>
                   <Link
                     to="/docs"
-                    className="text-black text-sm font-bold hover:bg-black hover:text-white px-3 py-1 rounded-full transition-colors"
+                    className="text-black text-sm font-bold hover:bg-black hover:text-white px-3 py-1 rounded-full transition-colors border border-black"
                   >
                     Documentation
                   </Link>
                   <Link
                     to="/trade"
-                    className="text-black text-sm font-bold hover:bg-black hover:text-white px-3 py-1 rounded-full transition-colors"
+                    className="text-black text-sm font-bold hover:bg-black hover:text-white px-3 py-1 rounded-full transition-colors border border-black"
                   >
                     Trade
                   </Link>
@@ -81,7 +81,7 @@ const LandingPage = () => {
                 {/* Sign up button on right - black with arrow */}
                 <Button
                   asChild
-                  className="px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm font-medium rounded-full flex items-center gap-2"
+                  className="px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm font-medium rounded-full flex items-center gap-2 border border-black"
                 >
                   <Link to="/signin">
                     Sign up
@@ -109,7 +109,7 @@ const LandingPage = () => {
           </h1>
 
           {/* Start Trading button */}
-          <div className="flex justify-center mt-18">
+          <div className="flex justify-center mt-8">
             <Link to="/trade">
               <TradingButton />
             </Link>

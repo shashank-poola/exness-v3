@@ -49,8 +49,20 @@ export function TradingChart({ symbol, interval }: TradingChartProps) {
       height: chartContainerRef.current.clientHeight,
       timeScale: {
         timeVisible: true,
-        secondsVisible: true,
+        secondsVisible: false,
         borderColor: isDark ? '#2B2B43' : '#D1D4DC',
+        timezone: 'Asia/Kolkata',
+        tickMarkFormatter: (time: number, tickMarkType: number, locale: string) => {
+          const date = new Date(time * 1000);
+          return date.toLocaleString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit',
+            month: 'short',
+            day: 'numeric'
+          });
+        },
       },
       rightPriceScale: {
         borderColor: isDark ? '#2B2B43' : '#D1D4DC',

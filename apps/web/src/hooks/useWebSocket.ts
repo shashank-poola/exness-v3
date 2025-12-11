@@ -37,11 +37,9 @@ export function useWebSocket(onMessage: (msg: TradeMessage) => void) {
         return; // Already connected
       }
 
-      console.log('Connecting to WebSocket:', WS_URL);
-      ws = new WebSocket(WS_URL);
+        ws = new WebSocket(WS_URL);
 
       ws.onopen = () => {
-        console.log('WebSocket connected, listeners:', listeners.length);
       };
 
       ws.onmessage = (event) => {
@@ -110,7 +108,6 @@ export function useWebSocket(onMessage: (msg: TradeMessage) => void) {
       };
 
       ws.onclose = () => {
-        console.log('WebSocket closed');
         ws = null;
 
         // Don't clear listeners - they're still mounted!
@@ -118,7 +115,6 @@ export function useWebSocket(onMessage: (msg: TradeMessage) => void) {
         if (reconnectTimeout) clearTimeout(reconnectTimeout);
         reconnectTimeout = setTimeout(() => {
           if (listeners.length > 0 && !ws) {
-            console.log('Reconnecting WebSocket...');
             connectWebSocket();
           }
         }, 3000);
@@ -129,9 +125,7 @@ export function useWebSocket(onMessage: (msg: TradeMessage) => void) {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         // Page became visible - reconnect if needed
-        console.log('Page visible - checking WebSocket connection...');
         if (!ws || ws.readyState !== WebSocket.OPEN) {
-          console.log('Reconnecting after page wake...');
           connectWebSocket();
         }
       }
@@ -144,34 +138,27 @@ export function useWebSocket(onMessage: (msg: TradeMessage) => void) {
 
     // Cancel any pending close timeout since we have an active listener
     if (closeTimeout) {
-      console.log('Cancelled pending close (new listener added)');
       clearTimeout(closeTimeout);
       closeTimeout = null;
     }
 
     // Register listener for this hook call
     listeners.push(stableCallback);
-    console.log('Listener registered, total listeners:', listeners.length);
 
     // Cleanup when component unmounts
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       listeners = listeners.filter((cb) => cb !== stableCallback);
-      console.log('Listener removed, remaining listeners:', listeners.length);
 
       // If no more listeners, schedule socket close after a delay
       // This prevents rapid close/reconnect cycles during component remounts
       if (listeners.length === 0 && ws) {
-        console.log('Scheduling WebSocket close in 1 second...');
         if (closeTimeout) clearTimeout(closeTimeout);
         closeTimeout = setTimeout(() => {
           // Double-check there are still no listeners
           if (listeners.length === 0 && ws) {
-            console.log('Closing WebSocket (no active listeners)');
             ws.close();
             ws = null;
-          } else {
-            console.log('Close cancelled - listeners exist:', listeners.length);
           }
         }, 1000); // Wait 1 second before closing
       }
