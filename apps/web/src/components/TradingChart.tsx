@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { createChart, IChartApi, ISeriesApi, CandlestickSeriesPartialOptions } from 'lightweight-charts';
 import { getCandlesticks } from '@/lib/candlestick-store';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useBackendCandles } from '@/hooks/useBackendCandles';
 
 interface TradingChartProps {
   symbol: string;
@@ -27,6 +28,31 @@ export function TradingChart({ symbol, interval }: TradingChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const candlestickSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
+
+  // Fetch historical candlestick data from backend
+  const { data: backendData } = useBackendCandles(symbol, interval);
+
+  // Combine backend and frontend candlestick data
+  const allCandles = useMemo(() => {
+    const frontendCandles = getCandlesticks(symbol, interval as any);
+    const backendCandles = backendData?.candlesticks || [];
+
+    // Merge backend and frontend data, ensuring no duplicates
+    const merged = [...backendCandles];
+
+    // Add frontend candles that aren't already in backend data
+    frontendCandles.forEach(frontendCandle => {
+      const exists = backendCandles.some(backendCandle => backendCandle.time === frontendCandle.time);
+      if (!exists) {
+        merged.push(frontendCandle);
+      }
+    });
+
+    // Sort by time and limit to last 500 candles for performance
+    return merged
+      .sort((a, b) => a.time - b.time)
+      .slice(-500);
+  }, [backendData, symbol, interval]);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -54,14 +80,33 @@ export function TradingChart({ symbol, interval }: TradingChartProps) {
         timezone: 'Asia/Kolkata',
         tickMarkFormatter: (time: number, tickMarkType: number, locale: string) => {
           const date = new Date(time * 1000);
-          return date.toLocaleString('en-IN', {
-            timeZone: 'Asia/Kolkata',
-            hour12: false,
-            hour: '2-digit',
-            minute: '2-digit',
-            month: 'short',
-            day: 'numeric'
-          });
+
+          // For different tick mark types, show different formats
+          if (tickMarkType === 0) { // Year
+            return date.toLocaleDateString('en-IN', {
+              timeZone: 'Asia/Kolkata',
+              year: 'numeric'
+            });
+          } else if (tickMarkType === 1) { // Month
+            return date.toLocaleDateString('en-IN', {
+              timeZone: 'Asia/Kolkata',
+              month: 'short',
+              day: 'numeric'
+            });
+          } else if (tickMarkType === 2) { // Day of month
+            return date.toLocaleDateString('en-IN', {
+              timeZone: 'Asia/Kolkata',
+              month: 'short',
+              day: 'numeric'
+            });
+          } else { // Time (hours/minutes)
+            return date.toLocaleTimeString('en-IN', {
+              timeZone: 'Asia/Kolkata',
+              hour12: false,
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+          }
         },
       },
       rightPriceScale: {
@@ -115,20 +160,32 @@ export function TradingChart({ symbol, interval }: TradingChartProps) {
     };
   }, [symbol, interval, theme]);
 
-  // Update chart data periodically
+  // Initialize chart with backend data, then update with live frontend data
   useEffect(() => {
-    const updateInterval = setInterval(() => {
-      if (candlestickSeriesRef.current) {
-        const candles = getCandlesticks(symbol, interval as any);
-        if (candles.length > 0) {
-          // Update all candles
-          candlestickSeriesRef.current.setData(candles);
-        }
+    if (candlestickSeriesRef.current) {
+      // First, load backend historical data
+      if (allCandles.length > 0) {
+        const chartData = allCandles.map(candle => ({
+          time: candle.time,
+          open: candle.open,
+          high: candle.high,
+          low: candle.low,
+          close: candle.close,
+        }));
+        candlestickSeriesRef.current.setData(chartData);
       }
-    }, 1000); // Update every second
 
-    return () => clearInterval(updateInterval);
-  }, [symbol, interval]);
+      // Then, continuously update with live frontend data
+      const updateInterval = setInterval(() => {
+        const frontendCandles = getCandlesticks(symbol, interval as any);
+        if (frontendCandles.length > 0) {
+          candlestickSeriesRef.current.setData(frontendCandles);
+        }
+      }, 1000);
+
+      return () => clearInterval(updateInterval);
+    }
+  }, [allCandles, symbol, interval]);
 
   return (
     <div

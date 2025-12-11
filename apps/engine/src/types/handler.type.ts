@@ -24,3 +24,8 @@ export interface UserPayload {
 export interface FetchOpenOrdersPayload {
   email: string;
 }
+
+export interface FetchCandlesticksPayload {
+  symbol: string;
+  timeframe: string;
+}

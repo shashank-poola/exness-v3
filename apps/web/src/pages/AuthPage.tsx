@@ -41,7 +41,7 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col" style={{ fontFamily: 'Inter, sans-serif' }}>
+    <div className="min-h-screen bg-white flex flex-col" style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
       {/* Auth Form */}
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
@@ -55,7 +55,7 @@ const AuthPage = () => {
             <p className="text-gray-600">
               {isLogin
                 ? "Login to continue trading"
-                : "Sign up to start trading"}
+                : "Sign up to start trading with $10,000 demo balance"}
             </p>
           </div>
 
@@ -69,6 +69,7 @@ const AuthPage = () => {
                 placeholder="Enter your email"
                 required
                 className="font-bold"
+                style={{ fontFamily: 'IBM Plex Mono, monospace' }}
               />
             </div>
 
@@ -81,6 +82,7 @@ const AuthPage = () => {
                 placeholder="Enter your password"
                 required
                 className="font-bold"
+                style={{ fontFamily: 'IBM Plex Mono, monospace' }}
               />
             </div>
 
@@ -88,6 +90,7 @@ const AuthPage = () => {
               type="submit"
               disabled={signup.isPending || signin.isPending}
               className="w-full py-6 text-base font-extrabold rounded-full"
+              style={{ fontFamily: 'IBM Plex Mono, monospace' }}
             >
               {signup.isPending || signin.isPending
                 ? "LOADING..."
@@ -102,6 +105,7 @@ const AuthPage = () => {
               to={isLogin ? "/signup" : "/signin"}
               className="text-sm font-bold hover:underline"
               onClick={() => setIsLogin(!isLogin)}
+              style={{ fontFamily: 'IBM Plex Mono, monospace' }}
             >
               {isLogin
                 ? "Don't have an account? Sign up"

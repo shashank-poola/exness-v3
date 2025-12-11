@@ -2,18 +2,28 @@ import prisma from '@exness-v3/db';
 import { prices, users } from '../../memoryDb.js';
 import { calculatePnl, closeOrder } from '../utils/liquidation.utils.js';
 import { sendAcknowledgement } from '../utils/send-ack';
+import { processPriceTickForCandles, getCandlesticks, candleStore } from '../utils/candlestick.utils.js';
 
 import type { PriceStore, Trade } from '../types';
 import type {
   CloseOrderPayload,
   FetchOpenOrdersPayload,
   OpenTradePayload,
+  FetchCandlesticksPayload,
 } from '../types/handler.type.js';
 
 export async function handlePriceUpdateEntry(payload: PriceStore) {
-  
+
   // update in memory price
   Object.assign(prices, payload);
+
+  // Update candlesticks for all symbols in the price update
+  const currentTime = Date.now();
+  Object.entries(payload).forEach(([symbol, priceData]) => {
+    // Use mid price for candlesticks (average of buy and sell)
+    const midPrice = (priceData.buyPrice + priceData.sellPrice) / (2 * Math.pow(10, priceData.decimal));
+    processPriceTickForCandles(symbol, midPrice, currentTime);
+  });
 
   for (const user of Object.values(users)) {
     for (const order of [...user.trades]) {
@@ -280,6 +290,35 @@ export async function handleFetchOpenOrders(
   } catch (err) {
     console.error('Error in handleFetchOpenOrders:', err);
     await sendAcknowledgement(requestId, 'SOMETHING_WENT_WRONG', {
+      message: err,
+    });
+  }
+}
+
+export async function handleFetchCandlesticks(
+  payload: FetchCandlesticksPayload,
+  requestId: string
+) {
+  try {
+    const { symbol, timeframe } = payload;
+
+    // Convert frontend symbol format to backend format
+    const backendSymbol = symbol.replace('USDT', '_USDC');
+
+    // Debug logging
+    console.log(`Fetching candles for ${symbol} -> ${backendSymbol}, timeframe: ${timeframe}`);
+    console.log(`Available symbols in candleStore:`, Object.keys(candleStore));
+
+    const candlesticks = getCandlesticks(backendSymbol, timeframe as any);
+    console.log(`Found ${candlesticks.length} candles for ${backendSymbol}`);
+
+    await sendAcknowledgement(requestId, 'CANDLESTICK_FETCH_ACKNOWLEDGEMENT', {
+      status: 'success',
+      candlesticks: candlesticks,
+    });
+  } catch (err) {
+    console.error('Error in handleFetchCandlesticks:', err);
+    await sendAcknowledgement(requestId, 'CANDLESTICK_FETCH_ERROR', {
       message: err,
     });
   }

@@ -3,6 +3,7 @@ import {
     handleCloseTrade,
     handlePriceUpdateEntry,
     handleFetchOpenOrders,
+    handleFetchCandlesticks,
   } from './order.handler';
   import { handleGetUserBalance, handleUserCreation } from './user.handler';
   
@@ -29,6 +30,9 @@ import {
           break;
         case 'FETCH_OPEN_ORDERS':
           await handleFetchOpenOrders(payload, requestId);
+          break;
+        case 'FETCH_CANDLESTICKS':
+          await handleFetchCandlesticks(payload, requestId);
           break;
         default:
           console.log(`[HANDLER] Unknown event type: ${requestType}`);

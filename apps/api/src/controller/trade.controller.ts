@@ -149,3 +149,32 @@ export async function fetchOpenOrders(req: Request, res: Response) {
     res.status(500).json({ message: 'Something went wrong' });
   }
 }
+
+export async function fetchCandlesticks(req: Request, res: Response) {
+  try {
+    const { symbol, timeframe } = req.query;
+
+    if (!symbol || !timeframe) {
+      res.status(400).json({ error: 'Symbol and timeframe are required' });
+      return;
+    }
+
+    const requestId = Date.now().toString();
+    const payload = {
+      type: 'FETCH_CANDLESTICKS',
+      requestId: requestId,
+      data: JSON.stringify({
+        symbol: symbol as string,
+        timeframe: timeframe as string,
+      }),
+    };
+
+    const streamResult = await httpPusher.xAdd(CREATE_ORDER_QUEUE, '*', payload);
+    const { candlesticks } = await redisSubscriber.waitForMessage(requestId);
+
+    res.status(200).json({ candlesticks });
+  } catch (err) {
+    console.error('Error fetching candlesticks:', err);
+    res.status(500).json({ message: 'Something went wrong' });
+  }
+}
