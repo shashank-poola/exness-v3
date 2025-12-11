@@ -1,167 +1,159 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import logoImage from "@/assets/logo.png";
-import cryptoImage from "@/assets/crypto.png";
-import { Github } from "lucide-react";
+import TradingButton from "@/components/ui/trading-button";
+import { ArrowUpRight } from "lucide-react";
+import tradexLogoImage from "@/assets/tradex-logo.png";
+import heroBgImage from "@/assets/hero-bg.png";
+import backgroundTradexImage from "@/assets/background-tradex.png";
+import demoImage from "@/assets/demo.png";
+import { useEffect, useRef, useState } from 'react';
 
 const LandingPage = () => {
+  const [demoVisible, setDemoVisible] = useState(false);
+  const demoRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setDemoVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (demoRef.current) {
+      observer.observe(demoRef.current);
+    }
+
+    return () => {
+      if (demoRef.current) {
+        observer.unobserve(demoRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen bg-white flex flex-col" style={{ fontFamily: 'Inter, sans-serif' }}>
-      <nav className="px-6 lg:px-12 py-6 bg-black rounded-b-3xl">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center">
-            <Link to="/" className="flex items-center gap-3 group">
-              <img src={logoImage} alt="TradeX" className="h-10 transition-transform group-hover:scale-105" />
-            </Link>
-
-            <div className="hidden md:flex items-center gap-8">
-              <Link
-                to="/"
-                className="text-sm font-medium text-white hover:opacity-70 transition-opacity"
-              >
-                HOME
-              </Link>
-              <Link
-                to="/docs"
-                className="text-sm font-medium text-white hover:opacity-70 transition-opacity"
-              >
-                DOCS
-              </Link>
-              <Link
-                to="/trade"
-                className="text-sm font-medium text-white hover:opacity-70 transition-opacity"
-              >
-                TRADE
-              </Link>
-            </div>
-
-            <Button
-              asChild
-              className="rounded-full px-8 h-11 bg-white text-black hover:bg-gray-100 font-semibold text-sm"
-            >
-              <Link to="/signin">LOGIN</Link>
-            </Button>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="relative px-6 py-24 md:py-32 lg:py-40 bg-[#f5f8ff]">
-        <div className="max-w-6xl mx-auto text-center">
-          <h1
-            className="text-7xl md:text-8xl lg:text-9xl font-bold text-black mb-8 tracking-tight leading-[0.9]"
-            style={{ fontFamily: 'Instrument Serif, serif' }}
-          >
-            TradeX
-          </h1>
-
-          <p className="text-2xl md:text-3xl lg:text-4xl text-black max-w-4xl mx-auto mb-12 leading-tight font-medium">
-            Trade strong and profit instantly with the most powerful platform on Crypto
-          </p>
-
-          <Button
-            asChild
-            size="lg"
-            className="text-base font-semibold px-12 py-7 h-auto rounded-full bg-black text-white hover:bg-gray-800 transition-all duration-300 hover:scale-105 border-2 border-black"
-          >
-            <Link to="/trade">Start Trading</Link>
-          </Button>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 lg:py-32 px-6 bg-black">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            {/* Image Side */}
-            <div className="flex items-center justify-center">
-              <img
-                src={cryptoImage}
-                alt="Crypto Trading"
-                className="w-full max-w-md h-auto object-contain rounded-3xl"
-              />
-            </div>
-
-            {/* Text Side */}
-            <div className="space-y-6">
-              <p className="text=base font-semibold text-xs font-bold tracking-widest text-gray-400 uppercase">
-                Keys to the New World
-              </p>
-
-              <h2 className="text-4xl lg:text-5xl font-bold text-white leading-tight">
-                Your TradeX platform is your all-access pass to Crypto. It's a secure way to trade coins, stake assets, and explore a whole new world of digital trading. The power is in your hands.
-              </h2>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-20 px-6 mx-6 my-12 bg-gray-50 rounded-3xl">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
-            <div>
-              <div className="text-5xl font-bold text-black mb-3">24/7</div>
-              <p className="text-lg text-gray-600 font-medium">Real-time Market Data</p>
-            </div>
-            <div>
-              <div className="text-5xl font-bold text-black mb-3">100+</div>
-              <p className="text-lg text-gray-600 font-medium">Trading Pairs</p>
-            </div>
-            <div>
-              <div className="text-5xl font-bold text-black mb-3">$10K</div>
-              <p className="text-lg text-gray-600 font-medium">Demo Balance</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer
-        className="relative mt-auto py-24 mx-6 mb-6 rounded-3xl"
+    <div className="min-h-screen flex flex-col" style={{ fontFamily: 'Inter, sans-serif' }}>
+      {/* Hero Section - Full page with blur transition from navbar */}
+      <section
+        className="relative h-screen flex items-center justify-center px-6"
         style={{
-          background: 'linear-gradient(180deg, #84a9ff 0%, #f5f8ff 100%)'
+          backgroundImage: `url(${heroBgImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2
-            className="text-7xl md:text-8xl lg:text-9xl font-bold text-black mb-6"
-            style={{ fontFamily: 'Instrument Serif, serif' }}
+        {/* Navigation overlay on hero background */}
+        <div className="absolute top-0 left-0 right-0 bg-white bg-opacity-95 backdrop-blur-sm z-10">
+          <nav className="px-6 lg:px-12 py-4">
+            <div className="max-w-7xl mx-auto">
+              <div className="flex justify-between items-center">
+                {/* TradeX logo on left */}
+                <div className="flex items-center">
+                  <img src={tradexLogoImage} alt="TradeX" className="h-10" />
+                </div>
+
+                {/* Navigation links in center - capsule shape */}
+                <div className="hidden md:flex items-center gap-1 px-4 py-2 border-2 border-black rounded-full">
+                  <Link
+                    to="/"
+                    className="text-black text-sm font-bold hover:bg-black hover:text-white px-3 py-1 rounded-full transition-colors"
+                  >
+                    Home
+                  </Link>
+                  <Link
+                    to="/docs"
+                    className="text-black text-sm font-bold hover:bg-black hover:text-white px-3 py-1 rounded-full transition-colors"
+                  >
+                    Documentation
+                  </Link>
+                  <Link
+                    to="/trade"
+                    className="text-black text-sm font-bold hover:bg-black hover:text-white px-3 py-1 rounded-full transition-colors"
+                  >
+                    Trade
+                  </Link>
+                </div>
+
+                {/* Sign up button on right - black with arrow */}
+                <Button
+                  asChild
+                  className="px-4 py-2 bg-black text-white hover:bg-gray-800 text-sm font-medium rounded-full flex items-center gap-2"
+                >
+                  <Link to="/signin">
+                    Sign up
+                    <ArrowUpRight className="w-4 h-4" />
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </nav>
+        </div>
+        {/* Content container */}
+        <div className="max-w-4xl mx-auto text-center z-20" style={{ fontFamily: 'Inter, sans-serif' }}>
+          {/* Logo above heading - decreased size */}
+          <img
+            src={backgroundTradexImage}
+            alt="TradeX Logo"
+            className="h-14 mx-auto mb-4"
+          />
+
+          {/* Main heading - black text with Playfair Display */}
+          <h1
+            className="text-4xl md:text-5xl lg:text-8xl xl:text-8xl font-black text-black mb-12 tracking-tight leading-tight text-center"
+            style={{
+              fontFamily: 'Playfair Display, serif',
+              fontWeight: 700,
+              letterSpacing: '-0.02em'
+            }}
           >
-            TradeX
-          </h2>
+            One Platform
+            <br />
+            Infinite Trades
+          </h1>
 
-          <p className="text-sm text-black mb-12 font-medium italic">
-            "The future of trading is here"
-          </p>
+          {/* Start Trading button */}
+          <div className="flex justify-center mt-18">
+            <Link to="/trade">
+              <TradingButton />
+            </Link>
+          </div>
+        </div>
+      </section>
 
-          {/* Social Links */}
-          <div className="flex justify-center gap-6 mb-12">
-            <a
-              href="https://x.com/shashankpoola"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-black hover:opacity-70 transition-opacity"
-            >
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-              </svg>
-            </a>
-            <a
-              href="https://github.com/shashank-poola/exness-v3"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-black hover:opacity-70 transition-opacity"
-            >
-              <Github className="w-6 h-6" />
-            </a>
+      {/* Trading Platform Demo Section - Below Hero */}
+      <section className="relative py-20 px-6 bg-gradient-to-b from-white to-gray-50">
+
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-black mb-4 font-serif" style={{ fontFamily: 'Playfair Display' }}>
+              A High-Performance Trading Platform
+            </h2>
+            <p className="text-lg text-gray-600">
+              Trade global markets with precision, speed, and confidence.
+            </p>
           </div>
 
-          <p className="text-xs text-black font-medium">
-            COPYRIGHT ©2025 TRADEX.
-          </p>
+          {/* Trading Platform Demo Image with animation and no outline */}
+          <div
+            ref={demoRef}
+            className={`flex justify-center transition-all duration-1000 ease-out transform ${
+              demoVisible
+                ? 'opacity-100 translate-y-0 scale-100'
+                : 'opacity-0 translate-y-12 scale-95'
+            }`}
+          >
+            <img
+              src={demoImage}
+              alt="Trading Platform Demo"
+              className="w-full max-w-5xl rounded-lg shadow-2xl"
+              style={{ border: 'none', outline: 'none' }}
+            />
+          </div>
         </div>
-      </footer>
+      </section>
     </div>
   );
 };
