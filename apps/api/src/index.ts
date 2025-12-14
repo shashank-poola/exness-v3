@@ -9,7 +9,11 @@ const PORT = process.env.PORT || 3000;
 
 const app = express();
 
-const FE_URL = process.env.CORS_ORIGIN || 'http://localhost:5173';
+const ALLOWED_ORIGINS = [
+  "https://exness-v3-web.vercel.app",
+  "https://tradex.foo",
+  "https://www.tradex.foo"
+];
 
 // Connect Redis once at starting up
 await httpPusher.connect();
@@ -17,7 +21,7 @@ await httpPusher.connect();
 app.use(express.json());
 app.use(
   cors({
-    origin: FE_URL,
+    origin: ALLOWED_ORIGINS,
     credentials: true,
   })
 );
