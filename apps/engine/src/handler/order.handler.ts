@@ -305,19 +305,13 @@ export async function handleFetchCandlesticks(
     // Convert frontend symbol format to backend format
     const backendSymbol = symbol.replace('USDT', '_USDC');
 
-    // Debug logging
-    console.log(`Fetching candles for ${symbol} -> ${backendSymbol}, timeframe: ${timeframe}`);
-    console.log(`Available symbols in candleStore:`, Object.keys(candleStore));
-
     const candlesticks = getCandlesticks(backendSymbol, timeframe as any);
-    console.log(`Found ${candlesticks.length} candles for ${backendSymbol}`);
 
     await sendAcknowledgement(requestId, 'CANDLESTICK_FETCH_ACKNOWLEDGEMENT', {
       status: 'success',
       candlesticks: candlesticks,
     });
   } catch (err) {
-    console.error('Error in handleFetchCandlesticks:', err);
     await sendAcknowledgement(requestId, 'CANDLESTICK_FETCH_ERROR', {
       message: err,
     });

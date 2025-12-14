@@ -23,7 +23,18 @@ import {
           await handleCloseTrade(payload, requestId);
           break;
         case 'PRICE_UPDATE':
-          await handlePriceUpdateEntry(payload);
+          // Only process if data exists, is a string, and is not "undefined"
+          if (!payload.data || typeof payload.data !== 'string' || payload.data === 'undefined') {
+            break;
+          }
+
+          // Parse the nested data string safely
+          try {
+            const priceData = JSON.parse(payload.data);
+            await handlePriceUpdateEntry(priceData);
+          } catch (error) {
+            // Silently ignore parsing errors - some messages may be malformed
+          }
           break;
         case 'GET_USER_BALANCE':
           await handleGetUserBalance(payload, requestId);
