@@ -11,6 +11,9 @@ TradeX simulates a live crypto trading experience where users can:
 - View interactive candlestick charts across multiple timeframes
 - Manage trading history and balance
 
+## System architecture
+![Architecture](apps/web/src/assets/architecture.png)
+
 ## Feature Overview
 
 | Feature | Implementation | Details |
