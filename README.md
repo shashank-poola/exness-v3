@@ -92,21 +92,10 @@ exness-v3/
 │       ├── src/
 │       │   ├── components/     # React components
 │       │   │   ├── ui/         # Shadcn UI components
-│       │   │   └── TradingChart.tsx
 │       │   ├── contexts/       # React contexts (Theme)
 │       │   ├── hooks/          # Custom hooks
-│       │   │   ├── useAuth.ts
-│       │   │   ├── useTrade.ts
-│       │   │   └── useWebSocket.ts
 │       │   ├── lib/            # Utilities
-│       │   │   ├── axios.ts
-│       │   │   ├── candlestick-store.ts
-│       │   │   └── price-store.ts
 │       │   ├── pages/          # Page components
-│       │   │   ├── AuthPage.tsx
-│       │   │   ├── LandingPage.tsx
-│       │   │   ├── TradingPage.tsx
-│       │   │   └── DocsPage.tsx
 │       │   ├── App.tsx
 │       │   └── main.tsx
 │       ├── .env.example
@@ -115,13 +104,8 @@ exness-v3/
 ├── packages/
 │   ├── db/                     # Shared database (Prisma)
 │   │   ├── prisma/
-│   │   │   └── schema.prisma   # Database schema
-│   │   └── package.json
 │   │
-│   ├── redis/                  # Redis client wrapper
-│   │   ├── src/
-│   │   │   └── index.ts        # Redis pub/sub, streams
-│   │   └── package.json
+│   ├── redis/                  # Redis configuration
 │   │
 │   └── ui/                     # Shared UI components
 │       └── package.json
@@ -150,7 +134,7 @@ git clone https://github.com/shashank-poola/exness-v3.git
 cd exness-v3
 
 # Install dependencies
-pnpm install
+bun install
 
 # Setup environment files
 cp apps/api/.env.example apps/api/.env
@@ -182,7 +166,7 @@ bun run dev
 
 # Terminal 3: WebSocket server
 cd apps/ws
-npm run dev
+bun run dev
 
 # Terminal 4: API (backend)
 cd apps/api
@@ -190,12 +174,15 @@ bun run dev
 
 # Terminal 5: Web (frontend)
 cd apps/web
-npm run dev
+bun run dev
 ```
 
 Frontend: http://localhost:5173
 API: http://localhost:3000
 WebSocket: ws://localhost:8080
+
+### Live Preview
+![Livepreview](apps/web/src/assets/demoimage.png)
 
 ## API Endpoints
 
@@ -331,51 +318,9 @@ VITE_API_URL="http://localhost:3000"
 VITE_WS_URL="ws://localhost:8080"
 ```
 
-## Database Schema
-
-```prisma
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  balance   Balance?
-  orders    Order[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Balance {
-  id      String @id @default(uuid())
-  balance Float  @default(10000)
-  user    User   @relation(fields: [userId], references: [id])
-  userId  String @unique
-}
-
-model Order {
-  id              String   @id @default(uuid())
-  asset           String
-  side            String
-  quantity        Float
-  leverage        Int
-  openPrice       Float?
-  closePrice      Float?
-  stopLoss        Float?
-  takeProfit      Float?
-  slippage        Float
-  status          String   @default("OPEN")
-  pnl             Float?
-  user            User     @relation(fields: [userId], references: [id])
-  userId          String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-}
-```
-
 ## License
 
 MIT
-
-## Author
 
 **Shashank Poola**
 GitHub: [@shashank-poola](https://github.com/shashank-poola)
