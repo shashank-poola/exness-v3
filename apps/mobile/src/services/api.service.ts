@@ -8,7 +8,7 @@ const API_BASE_URL = env.EXPO_PUBLIC_BACKEND_URL;
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
-  validateStatus: (status) => status >= 200 && status < 300, // only 2xx are success
+  validateStatus: (status) => status >= 200 && status < 300,
 });
 
 api.interceptors.request.use(
