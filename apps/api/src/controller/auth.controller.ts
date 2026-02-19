@@ -61,7 +61,7 @@ export async function signupHandler(req: Request, res: Response) {
   }
 }
 
-// SIGNUP
+// SignInd
 export async function signInVerify(req: Request, res: Response) {
   try {
     const { email, password } = req.body;

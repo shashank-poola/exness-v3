@@ -71,5 +71,3 @@ export async function handleUserCreation(
     });
   }
 }
-
-// todo: get user assets
