@@ -1,15 +1,29 @@
-import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logger } from '../services/logger.service';
+import { JWT_Token } from '../types/auth.type';
 
-const TOKEN_KEY = 'jwt_token';
+export const storeToken = async (token: string) => {
+  try {
+    await AsyncStorage.setItem(JWT_Token, token);
+  } catch (error) {
+    logger.error('storeToken', 'error setting the jwt in async storage', error);
+  }
+};
 
-export async function getToken(): Promise<string | null> {
-  return SecureStore.getItemAsync(TOKEN_KEY);
-}
+export const getToken = async (): Promise<string | null> => {
+  try {
+    const token = await AsyncStorage.getItem(JWT_Token);
+    return token;
+  } catch (error) {
+    logger.error('getToken', 'error getting the jwt in async storage', error);
+    return null;
+  }
+};
 
-export async function setToken(token: string): Promise<void> {
-  await SecureStore.setItemAsync(TOKEN_KEY, token);
-}
-
-export async function clearToken(): Promise<void> {
-  await SecureStore.deleteItemAsync(TOKEN_KEY);
-}
+export const removeToken = async (): Promise<void> => {
+  try {
+    await AsyncStorage.removeItem(JWT_Token);
+  } catch (error) {
+    logger.error('removeToken', 'error removing the jwt in async storage', error);
+  }
+};
