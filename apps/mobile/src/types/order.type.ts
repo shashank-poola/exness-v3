@@ -49,3 +49,12 @@ export interface ClosedOrder {
     userId: string;
     reason?: string;
 }
+
+export interface CreateOrderResponse {
+    message: string;
+    trade: OpenOrder;
+}
+
+export interface CloseOrderResponse {
+    message: string;
+}
