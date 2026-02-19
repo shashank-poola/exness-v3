@@ -30,5 +30,5 @@ app.use(cookieParser());
 app.use('/api/v1', mainRouter);
 
 app.listen(PORT, () => {
-  console.log('Server started');
+  console.log('Server started on PORT: 3000',);
 });
