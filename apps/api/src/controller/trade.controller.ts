@@ -96,7 +96,8 @@ export async function closeOrder(req: Request, res: Response) {
     });
   } catch (err: any) {
     console.log('err', err);
-    res.status(500).json({
+    
+    return res.status(500).json({
       message: 'Something went wrong: ' + err.reason,
     });
   }
