@@ -1,8 +1,9 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { getToken } from '../storage/auth.storage';
+import { env } from '../config/env';
 import { logger } from './logger.service';
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+const API_BASE_URL = env.EXPO_PUBLIC_BACKEND_URL;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
