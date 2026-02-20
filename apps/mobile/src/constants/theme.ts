@@ -2,6 +2,7 @@ export const ThemeColor = {
   text: {
     primary: "#191708",
     secondary: "#A1A1AA",
+    tertiary: "#71717A",
   },
   background: {
     app: "#000000",

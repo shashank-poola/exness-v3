@@ -1,22 +1,22 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { useEffect } from "react";
+import * as Font from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
 
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
 
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
+  const [fontsLoaded] = Font.useFonts({
+    "Sora-Regular": require("../assets/fonts/Sora-Regular.ttf"),
+    "Sora-Medium": require("../assets/fonts/Sora-Medium.ttf"),
+    "Sora-SemiBold": require("../assets/fonts/Sora-SemiBold.ttf"),
+    "Sora-Bold": require("../assets/fonts/Sora-Bold.ttf"),
+    "Sora-ExtraBold": require("../assets/fonts/Sora-ExtraBold.ttf"),
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) SplashScreen.hideAsync();
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) return null;
 }
