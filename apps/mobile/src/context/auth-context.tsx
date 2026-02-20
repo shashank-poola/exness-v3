@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setUser(user);
       await storeToken(token);
-      router.replace('/(tabs)' as Href);
+      router.replace('/(tabs)/home' as Href);
     } catch (error) {
       logger.error('login', 'Error logging in auth context', error);
     }

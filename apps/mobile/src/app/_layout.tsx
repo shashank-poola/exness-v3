@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { Stack, useRouter, type Href } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "@/src/context/auth-context";
 
 SplashScreen.preventAutoHideAsync();
@@ -14,7 +16,7 @@ function RootLayoutNav() {
     if (isLoading) return;
 
     if (user) {
-      router.replace("/(tabs)" as Href);
+      router.replace("/(tabs)/home" as Href);
     } else {
       router.replace("/(auth)/signin");
     }
@@ -23,7 +25,12 @@ function RootLayoutNav() {
   if (isLoading) return null; // or a splash/loading screen
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: "#000000" },
+      }}
+    >
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="(tabs)" />
     </Stack>
@@ -43,8 +50,11 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <AuthProvider>
-      <RootLayoutNav />
-    </AuthProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <StatusBar style="light" />
+        <RootLayoutNav />
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }

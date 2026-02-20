@@ -1,38 +1,51 @@
 import { Tabs } from 'expo-router';
-import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Foundation from '@expo/vector-icons/Foundation';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import React from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemeColor } from '@/src/constants/theme';
 
 const GREY_CARD = '#25252A';
 
 export default function TabLayout() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tabs
+      initialRouteName="home"
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: '#FFFFFF',
         tabBarInactiveTintColor: ThemeColor.text.tertiary,
         tabBarActiveBackgroundColor: GREY_CARD,
-        tabBarStyle: { backgroundColor: ThemeColor.background.app },
-        tabBarItemStyle: { borderRadius: 12, marginHorizontal: 4, marginVertical: 6 },
+        tabBarStyle: {
+          backgroundColor: ThemeColor.background.app,
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 12,
+          paddingTop: 8,
+          height: 56 + (insets.bottom > 0 ? insets.bottom : 12),
+        },
+        tabBarItemStyle: { borderRadius: 20, marginHorizontal: 4, marginVertical: 6 },
         tabBarShowLabel: true,
+        tabBarLabelStyle: { fontWeight: '600' },
       }}>
       <Tabs.Screen
         name="home"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, size }) => <Feather name="home" size={size} color={color} />,
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons name={focused ? 'home' : 'home-outline'} size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="markets"
         options={{
           title: 'Markets',
-          tabBarIcon: ({ color, size }) => <Ionicons name="bar-chart-outline" size={size} color={color} />,
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons name={focused ? 'bar-chart' : 'bar-chart-outline'} size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
@@ -46,7 +59,9 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color, size }) => <FontAwesome5 name="user-circle" size={size} color={color} />,
+          tabBarIcon: ({ color, size, focused }) => (
+            <FontAwesome5 name="user-circle" size={size} color={color} solid={focused} />
+          ),
         }}
       />
     </Tabs>

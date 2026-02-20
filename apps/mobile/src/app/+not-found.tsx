@@ -15,7 +15,7 @@ export default function NotFound() {
     <View style={styles.container}>
       <Text style={styles.code}>404</Text>
       <Text style={styles.title}>Page not found</Text>
-      <TouchableOpacity onPress={() => router.replace("/")} activeOpacity={0.7}>
+      <TouchableOpacity onPress={() => router.replace("/(tabs)/home")} activeOpacity={0.7}>
         <Text style={styles.link}>Return to Home</Text>
       </TouchableOpacity>
     </View>
