@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { getToken, removeToken, removeUser, storeToken, storeUser } from '../storage/auth.storage';
+import { getToken, removeToken, storeToken } from '../storage/auth.storage';
 import { getUserProfile } from '../services/auth.service';
 import { logger } from '../services/logger.service';
 import type { AuthUser } from '../types/auth.type';
@@ -48,7 +48,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setUser(user);
       await storeToken(token);
-      await storeUser(user);
       router.replace('/(tabs)');
     } catch (error) {
       logger.error('login', 'Error logging in auth context', error);
@@ -59,8 +58,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setUser(null);
       await removeToken();
-      await removeUser();
-      router.replace('/(auth)');
+      router.replace('/(auth)/signin');
     } catch (error) {
       logger.error('logout', 'Error logging out auth context', error);
     }
