@@ -5,7 +5,7 @@ import { authService } from '@/src/services/auth.service';
 import { logger } from '@/src/services/logger.service';
 import { ThemeColor } from '@/src/constants/theme';
 import React, { useMemo, useState } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function SignUpScreen() {
   const router = useRouter();
@@ -59,6 +59,11 @@ export default function SignUpScreen() {
 
   return (
     <View style={styles.container}>
+      <Image
+        source={require('../../../assets/images/exness/whitelogo.png')}
+        style={styles.logo}
+        resizeMode="contain"
+      />
       <ThemedText size="xxl" style={styles.title}>
         Sign Up
       </ThemedText>
@@ -138,9 +143,16 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'center',
   },
+  logo: {
+    width: 160,
+    height: 48,
+    alignSelf: 'center',
+    marginBottom: 24,
+  },
   title: {
     textAlign: 'center',
     marginBottom: 32,
+    color: ThemeColor.text.primary,
   },
   form: {
     gap: 12,

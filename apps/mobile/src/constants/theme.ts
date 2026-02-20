@@ -1,8 +1,8 @@
 export const ThemeColor = {
   text: {
-    primary: "#191708",
-    secondary: "#A1A1AA",
-    tertiary: "#71717A",
+    primary: "#FFFFFF",
+    secondary: "#D4D4D8",
+    tertiary: "#A1A1AA",
   },
   background: {
     app: "#000000",

@@ -20,13 +20,22 @@ export async function authService( email: string, password: string, isSignIn: bo
       password,
     });
     return Ok(response);
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error(
       'authService',
       `Error in user ${isSignIn ? 'signin' : 'signup'}`,
       error
     );
-    return ServerError();
+    const axiosError = error as { response?: { data?: { error?: string | string[] | Record<string, string[]> } }; message?: string };
+    const apiError = axiosError.response?.data?.error;
+    let msg: string | null = null;
+    if (typeof apiError === 'string') msg = apiError;
+    else if (Array.isArray(apiError)) msg = apiError[0] ?? null;
+    else if (apiError && typeof apiError === 'object') {
+      const first = Object.values(apiError).flat().find(Boolean);
+      msg = typeof first === 'string' ? first : null;
+    }
+    return { success: false, error: msg ?? axiosError.message ?? 'Something went wrong' };
   }
 }
 
