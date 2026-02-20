@@ -1,18 +1,41 @@
 import apiCaller from './api.service';
-import type { SignupRequest, SignInRequest } from '../types/auth.type';
-import type { AuthUser } from '../types/auth.type';
 import { logger } from './logger.service';
+import { UserProfile } from '../types/auth.type';
+import { ServerError, Ok, type ServiceResult } from '../utils/api-result';
 
-export interface AuthSuccessResponse {
+export interface AuthResponse {
   message: string;
   token: string;
-  user: AuthUser;
+  user: {
+    email: string;
+    balance: number;
+  };
 }
 
-export async function signupService(input: SignupRequest): Promise<AuthSuccessResponse> {
-  return apiCaller.post<AuthSuccessResponse>('/auth/signup', input);
+export async function authService( email: string, password: string, isSignIn: boolean ): Promise<ServiceResult<AuthResponse>> {
+  try {
+    const route = isSignIn ? 'signin' : 'signup';
+    const response = await apiCaller.post<AuthResponse>(`/auth/${route}`, {
+      email,
+      password,
+    });
+    return Ok(response);
+  } catch (error) {
+    logger.error(
+      'authService',
+      `Error in user ${isSignIn ? 'signin' : 'signup'}`,
+      error
+    );
+    return ServerError();
+  }
 }
 
-export async function signInService(input: SignInRequest): Promise<AuthSuccessResponse> {
-  return apiCaller.post<AuthSuccessResponse>('/auth/signin', input);
+export async function getUserProfile(): Promise<ServiceResult<UserProfile>> {
+  try {
+    const response = await apiCaller.get<UserProfile>('/auth/me');
+    return Ok(response);
+  } catch (error) {
+    logger.error('authService', 'Error fetching user profile', error);
+    return ServerError();
+  }
 }

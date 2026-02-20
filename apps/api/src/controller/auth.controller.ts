@@ -61,7 +61,6 @@ export async function signupHandler(req: Request, res: Response) {
   }
 }
 
-// SignInd
 export async function signInVerify(req: Request, res: Response) {
   try {
     const { email, password } = req.body;
@@ -111,4 +110,26 @@ export async function signInVerify(req: Request, res: Response) {
     console.error(err);
     return res.status(500).json({ message: 'Internal server error' });
   }
+}
+
+export async function getMeHandler(req: Request, res: Response) {
+  try {
+    const email = req.user;
+    const user = await dbClient.user.findFirst({
+      where: { email: email as string },
+      select: { id: true, email: true, balance: true },
+    });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    return res.status(200).json({
+      id: user.id,
+      email: user.email,
+      balance: user.balance,
+    });
+  } catch (err) {
+    res.status(500).json({ 
+      message: 'Internal server error' 
+    })
+  } return;
 }

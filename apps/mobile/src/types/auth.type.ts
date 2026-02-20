@@ -13,4 +13,10 @@ export interface AuthUser {
     balance: number;
 }
 
+export interface UserProfile {
+    id: string;
+    email: string;
+    balance: number;
+}
+
 export const JWT_Token = "jwt_token";
