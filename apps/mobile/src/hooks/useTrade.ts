@@ -33,7 +33,6 @@ async function unwrap<T>(fn: () => Promise<{ success: boolean; data?: T; error?:
     if (result.success && result.data !== undefined) return result.data;
     throw new Error(result.error ?? 'Request failed');
   }
-  
 
 export const useOpenTrades = () => {
   return useQuery({
