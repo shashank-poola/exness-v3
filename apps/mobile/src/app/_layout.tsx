@@ -1,17 +1,39 @@
 import { useEffect } from "react";
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
+import { Stack, useRouter, type Href } from "expo-router";
+import { AuthProvider, useAuth } from "@/src/context/auth-context";
 
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+function RootLayoutNav() {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
 
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (user) {
+      router.replace("/(tabs)" as Href);
+    } else {
+      router.replace("/(auth)/signin");
+    }
+  }, [user, isLoading]);
+
+  if (isLoading) return null; // or a splash/loading screen
+
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(auth)" />
+      <Stack.Screen name="(tabs)" />
+    </Stack>
+  );
+}
+
+export default function RootLayout() {
   const [fontsLoaded] = Font.useFonts({
-    "Sora-Regular": require("../assets/fonts/Sora-Regular.ttf"),
-    "Sora-Medium": require("../assets/fonts/Sora-Medium.ttf"),
-    "Sora-SemiBold": require("../assets/fonts/Sora-SemiBold.ttf"),
-    "Sora-Bold": require("../assets/fonts/Sora-Bold.ttf"),
-    "Sora-ExtraBold": require("../assets/fonts/Sora-ExtraBold.ttf"),
+    "Sora-Regular": require("../../assets/fonts/Sora-Regular.ttf"),
+    "Sora-Medium": require("../../assets/fonts/Sora-Medium.ttf"),
   });
 
   useEffect(() => {
@@ -19,4 +41,10 @@ export default function RootLayout() {
   }, [fontsLoaded]);
 
   if (!fontsLoaded) return null;
+
+  return (
+    <AuthProvider>
+      <RootLayoutNav />
+    </AuthProvider>
+  );
 }

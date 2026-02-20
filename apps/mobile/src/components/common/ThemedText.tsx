@@ -43,14 +43,14 @@ const ThemedText: React.FC<ThemedTextProps> = ({
 };
 
 const themedTextStyles = StyleSheet.create({
-  xxl: { fontSize: 30, fontFamily: "Sora-ExtraBold" },
-  xl: { fontSize: 24, fontFamily: "Sora-Bold" },
-  lg: { fontSize: 20, fontFamily: "Sora-SemiBold" },
+  xxl: { fontSize: 30, fontFamily: "Sora-Medium" },
+  xl: { fontSize: 24, fontFamily: "Sora-Medium" },
+  lg: { fontSize: 20, fontFamily: "Sora-Medium" },
   md: { fontSize: 16, fontFamily: "Sora-Medium" },
   sm: { fontSize: 14, fontFamily: "Sora-Regular" },
   xs: { fontSize: 10, fontFamily: "Sora-Regular" },
   body: { fontSize: 16, fontFamily: "Sora-Regular", lineHeight: 24 },
-  button: { fontSize: 16, fontFamily: "Sora-SemiBold" },
+  button: { fontSize: 16, fontFamily: "Sora-Medium" },
 });
 
 export default ThemedText;

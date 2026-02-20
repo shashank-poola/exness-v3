@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { getToken, removeToken, storeToken } from '../storage/auth.storage';
 import { getUserProfile } from '../services/auth.service';
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setUser(user);
       await storeToken(token);
-      router.replace('/(tabs)');
+      router.replace('/(tabs)' as Href);
     } catch (error) {
       logger.error('login', 'Error logging in auth context', error);
     }

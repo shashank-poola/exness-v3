@@ -12,7 +12,8 @@ const app = express();
 const ALLOWED_ORIGINS = [
   "https://exness-v3-web.vercel.app",
   "https://tradex.foo",
-  "https://www.tradex.foo"
+  "https://www.tradex.foo",
+  "http://192.168.0.84:3000"
 ];
 
 // Connect Redis once at starting up
