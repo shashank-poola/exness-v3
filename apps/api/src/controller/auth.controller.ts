@@ -15,16 +15,19 @@ export async function signupHandler(req: Request, res: Response) {
 
     const { email, password } = parsed.data;
 
-    // Check existing user by email only
     const existing = await dbClient.user.findFirst({
       where: { email }
     });
 
     if (existing) {
-      return res.status(400).json({ error: 'User already exists' });
+      res.status(400).json({
+        success: false,
+        message: null,
+        error: "USER_ALREADY_EXISTS"
+        })
+      return;
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create new user
@@ -38,16 +41,15 @@ export async function signupHandler(req: Request, res: Response) {
       select: { id: true, email: true, balance: true, password: true, lastLoggedIn: true },
     });
 
-    // Engine server for user authentication
     createUserInEngine(user);
 
-    // Issue JWT (return in response body)
     const token = jwt.sign({ email }, process.env.JWT_SECRET!, {
       expiresIn: '2d',
     });
 
     return res.status(201).json({
-      message: 'Signup successful',
+      success: true,
+      message: 'SIGNUP_SUCCESSFULLY',
       token,
       user: {
         email: user.email,
@@ -57,7 +59,12 @@ export async function signupHandler(req: Request, res: Response) {
 
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ 
+      success: false,
+      message: null,
+      error: 'INTERNAL_SERVER_ERROR' 
+     })
+    return;
   }
 }
 
@@ -66,39 +73,45 @@ export async function signInVerify(req: Request, res: Response) {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+      res.status(400).json({
+        success: false,
+        message: null,
+        error: "EMAIL_AND_PASSWORD_REQUIRED",
+      })
+      return;
     }
 
-    // Fetch user with balance for validation and response
     const user = await dbClient.user.findFirst({
       where: { email },
-      select: { id: true, email: true, password: true, balance: true },
+      select: { 
+        id: true, 
+        email: true, 
+        password: true, 
+        balance: true },
     });
 
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Validate password
     const isValid = await bcrypt.compare(password, user.password);
 
     if (!isValid) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Update login timestamp
     await dbClient.user.update({
       where: { id: user.id },
       data: { lastLoggedIn: new Date() },
     });
 
-    // it will generate a jwt token
     const token = jwt.sign({ email }, process.env.JWT_SECRET!, {
       expiresIn: '2d',
     });
 
     return res.status(200).json({
-      message: 'Login successful',
+      success: true,
+      message: 'LOGIN_SUCCESSFUL',
       token,
       user: {
         email: user.email,
@@ -108,7 +121,12 @@ export async function signInVerify(req: Request, res: Response) {
 
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({
+      success: true,
+      message: null,
+      error: 'INTERNAL_SERVER_ERROR' 
+    })
+    return;
   }
 }
 
@@ -119,17 +137,26 @@ export async function getMeHandler(req: Request, res: Response) {
       where: { email: email as string },
       select: { id: true, email: true, balance: true },
     });
+
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      res.status(404).json({ 
+        success: false,
+        message: null,
+        error: 'USER_NOT_FOUND' 
+      })
+      return;
     }
+
     return res.status(200).json({
       id: user.id,
       email: user.email,
       balance: user.balance,
     });
   } catch (err) {
-    res.status(500).json({ 
-      message: 'Internal server error' 
+    res.status(500).json({
+      success: false,
+      message: null,
+      error: 'INTERNAL_SERVER_ERROR',
     })
   } return;
 }

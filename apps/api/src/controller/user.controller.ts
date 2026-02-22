@@ -7,30 +7,45 @@ export async function getUserBalance(req: Request, res: Response) {
     const email = req.user;
 
     if (!email) {
-      res.status(401).json({ error: 'Unauthorized' });
+      res.status(401).json({
+        success: false,
+        message: null,
+        error: 'UNAUTHORIZED_EMAIL' 
+      });
       return;
     }
 
-    // Get balance directly from database
     const user = await dbClient.user.findFirst({
-      where: { email: email as string },
-      select: { balance: true, email: true },
+      where: { 
+        email: email as string 
+      },
+      select: { 
+        balance: true, email: true 
+      },
     });
 
     if (!user) {
-      res.status(404).json({ error: 'User not found' });
+      res.status(404).json({
+        success: false,
+        message: null,
+        error: 'USER_NOT_FOUND'
+      });
       return;
     }
 
-    res.status(200).json({
-      balance: Number(user.balance) || 10000,
+    return res.status(200).json({
+      success: true,
+      message: Number(user.balance) || 10000,
+      error: null,
     });
 
   } catch (err) {
     console.log(err);
 
     res.status(500).json({
-       message: 'Internal server error' 
+      success: false,
+      message: null,
+      error: 'INTERNAL_SERVER_ERROR' 
     })
     return;
   }
