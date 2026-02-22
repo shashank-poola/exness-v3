@@ -5,7 +5,7 @@ import mainRouter from './routes/index.js';
 import cookieParser from 'cookie-parser';
 import { httpPusher } from '@exness-v3/redis/streams';
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 const app = express();
 

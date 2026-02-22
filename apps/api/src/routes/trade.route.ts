@@ -1,11 +1,5 @@
 import express from 'express';
-import {
-  closeOrder,
-  createOrder,
-  fetchCloseOrders,
-  fetchOpenOrders,
-  fetchCandlesticks,
-} from '../controller/trade.controller.js';
+import { closeOrder, createOrder, fetchCloseOrders, fetchOpenOrders, fetchCandlesticks } from '../controller/trade.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 
 const tradeRouter = express();
