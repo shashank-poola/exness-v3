@@ -49,7 +49,7 @@ export async function signupHandler(req: Request, res: Response) {
 
     return res.status(201).json({
       success: true,
-      message: 'SIGNUP_SUCCESSFULLY',
+      message: 'SIGNUP_SUCCESSFULL',
       token,
       user: {
         email: user.email,
