@@ -46,7 +46,7 @@ export async function createOrder(req: Request, res: Response) {
 
     const streamId = await httpPusher.xAdd(CREATE_ORDER_QUEUE, '*', payload);
 
-    const { tradeDetails } = await redisSubscriber.waitForMessage(requestId);
+    const { tradeDetails } = await redisSubscriber.waitForMessage<{ tradeDetails: unknown }>(requestId);
 
     res.status(201).json({
       success: true,
@@ -94,7 +94,7 @@ export async function closeOrder(req: Request, res: Response) {
   await httpPusher.xAdd(CREATE_ORDER_QUEUE, '*', payload);
 
   try {
-    const { status, reason } = await redisSubscriber.waitForMessage(requestId);
+    const { status, reason } = await redisSubscriber.waitForMessage<{ status: string; reason?: string }>(requestId);
 
     return res.status(201).json({
       success: true,
@@ -171,7 +171,7 @@ export async function fetchOpenOrders(req: Request, res: Response) {
     const res1 = await httpPusher.xAdd(CREATE_ORDER_QUEUE, '*', payload);
     console.log(res1);
 
-    const { orders } = await redisSubscriber.waitForMessage(requestId);
+    const { orders } = await redisSubscriber.waitForMessage<{ orders: unknown }>(requestId);
     console.log(orders);
 
     return res.status(200).json({
@@ -217,7 +217,7 @@ export async function fetchCandlesticks(req: Request, res: Response) {
 
     const streamResult = await httpPusher.xAdd(CREATE_ORDER_QUEUE, '*', payload);
 
-    const { candlesticks } = await redisSubscriber.waitForMessage(requestId);
+    const { candlesticks } = await redisSubscriber.waitForMessage<{ candlesticks: unknown }>(requestId);
 
     res.status(200).json({ 
       success: true,
