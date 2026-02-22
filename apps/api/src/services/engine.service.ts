@@ -6,6 +6,7 @@ const redisSub = RedisSubscriber.getInstance();
 
 export async function createUserInEngine(user: User) {
     const requestId = Date.now().toString();
+    
     const payload = {
         type: 'USER_CREATED',
         requestId,
@@ -18,12 +19,16 @@ export async function createUserInEngine(user: User) {
     };
 
     await httpPusher.xAdd('stream:engine', '*', payload);
+
     const res = await redisSub.waitForMessage(requestId);
+
     return res;
 }
 
 export async function getUserBalanceFromEngine(email: string, password: string) {
+
     const requestId = Date.now().toString();
+
     const payload = {
         type: 'GET_USER_BALANCE',
         requestId,
@@ -35,7 +40,9 @@ export async function getUserBalanceFromEngine(email: string, password: string) 
 
     const res1 = await httpPusher.xAdd('stream:engine', '*', payload);
     console.log(res1);
-    const res = await redisSub.waitForMessage(requestId);
-    console.log(res)
+
+    const res = await redisSub.waitForMessage<{ balance: number }>(requestId);
+    console.log(res);
+
     return res.balance;
 }
