@@ -39,8 +39,13 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   const [fontsLoaded] = Font.useFonts({
+    "Sora-Bold": require("../../assets/fonts/Sora-Bold.ttf"),
+    "Sora-ExtraBold": require("../../assets/fonts/Sora-ExtraBold.ttf"),
+    "Sora-ExtraLight": require("../../assets/fonts/Sora-ExtraLight.ttf"),
+    "Sora-Light": require("../../assets/fonts/Sora-Light.ttf"),
     "Sora-Regular": require("../../assets/fonts/Sora-Regular.ttf"),
     "Sora-Medium": require("../../assets/fonts/Sora-Medium.ttf"),
+    "Sora-SemiBold": require("../../assets/fonts/Sora-SemiBold.ttf"),
   });
 
   useEffect(() => {
