@@ -9,10 +9,7 @@ interface ActionButtonsProps {
   onSellPress?: () => void;
 }
 
-const ActionButtons: React.FC<ActionButtonsProps> = ({
-  onBuyPress,
-  onSellPress,
-}) => {
+const ActionButtons: React.FC<ActionButtonsProps> = ({ onBuyPress, onSellPress }) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity

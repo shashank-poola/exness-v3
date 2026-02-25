@@ -38,19 +38,7 @@ async function fetchBinanceKlines(
 export function useCandlesticks(symbol: string, timeframe: string) {
   return useQuery<Candlestick[]>({
     queryKey: ["candlesticks", symbol, timeframe],
-    queryFn: async () => {
-      try {
-        const result = await getCandlesticksService(symbol, timeframe);
-        if (result.success && result.data) {
-          const raw = result.data as { candlesticks?: Candlestick[]; message?: Candlestick[] };
-          const list = raw.candlesticks ?? raw.message;
-          if (Array.isArray(list) && list.length > 0) return list;
-        }
-      } catch {
-        // Backend failed (e.g. 500) or returned empty — use Binance fallback
-      }
-      return fetchBinanceKlines(symbol, timeframe);
-    },
+    queryFn: async () => fetchBinanceKlines(symbol, timeframe),
     refetchInterval: 5000,
     staleTime: 2000,
     retry: 1,

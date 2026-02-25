@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Image, Pressable, ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from "react-native";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ActionButtons from "@/src/components/trading/ActionButtons";
 import HoldingsSection from "@/src/components/trading/HoldingsSection";
@@ -20,14 +20,28 @@ import {
   SYMBOL_TO_WS_SYMBOL,
   type SupportedSymbol,
 } from "@/src/constants/markets";
+import OrderBottomSheet, {
+  type OrderBottomSheetRef,
+} from "@/src/components/trading/OrderBottomSheet";
 
 const TIMEFRAMES = ["1m", "5m", "30m", "1h", "6h", "1d", "3d"];
 
 export default function MarketsScreen() {
+  const params = useLocalSearchParams<{ symbol?: string }>();
   const [selectedTimeframe, setSelectedTimeframe] = useState<string>("1m");
   const [selectedSymbol, setSelectedSymbol] = useState<SupportedSymbol>("BTC");
   const [isSymbolMenuOpen, setIsSymbolMenuOpen] = useState(false);
   const router = useRouter();
+  const orderSheetRef = useRef<OrderBottomSheetRef | null>(null);
+
+  useEffect(() => {
+    const raw = params.symbol;
+    if (!raw) return;
+    const upper = String(raw).toUpperCase();
+    if (SUPPORTED_SYMBOLS.includes(upper as SupportedSymbol)) {
+      setSelectedSymbol(upper as SupportedSymbol);
+    }
+  }, [params.symbol]);
 
   const prices = useMarketPrices((symbol, price, time) => {
     processPriceTick({ symbol, price, time });
@@ -114,12 +128,20 @@ export default function MarketsScreen() {
 
         <PriceChart symbol={wsSymbol} timeframe={selectedTimeframe} />
 
-        <ActionButtons />
+        <ActionButtons
+          onBuyPress={() => orderSheetRef.current?.open("BUY")}
+          onSellPress={() => orderSheetRef.current?.open("SELL")}
+        />
 
-        <HoldingsSection hasPosition={false} />
+        <HoldingsSection symbol={selectedSymbol} />
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
+      <OrderBottomSheet
+        ref={orderSheetRef}
+        symbol={selectedSymbol}
+        currentPrice={displayPrice}
+      />
     </SafeAreaView>
   );
 }

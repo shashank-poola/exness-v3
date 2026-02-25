@@ -1,6 +1,7 @@
 import React from "react";
 import { Image, ImageSourcePropType, StyleSheet, View } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 
 import ThemedText from "../common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
@@ -13,7 +14,13 @@ interface MarketHeaderProps {
   iconSource?: ImageSourcePropType;
 }
 
-const MarketHeader: React.FC<MarketHeaderProps> = ({ baseSymbol, pair, price, changePercent, iconSource }) => {
+const MarketHeader: React.FC<MarketHeaderProps> = ({
+  baseSymbol,
+  pair,
+  price,
+  changePercent,
+  iconSource,
+}) => {
   const numericPrice = typeof price === "number" ? price : undefined;
   const formattedPrice =
     numericPrice != null && numericPrice > 0
@@ -50,6 +57,20 @@ const MarketHeader: React.FC<MarketHeaderProps> = ({ baseSymbol, pair, price, ch
               color={ThemeColor.text.secondary}
             />
           </View>
+        </View>
+
+        <View style={styles.rightIcons}>
+          <Ionicons
+            name="star-outline"
+            size={22}
+            color={ThemeColor.text.secondary}
+            style={styles.rightIcon}
+          />
+          <FontAwesome5
+            name="chart-line"
+            size={20}
+            color={ThemeColor.text.secondary}
+          />
         </View>
       </View>
 
@@ -113,6 +134,13 @@ const styles = StyleSheet.create({
   chevronStack: {
     justifyContent: "center",
     alignItems: "center",
+  },
+  rightIcons: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  rightIcon: {
+    marginRight: 16,
   },
   symbolInfo: {
     gap: 4,

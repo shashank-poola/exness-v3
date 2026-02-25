@@ -1,6 +1,6 @@
 export enum TradeSide {
-    BUY,
-    SELL
+    BUY = "LONG",
+    SELL = "SHORT",
 }
 
 export enum AssetSymbol {

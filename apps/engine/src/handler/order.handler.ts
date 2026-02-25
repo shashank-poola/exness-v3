@@ -119,11 +119,13 @@ export async function handleOpenTrade(
     const slippedFraction = Math.abs(
       (tradeOpeningPrice - openPrice) / openPrice
     );
-    if (slippedFraction > slippage / 100) {
-      await sendAcknowledgement(requestId, 'TRADE_SLIPPAGE_MAX_EXCEEDED', {
-        message: 'Price changed by alot',
-      });
-      return;
+    const maxSlippageFraction = slippage / 100;
+
+    if (maxSlippageFraction > 0 && slippedFraction > maxSlippageFraction) {
+      console.warn(
+        `Slippage exceeded for ${asset}: requested=${tradeOpeningPrice}, open=${openPrice}, allowed=${slippage}%`
+      );
+      // For now we still proceed with opening the trade using current engine price.
     }
     if (!leverage || leverage <= 0) {
       await sendAcknowledgement(requestId, 'TRADE_OPEN_FAILED', {

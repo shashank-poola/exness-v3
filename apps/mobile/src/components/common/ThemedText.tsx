@@ -1,12 +1,12 @@
 import React from "react";
-import { StyleSheet, Text, TextProps, TextStyle } from "react-native";
+import { StyleSheet, Text, TextProps, TextStyle, StyleProp } from "react-native";
 import { ThemeColor } from "@/src/constants/theme";
 
 interface ThemedTextProps extends TextProps {
   children: React.ReactNode;
   size?: "xxl" | "xl" | "lg" | "md" | "sm" | "xs" | "body" | "button";
   variant?: "primary" | "secondary" | "tertiary" | "success" | "error";
-  style?: TextStyle | TextStyle[];
+  style?: StyleProp<TextStyle>;
 }
 
 const ThemedText: React.FC<ThemedTextProps> = ({
@@ -23,13 +23,11 @@ const ThemedText: React.FC<ThemedTextProps> = ({
       case "secondary":
         return ThemeColor.text.secondary;
       case "tertiary":
-        return "#71717A";
+        return ThemeColor.text.tertiary;
       case "success":
         return ThemeColor.status.success;
       case "error":
         return ThemeColor.status.error;
-      case "tertiary":
-        return ThemeColor.text.tertiary;
       default:
         return ThemeColor.text.primary;
     }

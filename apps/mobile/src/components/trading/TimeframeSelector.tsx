@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View, ViewStyle, TextStyle } from "react-native";
 
 import ThemedText from "../common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
@@ -40,6 +40,14 @@ const TimeframeSelector: React.FC<TimeframeSelectorProps> = ({
   );
 };
 
+interface TimeframeStyles {
+  container: ViewStyle;
+  chip: ViewStyle;
+  chipActive: ViewStyle;
+  label: TextStyle;
+  labelActive: TextStyle;
+}
+
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
@@ -65,6 +73,6 @@ const styles = StyleSheet.create({
   labelActive: {
     color: "#FFFFFF",
   },
-});
+}) as TimeframeStyles;
 
 export default TimeframeSelector;

@@ -4,8 +4,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 
 import ScreenHeader from "@/src/components/common/ScreenHeader";
-import ThemedText from "@/src/components/common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
+import PriceMarquee from "@/src/components/home/PriceMarquee";
+import HomePortfolioCard from "@/src/components/home/HomePortfolioCard";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -18,9 +19,8 @@ export default function HomeScreen() {
       />
 
       <View style={styles.content}>
-        <ThemedText size="xl" variant="primary">
-          Home
-        </ThemedText>
+        <PriceMarquee />
+        <HomePortfolioCard />
       </View>
     </SafeAreaView>
   );
@@ -33,7 +33,5 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 16,
   },
 });
