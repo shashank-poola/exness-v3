@@ -75,7 +75,7 @@ const MarketHeader: React.FC<MarketHeaderProps> = ({
       </View>
 
       <View style={styles.symbolInfo}>
-        <ThemedText size="sm" variant="secondary" style={styles.pairLabel}>
+        <ThemedText size="lg" variant="primary" style={styles.pairLabel}>
           {pair}
         </ThemedText>
         <View style={styles.priceRow}>
@@ -104,7 +104,7 @@ const MarketHeader: React.FC<MarketHeaderProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 24,
+    marginBottom: 16,
   },
   rowTop: {
     flexDirection: "row",
@@ -147,6 +147,7 @@ const styles = StyleSheet.create({
   },
   pairLabel: {
     letterSpacing: 0.5,
+    fontFamily: "Sora-SemiBold",
   },
   priceRow: {
     flexDirection: "row",

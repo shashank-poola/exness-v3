@@ -86,7 +86,7 @@ const HoldingsSection: React.FC<HoldingsSectionProps> = ({ symbol }) => {
                       Entry
                     </ThemedText>
                     <ThemedText size="sm" variant="primary">
-                      {position.openPrice.toFixed(2)}
+                      {position.tradeOpeningPrice.toFixed(2)}
                     </ThemedText>
                   </View>
                 </View>

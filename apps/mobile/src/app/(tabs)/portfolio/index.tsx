@@ -10,6 +10,7 @@ import { ThemeColor } from "@/src/constants/theme";
 import CardContainer from "@/src/components/common/CardContainer";
 import { useOpenTrades } from "@/src/hooks/useTrade";
 import { useMarketPrices } from "@/src/hooks/useMarketPrices";
+import { useUserBalance } from "@/src/hooks/useUserBalance";
 import type { OpenOrder } from "@/src/types/order.type";
 import { SYMBOL_ICON_MAP, type SupportedSymbol } from "@/src/constants/markets";
 
@@ -30,6 +31,7 @@ export default function PortfolioScreen() {
   const [showValues, setShowValues] = useState(true);
   const { data: openOrders, isLoading } = useOpenTrades();
   const prices = useMarketPrices();
+  const { data: balance } = useUserBalance();
 
   const enriched = useMemo(() => {
     if (!openOrders) return [];
@@ -85,7 +87,9 @@ export default function PortfolioScreen() {
                 Portfolio
               </ThemedText>
               <ThemedText size="xl" variant="primary" style={styles.portfolioBalance}>
-                {showValues ? `$${hasPositions ? totalEquity.toFixed(2) : "0.00"}` : "••••••"}
+                {showValues
+                  ? `$${typeof balance === "number" ? balance.toFixed(2) : "0.00"}`
+                  : "••••••"}
               </ThemedText>
               <ThemedText
                 size="sm"
@@ -154,7 +158,16 @@ export default function PortfolioScreen() {
 
                   <View style={styles.positionRight}>
                     <ThemedText size="sm" variant="secondary">
-                      Qty {position.quantity.toFixed(3)}
+                      Entry {position.tradeOpeningPrice.toFixed(2)}
+                    </ThemedText>
+                    <ThemedText size="xs" variant="secondary">
+                      Current{" "}
+                      {position.currentPrice != null
+                        ? position.currentPrice.toFixed(2)
+                        : "--"}
+                    </ThemedText>
+                    <ThemedText size="xs" variant="secondary">
+                      Margin ${position.margin.toFixed(2)}
                     </ThemedText>
                     <ThemedText
                       size="sm"

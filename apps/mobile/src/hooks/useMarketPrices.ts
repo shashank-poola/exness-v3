@@ -31,8 +31,16 @@ interface LegacyTradeMessage {
 }
 
 function mapPairToUiSymbol(pair: string): string {
-  const compact = pair.replace("_", "");
-  if (compact.endsWith("USDC")) return compact.replace("USDC", "USDT");
+  // Normalise engine / aggregator symbols like "BTC_USDC" or "BTC_USDC_PERP"
+  // into the compact UI symbols we use everywhere, e.g. "BTCUSDT".
+  const compact = pair.replace(/_/g, "");
+
+  const usdcIndex = compact.indexOf("USDC");
+  if (usdcIndex !== -1) {
+    const base = compact.slice(0, usdcIndex);
+    return `${base}USDT`;
+  }
+
   return compact;
 }
 

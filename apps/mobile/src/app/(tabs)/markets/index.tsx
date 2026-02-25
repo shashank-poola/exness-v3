@@ -156,13 +156,13 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: 16,
-    paddingTop: 24,
+    paddingTop: 16,
   },
   bottomSpacer: {
     height: 16,
   },
   headerSection: {
-    marginBottom: 12,
+    marginBottom: 6,
   },
   symbolMenu: {
     marginTop: 4,

@@ -1,18 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
+import { QueryKeys } from "../types/queryKeys.type";
 import { getUserBalanceService } from "../services/balance.service";
 
-// Legacy hook kept for compatibility; returns the numeric balance.
-export const useBalance = () => {
-  return useQuery({
-    queryKey: ["balance"],
+export function useUserBalance() {
+  return useQuery<number>({
+    queryKey: [QueryKeys.USER_BALANCE],
     queryFn: async () => {
       const result = await getUserBalanceService();
       if (result.success && typeof result.data === "number") {
-        return { balance: result.data };
+        return result.data;
       }
-      return { balance: 0 };
+      throw new Error(result.error ?? "Failed to fetch balance");
     },
-    refetchInterval: 5000,
-    retry: 1,
+    staleTime: 30_000,
   });
-};
+}
+

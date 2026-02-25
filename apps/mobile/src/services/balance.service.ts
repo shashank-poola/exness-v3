@@ -1,16 +1,14 @@
-import apiCaller from './api.service';
-import type { BalanceResponse } from '../types/user.type';
-import { ServerError, Ok, type ServiceResult } from '../utils/api-result';
-import { logger } from './logger.service';
+import apiCaller from "./api.service";
+import { Ok, ServerError, type ServiceResult } from "../utils/api-result";
+import { logger } from "./logger.service";
 
-export async function getBalanceService(): Promise<ServiceResult<BalanceResponse>> {
-    try {
-        const data = await apiCaller.get<BalanceResponse>('/balance/me');
-        return Ok(data);
-
-    } catch (error) {
-        logger.error('getBalance', "Error getting user Balance", error);
-
-        return ServerError();
-    }
+// Unified balance service: adapts /balance/me { message: number } response
+export async function getUserBalanceService(): Promise<ServiceResult<number>> {
+  try {
+    const data = await apiCaller.get<{ message: number }>("/balance/me");
+    return Ok(data.message);
+  } catch (error) {
+    logger.error("getUserBalanceService", "Error fetching user balance", error);
+    return ServerError();
+  }
 }

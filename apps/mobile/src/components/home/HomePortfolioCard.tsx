@@ -7,6 +7,7 @@ import ThemedText from "@/src/components/common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
 import { useOpenTrades } from "@/src/hooks/useTrade";
 import { useMarketPrices } from "@/src/hooks/useMarketPrices";
+import { useUserBalance } from "@/src/hooks/useUserBalance";
 import type { OpenOrder } from "@/src/types/order.type";
 import type { SupportedSymbol } from "@/src/constants/markets";
 
@@ -26,6 +27,7 @@ const HomePortfolioCard: React.FC = () => {
   const [showValues, setShowValues] = useState(true);
   const { data: openOrders } = useOpenTrades();
   const prices = useMarketPrices();
+  const { data: balance } = useUserBalance();
 
   const { totalEquity, totalPnl, totalPnlPercent, hasPositions } = useMemo(() => {
     if (!openOrders) {
@@ -89,7 +91,9 @@ const HomePortfolioCard: React.FC = () => {
             Portfolio
           </ThemedText>
           <ThemedText size="xl" variant="primary" style={styles.balance}>
-            {showValues ? `$${hasPositions ? totalEquity.toFixed(2) : "0.00"}` : "••••••"}
+            {showValues
+              ? `$${typeof balance === "number" ? balance.toFixed(2) : "0.00"}`
+              : "••••••"}
           </ThemedText>
           <ThemedText
             size="sm"

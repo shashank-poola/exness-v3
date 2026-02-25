@@ -82,9 +82,10 @@ const PriceMarquee: React.FC = () => {
         style={[styles.marqueeContent, { transform: [{ translateX }] }]}
         onLayout={handleContentLayout}
       >
-        {TICKERS.map((item, index) => {
+        {([...TICKERS, ...TICKERS] as TickerInfo[]).map((item, index) => {
           const priceEntry = prices[item.wsSymbol];
-          const price = priceEntry ? priceEntry.ask || priceEntry.bid || 0 : 0;
+          // Show the current buy price (ask) explicitly in the marquee
+          const price = priceEntry ? priceEntry.ask : 0;
           const change = changeBySymbol[item.symbol];
           const isPositive = change != null && change >= 0;
 
@@ -95,7 +96,7 @@ const PriceMarquee: React.FC = () => {
           return (
             <Pressable
               style={styles.tickerItem}
-              key={item.symbol}
+              key={`${item.symbol}-${index}`}
               onPress={() =>
                 router.push({
                   pathname: "/(tabs)/markets/[symbol]",
@@ -112,7 +113,7 @@ const PriceMarquee: React.FC = () => {
                   {isPositive ? "▲" : "▼"} {Math.abs(change).toFixed(2)}%
                 </ThemedText>
               )}
-              {index < TICKERS.length - 1 && (
+              {index < TICKERS.length * 2 - 1 && (
                 <View style={styles.separatorWrapper}>
                   <ThemedText size="sm" variant="secondary">
                     |
@@ -146,15 +147,12 @@ function formatPrice(price: number | undefined): string {
 
 const styles = StyleSheet.create({
   outer: {
-    marginHorizontal: 16,
-    marginTop: 12,
+    marginHorizontal: 0,
+    marginTop: 8,
     overflow: "hidden",
-    borderRadius: 999,
-    backgroundColor: "#09090B",
-    borderWidth: 1,
-    borderColor: "#27272A",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    backgroundColor: "#000000",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
   marqueeContent: {
     flexDirection: "row",
@@ -164,22 +162,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    marginRight: 18,
+    marginRight: 24,
   },
   icon: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
   },
   textBlock: {
     flexDirection: "column",
     gap: 2,
   },
   priceText: {
-    marginRight: 4,
+    marginRight: 6,
+    fontSize: 16,
   },
   changeInline: {
-    fontSize: 12,
+    fontSize: 14,
   },
   changeText: {
     fontSize: 11,

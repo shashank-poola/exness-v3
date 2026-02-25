@@ -27,8 +27,8 @@ export async function closeOrderService(orderId: string): Promise<ServiceResult<
 
 export async function getOpenOrdersService(): Promise<ServiceResult<OpenOrder[]>> {
   try {
-    const data = await apiCaller.get<{ orders: OpenOrder[] }>('/trade/get-open-orders');
-    return Ok(data.orders);
+    const data = await apiCaller.get<{ message: OpenOrder[] }>('/trade/get-open-orders');
+    return Ok(data.message);
   } catch (error) {
     logger.error('getOpenOrdersService', 'Error fetching open orders', error);
 
@@ -38,8 +38,8 @@ export async function getOpenOrdersService(): Promise<ServiceResult<OpenOrder[]>
 
 export async function getClosedOrdersService(): Promise<ServiceResult<ClosedOrder[]>> {
   try {
-    const data = await apiCaller.get<{ orders: ClosedOrder[] }>('/trade/get-close-orders');
-    return Ok(data.orders);
+    const data = await apiCaller.get<{ message: ClosedOrder[] }>('/trade/get-close-orders');
+    return Ok(data.message);
   } catch (error) {
     logger.error('getClosedOrdersService', 'Error fetching closed orders', error);
 
