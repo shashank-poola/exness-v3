@@ -1,52 +1,33 @@
 import React, { useMemo, useState } from "react";
-import {
-  Image,
-  Pressable,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Image, Pressable, ScrollView, StatusBar, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import ActionButtons from "@/src/components/trading/ActionButtons";
 import HoldingsSection from "@/src/components/trading/HoldingsSection";
 import MarketHeader from "@/src/components/trading/MarketHeader";
 import PriceChart from "@/src/components/trading/PriceChart";
 import TimeframeSelector from "@/src/components/trading/TimeframeSelector";
 import ThemedText from "@/src/components/common/ThemedText";
+import ScreenHeader from "@/src/components/common/ScreenHeader";
 import { ThemeColor } from "@/src/constants/theme";
 import { useMarketPrices } from "@/src/hooks/useMarketPrices";
 import { useCandlestickChangePercent, useCandlesticks } from "@/src/hooks/useCandlesticks";
 import { processPriceTick } from "@/src/lib/candlestick-store";
+import {
+  SUPPORTED_SYMBOLS,
+  SYMBOL_ICON_MAP,
+  SYMBOL_TO_PAIR,
+  SYMBOL_TO_WS_SYMBOL,
+  type SupportedSymbol,
+} from "@/src/constants/markets";
 
 const TIMEFRAMES = ["1m", "5m", "30m", "1h", "6h", "1d", "3d"];
-const SUPPORTED_SYMBOLS = ["BTC", "ETH", "SOL"] as const;
-type SupportedSymbol = (typeof SUPPORTED_SYMBOLS)[number];
-
-const SYMBOL_TO_PAIR: Record<SupportedSymbol, string> = {
-  BTC: "BTC/USD",
-  ETH: "ETH/USD",
-  SOL: "SOL/USD",
-};
-
-const SYMBOL_TO_WS_SYMBOL: Record<SupportedSymbol, string> = {
-  BTC: "BTCUSDT",
-  ETH: "ETHUSDT",
-  SOL: "SOLUSDT",
-};
-
-const SYMBOL_ICON_MAP: Record<SupportedSymbol, any> = {
-  BTC: require("../../../../assets/images/exness/btc.png"),
-  ETH: require("../../../../assets/images/exness/eth.png"),
-  SOL: require("../../../../assets/images/exness/solana.png"),
-};
 
 export default function MarketsScreen() {
   const [selectedTimeframe, setSelectedTimeframe] = useState<string>("1m");
   const [selectedSymbol, setSelectedSymbol] = useState<SupportedSymbol>("BTC");
   const [isSymbolMenuOpen, setIsSymbolMenuOpen] = useState(false);
+  const router = useRouter();
 
   const prices = useMarketPrices((symbol, price, time) => {
     processPriceTick({ symbol, price, time });
@@ -74,17 +55,18 @@ export default function MarketsScreen() {
 
   const displayPrice = currentPrice?.ask ?? midPrice ?? lastClose;
 
-  const assetIconSource = useMemo(
-    () => SYMBOL_ICON_MAP[selectedSymbol],
-    [selectedSymbol]
-  );
-
+  const assetIconSource = useMemo( () => SYMBOL_ICON_MAP[selectedSymbol], [selectedSymbol] );
   return (
     <SafeAreaView
       style={styles.safeArea}
       edges={["top", "bottom", "left", "right"]}
     >
       <StatusBar barStyle="light-content" />
+
+      <ScreenHeader
+        onBackPress={() => router.push("/(tabs)/home")}
+        onSearchPress={() => router.push("/(tabs)/markets/search")}
+      />
 
       <ScrollView
         style={styles.scroll}
@@ -118,14 +100,6 @@ export default function MarketsScreen() {
                     source={SYMBOL_ICON_MAP[symbol]}
                     style={styles.symbolMenuIcon}
                   />
-                  <View>
-                    <ThemedText size="sm" variant="primary">
-                      {symbol}
-                    </ThemedText>
-                    <ThemedText size="xs" variant="secondary">
-                      {SYMBOL_TO_PAIR[symbol]}
-                    </ThemedText>
-                  </View>
                 </TouchableOpacity>
               ))}
             </View>
@@ -171,21 +145,23 @@ const styles = StyleSheet.create({
   symbolMenu: {
     marginTop: 4,
     backgroundColor: "#09090B",
-    borderRadius: 10,
+    borderRadius: 999,
     paddingVertical: 6,
     paddingHorizontal: 8,
     borderWidth: 1,
     borderColor: "#27272A",
-  },
-  symbolMenuItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 6,
+    justifyContent: "flex-start",
     gap: 8,
   },
+  symbolMenuItem: {
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+  },
   symbolMenuIcon: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
   },
 });

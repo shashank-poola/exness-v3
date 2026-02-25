@@ -1,19 +1,39 @@
-import { StyleSheet, Text, View } from 'react-native';
+import React from "react";
+import { StyleSheet, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
+
+import ScreenHeader from "@/src/components/common/ScreenHeader";
+import ThemedText from "@/src/components/common/ThemedText";
+import { ThemeColor } from "@/src/constants/theme";
 
 export default function PortfolioScreen() {
+  const router = useRouter();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Portfolio</Text>
-    </View>
+    <SafeAreaView style={styles.safeArea} edges={["top", "bottom", "left", "right"]}>
+      <ScreenHeader
+        onBackPress={() => router.push("/(tabs)/home")}
+        onSearchPress={() => router.push("/(tabs)/markets/search")}
+      />
+
+      <View style={styles.content}>
+        <ThemedText size="xl" variant="primary">
+          Portfolio
+        </ThemedText>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#000000',
+    backgroundColor: ThemeColor.background.app,
   },
-  text: { color: '#fff' },
+  content: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
 });

@@ -11,7 +11,7 @@ interface HoldingsSectionProps {
 const HoldingsSection: React.FC<HoldingsSectionProps> = ({ hasPosition }) => {
   return (
     <View style={styles.wrapper}>
-      <ThemedText size="lg" variant="primary" style={styles.title}>
+      <ThemedText size="xl" variant="primary" style={styles.title}>
         Holdings
       </ThemedText>
 

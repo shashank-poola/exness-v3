@@ -1,7 +1,6 @@
 import React from "react";
 import { Image, ImageSourcePropType, StyleSheet, View } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 
 import ThemedText from "../common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
@@ -14,13 +13,7 @@ interface MarketHeaderProps {
   iconSource?: ImageSourcePropType;
 }
 
-const MarketHeader: React.FC<MarketHeaderProps> = ({
-  baseSymbol,
-  pair,
-  price,
-  changePercent,
-  iconSource,
-}) => {
+const MarketHeader: React.FC<MarketHeaderProps> = ({ baseSymbol, pair, price, changePercent, iconSource }) => {
   const numericPrice = typeof price === "number" ? price : undefined;
   const formattedPrice =
     numericPrice != null && numericPrice > 0
@@ -36,7 +29,7 @@ const MarketHeader: React.FC<MarketHeaderProps> = ({
 
   return (
     <View style={styles.container}>
-      <View style={styles.left}>
+      <View style={styles.rowTop}>
         <View style={styles.assetWrapper}>
           <View style={styles.assetIcon}>
             {iconSource ? (
@@ -45,17 +38,26 @@ const MarketHeader: React.FC<MarketHeaderProps> = ({
               <ThemedText size="lg">{baseSymbol[0]}</ThemedText>
             )}
           </View>
-          <Ionicons
-            name="chevron-down"
-            size={16}
-            color={ThemeColor.text.secondary}
-          />
+          <View style={styles.chevronStack}>
+            <Ionicons
+              name="chevron-up-outline"
+              size={12}
+              color={ThemeColor.text.secondary}
+            />
+            <Ionicons
+              name="chevron-down-outline"
+              size={12}
+              color={ThemeColor.text.secondary}
+            />
+          </View>
         </View>
+      </View>
 
-        <View style={styles.symbolInfo}>
-          <ThemedText size="sm" variant="secondary" style={styles.pairLabel}>
-            {pair}
-          </ThemedText>
+      <View style={styles.symbolInfo}>
+        <ThemedText size="sm" variant="secondary" style={styles.pairLabel}>
+          {pair}
+        </ThemedText>
+        <View style={styles.priceRow}>
           <ThemedText
             size="xxl"
             variant="primary"
@@ -75,40 +77,24 @@ const MarketHeader: React.FC<MarketHeaderProps> = ({
           </View>
         </View>
       </View>
-
-      <View style={styles.right}>
-        <Ionicons
-          name="star-outline"
-          size={22}
-          color={ThemeColor.text.secondary}
-          style={styles.icon}
-        />
-        <FontAwesome5
-          name="chart-line"
-          size={20}
-          color={ThemeColor.text.secondary}
-        />
-      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    marginBottom: 24,
+  },
+  rowTop: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 24,
-  },
-  left: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
+    marginBottom: 8,
   },
   assetWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: 8,
   },
   assetIcon: {
     width: 40,
@@ -124,14 +110,24 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     resizeMode: "cover",
   },
+  chevronStack: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
   symbolInfo: {
     gap: 4,
   },
-  priceFont: {
-    fontFamily: "Sora-SemiBold",
-  },
   pairLabel: {
     letterSpacing: 0.5,
+  },
+  priceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 2,
+  },
+  priceFont: {
+    fontFamily: "Sora-SemiBold",
   },
   changePill: {
     paddingHorizontal: 8,
@@ -147,13 +143,6 @@ const styles = StyleSheet.create({
   changeText: {
     fontFamily: "Sora-SemiBold",
     color: "#FFFFFF",
-  },
-  right: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  icon: {
-    marginRight: 16,
   },
 });
 

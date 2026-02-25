@@ -34,12 +34,12 @@ const CHART_HTML = `
         width: container.clientWidth,
         height: container.clientHeight,
         timeScale: {
-          timeVisible: true,
+          timeVisible: false,
           secondsVisible: false,
           borderColor: '#2B2B43',
         },
         rightPriceScale: {
-          visible: false,
+          visible: true,
           borderVisible: false,
           borderColor: 'transparent',
         },
@@ -49,8 +49,8 @@ const CHART_HTML = `
         topColor: 'rgba(230, 126, 34, 0.4)',
         bottomColor: 'rgba(230, 126, 34, 0.0)',
         lineWidth: 2,
-        priceLineVisible: false,
-        lastValueVisible: false,
+        priceLineVisible: true,
+        lastValueVisible: true,
       });
     }
     function updateData(candles) {

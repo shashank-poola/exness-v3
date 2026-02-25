@@ -2,7 +2,6 @@ import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Octicons from "@expo/vector-icons/Octicons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-
 import ThemedText from "../common/ThemedText";
 
 interface ActionButtonsProps {

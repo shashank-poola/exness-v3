@@ -1,7 +1,8 @@
 import { Tabs } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Foundation from '@expo/vector-icons/Foundation';
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import Octicons from '@expo/vector-icons/Octicons';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import React from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -35,7 +36,7 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color, size, focused }) => (
-            <Ionicons name={focused ? 'home' : 'home-outline'} size={size} color={color} />
+            <Octicons name={focused ? 'home-fill' : 'home'} size={size} color={color} />
           ),
         }}
       />
@@ -60,7 +61,7 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, size, focused }) => (
-            <FontAwesome5 name="user-circle" size={size} color={color} solid={focused} />
+            <FontAwesome name={focused ? 'user-circle' : 'user-circle-o'} size={size} color={color} />
           ),
         }}
       />
