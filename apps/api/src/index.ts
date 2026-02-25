@@ -13,7 +13,7 @@ const ALLOWED_ORIGINS = [
   "https://exness-v3-web.vercel.app",
   "https://tradex.foo",
   "https://www.tradex.foo",
-  "http://192.168.0.84:3000"
+  "http://192.168.0.116:3000"
 ];
 
 // Connect Redis once at starting up
@@ -30,6 +30,6 @@ app.use(cookieParser());
 
 app.use('/api/v1', mainRouter);
 
-app.listen(PORT, () => {
+app.listen(3000, "0.0.0.0", () => {
   console.log('Server started on PORT: 3000',);
 });

@@ -5,7 +5,7 @@ import { authService } from '@/src/services/auth.service';
 import { logger } from '@/src/services/logger.service';
 import { ThemeColor } from '@/src/constants/theme';
 import React, { useMemo, useState } from 'react';
-import { Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function SignUpScreen() {
   const router = useRouter();
@@ -64,8 +64,11 @@ export default function SignUpScreen() {
         style={styles.logo}
         resizeMode="contain"
       />
-      <ThemedText size="xxl" style={styles.title}>
+      <ThemedText size="xxl" style={[styles.title, styles.semibold]}>
         Sign Up
+      </ThemedText>
+      <ThemedText size="sm" variant="secondary" style={styles.tagline}>
+        Trade smarter. Move faster
       </ThemedText>
 
       <View style={styles.form}>
@@ -121,7 +124,7 @@ export default function SignUpScreen() {
           onPress={handleSubmit}
           disabled={loading || !isFormValid}
         >
-          <ThemedText size="button" style={styles.submitButtonText}>
+          <ThemedText size="button" style={[styles.submitButtonText, styles.semibold]}>
             {loading ? 'Loading...' : 'Sign Up'}
           </ThemedText>
         </TouchableOpacity>
@@ -129,7 +132,7 @@ export default function SignUpScreen() {
 
       <TouchableOpacity style={styles.toggleButton} onPress={() => router.push('/(auth)/signin')}>
         <ThemedText size="sm">
-          Already have an account? Sign In
+          Already have an account? <Text style={styles.semibold}>Sign In</Text>
         </ThemedText>
       </TouchableOpacity>
     </View>
@@ -200,6 +203,13 @@ const styles = StyleSheet.create({
   },
   toggleButton: {
     alignItems: 'center',
+  },
+  tagline: {
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  semibold: {
+    fontFamily: 'Sora-SemiBold',
   },
   submitButtonDisabled: {
     opacity: 0.5,

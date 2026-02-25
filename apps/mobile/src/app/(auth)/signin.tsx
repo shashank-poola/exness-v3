@@ -5,7 +5,7 @@ import { logger } from '@/src/services/logger.service';
 import { ThemeColor } from '@/src/constants/theme';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
-import { Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function SignInScreen() {
   const router = useRouter();
@@ -64,8 +64,11 @@ export default function SignInScreen() {
         style={styles.logo}
         resizeMode="contain"
       />
-      <ThemedText size="xxl" style={styles.title}>
+      <ThemedText size="xxl" style={[styles.title, styles.semibold]}>
         Sign In
+      </ThemedText>
+      <ThemedText size="sm" variant="secondary" style={styles.tagline}>
+        Trade smarter. Move faster
       </ThemedText>
 
       <View style={styles.form}>
@@ -121,7 +124,7 @@ export default function SignInScreen() {
           onPress={handleSubmit}
           disabled={loading || !isFormValid}
         >
-          <ThemedText size="button" style={styles.submitButtonText}>
+          <ThemedText size="button" style={[styles.submitButtonText, styles.semibold]}>
             {loading ? 'Loading...' : 'Sign In'}
           </ThemedText>
         </TouchableOpacity>
@@ -129,7 +132,7 @@ export default function SignInScreen() {
 
       <TouchableOpacity style={styles.toggleButton} onPress={() => router.push('/(auth)/signup')}>
         <ThemedText size="sm">
-          Don't have an account? Sign Up
+          Don't have an account? <Text style={styles.semibold}>Sign Up</Text>
         </ThemedText>
       </TouchableOpacity>
     </View>
@@ -198,8 +201,15 @@ const styles = StyleSheet.create({
   submitButtonText: {
     color: ThemeColor.background.app,
   },
+  tagline: {
+    textAlign: 'center',
+    marginBottom: 24,
+  },
   toggleButton: {
     alignItems: 'center',
+  },
+  semibold: {
+    fontFamily: 'Sora-SemiBold',
   },
   submitButtonDisabled: {
     opacity: 0.5,

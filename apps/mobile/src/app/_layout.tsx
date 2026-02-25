@@ -4,9 +4,12 @@ import * as SplashScreen from "expo-splash-screen";
 import { Stack, useRouter, type Href } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider, useAuth } from "@/src/context/auth-context";
 
 SplashScreen.preventAutoHideAsync();
+
+const queryClient = new QueryClient();
 
 function RootLayoutNav() {
   const { user, isLoading } = useAuth();
@@ -56,10 +59,12 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <StatusBar style="light" />
-        <RootLayoutNav />
-      </AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <StatusBar style="light" />
+          <RootLayoutNav />
+        </AuthProvider>
+      </QueryClientProvider>
     </SafeAreaProvider>
   );
 }
