@@ -14,7 +14,7 @@ import Octicons from "@expo/vector-icons/Octicons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import ThemedText from "@/src/components/common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
-import type { SupportedSymbol } from "@/src/constants/markets";
+import { SYMBOL_TO_PAIR, type SupportedSymbol } from "@/src/constants/markets";
 import { useCreateTrade } from "@/src/hooks/useTrade";
 import { TradeSide, type OrderRequest } from "@/src/types/order.type";
 import LeverageSlider from "./LeverageSlider";
@@ -46,7 +46,7 @@ const getSideChipActiveStyle = (isBuy: boolean): ViewStyle => ({
 const OrderBottomSheet = forwardRef<OrderBottomSheetRef, OrderBottomSheetProps>(
   ({ symbol, currentPrice }, ref) => {
     const bottomSheetRef = useRef<BottomSheetModal>(null);
-    const snapPoints = useMemo(() => ["30%", "90%"], []);
+    const snapPoints = useMemo(() => ["90%", "90%"], []);
 
     const [side, setSide] = useState<Side>("BUY");
     const [quantity, setQuantity] = useState("1");
@@ -120,7 +120,7 @@ const OrderBottomSheet = forwardRef<OrderBottomSheetRef, OrderBottomSheetProps>(
           >
             <View style={styles.sheetHeader}>
               <ThemedText size="lg" variant="primary">
-                {side === "BUY" ? "Open Buy" : "Open Sell"} {symbol}
+                Open Position - {SYMBOL_TO_PAIR[symbol]}
               </ThemedText>
             </View>
 
@@ -137,7 +137,7 @@ const OrderBottomSheet = forwardRef<OrderBottomSheetRef, OrderBottomSheetProps>(
                       size="sm"
                       variant={active ? "primary" : "secondary"}
                     >
-                      {s}
+                      {s === "BUY" ? "LONG" : "SHORT"}
                     </ThemedText>
                   </Pressable>
                 );
@@ -146,7 +146,7 @@ const OrderBottomSheet = forwardRef<OrderBottomSheetRef, OrderBottomSheetProps>(
 
             <View style={styles.fieldGroup}>
               <ThemedText size="sm" variant="secondary">
-                Volume / Quantity
+                Quantity
               </ThemedText>
               <TextInput
                 value={quantity}
@@ -218,12 +218,12 @@ const OrderBottomSheet = forwardRef<OrderBottomSheetRef, OrderBottomSheetProps>(
             >
               <View style={styles.submitContent}>
                 {side === "BUY" ? (
-                  <Octicons name="feed-plus" size={18} color="#000000" />
+                  <Octicons name="feed-plus" size={20} color="#000000" />
                 ) : (
-                  <FontAwesome5 name="money-bill-wave" size={18} color="#000000" />
+                  <FontAwesome5 name="money-bill-wave" size={20} color="#000000" />
                 )}
                 <ThemedText
-                  size="button"
+                  size="md"
                   style={[
                     styles.submitLabel,
                     side === "BUY" ? styles.submitLabelBuy : styles.submitLabelSell,
@@ -325,11 +325,11 @@ const styles = StyleSheet.create({
   },
   submitBuy: {
     borderWidth: 1,
-    borderColor: "#16A34A",
+    borderColor: "#FFFFFF",
   },
   submitSell: {
     borderWidth: 1,
-    borderColor: "#DC2626",
+    borderColor: "#FFFFFF",
   },
   submitContent: {
     flexDirection: "row",
@@ -340,10 +340,10 @@ const styles = StyleSheet.create({
     color: "#000000",
   },
   submitLabelBuy: {
-    color: "#16A34A",
+    color: "#000000",
   },
   submitLabelSell: {
-    color: "#DC2626",
+    color: "#000000",
   },
 }) as OrderBottomSheetStyles;
 

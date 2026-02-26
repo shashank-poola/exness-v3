@@ -98,7 +98,7 @@ const PriceMarquee: React.FC = () => {
               }
             >
               <Image source={SYMBOL_ICON_MAP[item.symbol]} style={styles.icon} />
-              <ThemedText size="sm" variant="primary" style={styles.priceText}>
+              <ThemedText size="md" variant="primary" style={styles.priceText}>
                 {formatPrice(price)}
               </ThemedText>
               {change != null && (

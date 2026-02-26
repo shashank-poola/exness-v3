@@ -29,7 +29,7 @@ const HomePortfolioCard: React.FC = () => {
   const prices = useMarketPrices();
   const { data: balance } = useUserBalance();
 
-  const { cashBalance, totalPnl, totalPnlPercent, hasPositions } = useMemo(() => {
+  const { cashBalance } = useMemo(() => {
     const numericBalance = typeof balance === "number" ? balance : 0;
 
     if (!openOrders) {
@@ -96,13 +96,13 @@ const HomePortfolioCard: React.FC = () => {
           </ThemedText>
           <View style={styles.actionRow}>
             <Pressable style={[styles.actionButton, styles.actionButtonPrimary]}>
-              <Feather name="plus" size={18} color="#000000" />
+              <Feather name="plus" size={22} color="#727CF5" />
             </Pressable>
             <Pressable style={[styles.actionButton, styles.actionButtonSecondary]}>
-              <Feather name="arrow-down" size={18} color="#FFFFFF" />
+              <Feather name="arrow-down" size={22} color="#FFFFFF" />
             </Pressable>
             <Pressable style={[styles.actionButton, styles.actionButtonTertiary]}>
-              <Feather name="arrow-up" size={18} color="#A1A1AA" />
+              <Feather name="arrow-up" size={22} color="#E4E4E7" />
             </Pressable>
           </View>
         </View>
@@ -141,13 +141,14 @@ const styles = StyleSheet.create({
   },
   actionRow: {
     flexDirection: "row",
-    gap: 8,
-    marginTop: 10,
+    gap: 10,
+    marginTop: 12,
   },
   actionButton: {
     flex: 1,
     borderRadius: 999,
-    paddingVertical: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 50,
     alignItems: "center",
     justifyContent: "center",
   },
