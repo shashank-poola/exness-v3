@@ -1,14 +1,9 @@
 import React, { useMemo } from "react";
 import { Image, StyleSheet, View } from "react-native";
-
 import CardContainer from "@/src/components/CardContainer";
 import ThemedText from "@/src/components/common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
-import {
-  SYMBOL_ICON_MAP,
-  SYMBOL_TO_WS_SYMBOL,
-  type SupportedSymbol,
-} from "@/src/constants/markets";
+import { SYMBOL_ICON_MAP, SYMBOL_TO_WS_SYMBOL, type SupportedSymbol } from "@/src/constants/markets";
 import { useMarketPrices } from "@/src/hooks/useMarketPrices";
 import { useCandlesticks } from "@/src/hooks/useCandlesticks";
 

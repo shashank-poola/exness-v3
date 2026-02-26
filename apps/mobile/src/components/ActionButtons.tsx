@@ -3,11 +3,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Octicons from "@expo/vector-icons/Octicons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import ThemedText from "./common/ThemedText";
-
-interface ActionButtonsProps {
-  onBuyPress?: () => void;
-  onSellPress?: () => void;
-}
+import { ActionButtonsProps } from "../types/queryKeys.type";
 
 const ActionButtons: React.FC<ActionButtonsProps> = ({ onBuyPress, onSellPress }) => {
   return (

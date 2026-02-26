@@ -6,6 +6,7 @@ import { ThemeColor } from "@/src/constants/theme";
 import { useOpenTrades } from "@/src/hooks/useTrade";
 import { SYMBOL_ICON_MAP, type SupportedSymbol } from "@/src/constants/markets";
 import type { OpenOrder } from "@/src/types/order.type";
+import { ASSET_TO_SYMBOL } from "@/src/constants/markets";
 
 interface HoldingsSectionProps {
   symbol: SupportedSymbol;
@@ -17,12 +18,6 @@ const getSidePillStyle = (isBuy: boolean): ViewStyle => ({
   borderRadius: 999,
   backgroundColor: isBuy ? "rgba(34,197,94,0.15)" : "rgba(248,113,113,0.15)",
 });
-
-const ASSET_TO_SYMBOL: Record<string, SupportedSymbol> = {
-  BTC_USDC: "BTC",
-  ETH_USDC: "ETH",
-  SOL_USDC: "SOL",
-};
 
 const HoldingsSection: React.FC<HoldingsSectionProps> = ({ symbol }) => {
   const { data: openOrders, isLoading } = useOpenTrades();

@@ -2,13 +2,7 @@ import React, { useEffect, useState } from "react";
 import { LayoutChangeEvent, Pressable, StyleSheet, View } from "react-native";
 import ThemedText from "@/src/components/common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
-
-type LeverageSliderProps = {
-  value: number;
-  onChange: (val: number) => void;
-  min?: number;
-  max?: number;
-};
+import { LeverageSliderProps } from "../types/candle.type";
 
 const LeverageSlider: React.FC<LeverageSliderProps> = ({ value, onChange, min = 1, max = 100 }) => {
   const [trackWidth, setTrackWidth] = useState(0);

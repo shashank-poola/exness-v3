@@ -21,3 +21,10 @@ export interface TradingViewChartProps {
     width: number;
     height: number;
 };
+
+export type LeverageSliderProps = {
+    value: number;
+    onChange: (val: number) => void;
+    min?: number;
+    max?: number;
+  };

@@ -3,3 +3,9 @@ export const QueryKeys = {
     CLOSE_TRADES: 'closeTrades',
     USER_BALANCE: 'balance',
 } as const;
+
+export interface ActionButtonsProps {
+    onBuyPress?: () => void;
+    onSellPress?: () => void;
+};
+
