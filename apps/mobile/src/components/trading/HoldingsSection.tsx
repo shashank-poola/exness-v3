@@ -82,7 +82,7 @@ const HoldingsSection: React.FC<HoldingsSectionProps> = ({ symbol }) => {
                   </View>
 
                   <View style={styles.positionRight}>
-                    <ThemedText size="sm" variant="secondary">
+                    <ThemedText size="xs" variant="secondary">
                       Entry
                     </ThemedText>
                     <ThemedText size="sm" variant="primary">

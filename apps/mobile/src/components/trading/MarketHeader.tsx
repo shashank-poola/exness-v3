@@ -75,7 +75,7 @@ const MarketHeader: React.FC<MarketHeaderProps> = ({
       </View>
 
       <View style={styles.symbolInfo}>
-        <ThemedText size="lg" variant="primary" style={styles.pairLabel}>
+        <ThemedText size="lg" variant="secondary" style={styles.pairLabel}>
           {pair}
         </ThemedText>
         <View style={styles.priceRow}>

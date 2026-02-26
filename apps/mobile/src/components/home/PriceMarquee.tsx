@@ -11,7 +11,7 @@ import {
   type SupportedSymbol,
 } from "@/src/constants/markets";
 import { useMarketPrices } from "@/src/hooks/useMarketPrices";
-import { useCandlestickChangePercent } from "@/src/hooks/useCandlesticks";
+import { useCandlestickChangePercent, useCandlesticks } from "@/src/hooks/useCandlesticks";
 
 type TickerInfo = {
   symbol: SupportedSymbol;
@@ -30,9 +30,9 @@ const PriceMarquee: React.FC = () => {
   const [contentWidth, setContentWidth] = useState(0);
   const translateX = useRef(new Animated.Value(0)).current;
 
-  const { btcChange } = useSymbolChange("BTC");
-  const { ethChange } = useSymbolChange("ETH");
-  const { solChange } = useSymbolChange("SOL");
+  const { btcChange, btcLast } = useSymbolStats("BTC");
+  const { ethChange, ethLast } = useSymbolStats("ETH");
+  const { solChange, solLast } = useSymbolStats("SOL");
 
   const changeBySymbol: Record<SupportedSymbol, number | undefined> = useMemo(
     () => ({
@@ -43,18 +43,30 @@ const PriceMarquee: React.FC = () => {
     [btcChange, ethChange, solChange]
   );
 
+  const fallbackPriceBySymbol: Record<SupportedSymbol, number | undefined> = useMemo(
+    () => ({
+      BTC: btcLast,
+      ETH: ethLast,
+      SOL: solLast,
+    }),
+    [btcLast, ethLast, solLast]
+  );
+
   useEffect(() => {
     if (!containerWidth || !contentWidth) return;
 
-    translateX.stopAnimation();
-    translateX.setValue(containerWidth);
+    const singleWidth = contentWidth / 2;
+    if (!singleWidth) return;
 
-    const distance = containerWidth + contentWidth;
+    translateX.stopAnimation();
+    translateX.setValue(0);
+
+    const distance = singleWidth;
     const duration = Math.max(12000, distance * 30);
 
     const animation = Animated.loop(
       Animated.timing(translateX, {
-        toValue: -contentWidth,
+        toValue: -singleWidth,
         duration,
         easing: Easing.linear,
         useNativeDriver: true,
@@ -84,8 +96,9 @@ const PriceMarquee: React.FC = () => {
       >
         {([...TICKERS, ...TICKERS] as TickerInfo[]).map((item, index) => {
           const priceEntry = prices[item.wsSymbol];
-          // Show the current buy price (ask) explicitly in the marquee
-          const price = priceEntry ? priceEntry.ask : 0;
+          const wsPrice = priceEntry ? priceEntry.ask : undefined;
+          const fallback = fallbackPriceBySymbol[item.symbol];
+          const price = wsPrice ?? fallback;
           const change = changeBySymbol[item.symbol];
           const isPositive = change != null && change >= 0;
 
@@ -128,17 +141,21 @@ const PriceMarquee: React.FC = () => {
   );
 };
 
-function useSymbolChange(symbol: SupportedSymbol) {
+function useSymbolStats(symbol: SupportedSymbol) {
   const wsSymbol = SYMBOL_TO_WS_SYMBOL[symbol];
-  const { changePercent } = useCandlestickChangePercent(wsSymbol, "1h");
+  const { changePercent, data } = useCandlestickChangePercent(wsSymbol, "1h");
+  const lastClose = useMemo(() => {
+    if (!data || !data.length) return undefined;
+    return data[data.length - 1]?.close;
+  }, [data]);
 
-  if (symbol === "BTC") return { btcChange: changePercent };
-  if (symbol === "ETH") return { ethChange: changePercent };
-  return { solChange: changePercent };
+  if (symbol === "BTC") return { btcChange: changePercent, btcLast: lastClose };
+  if (symbol === "ETH") return { ethChange: changePercent, ethLast: lastClose };
+  return { solChange: changePercent, solLast: lastClose };
 }
 
 function formatPrice(price: number | undefined): string {
-  if (!price || !isFinite(price)) return "--";
+  if (price == null || !isFinite(price)) return "--";
   if (price >= 1000) {
     return price.toLocaleString(undefined, { maximumFractionDigits: 2 });
   }

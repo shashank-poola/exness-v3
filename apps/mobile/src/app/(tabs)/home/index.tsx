@@ -2,7 +2,6 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-
 import ScreenHeader from "@/src/components/common/ScreenHeader";
 import { ThemeColor } from "@/src/constants/theme";
 import PriceMarquee from "@/src/components/home/PriceMarquee";

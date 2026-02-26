@@ -32,12 +32,13 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingTop: 40,
     backgroundColor: "#000000",
   },
   avatarSection: {
-    alignSelf: "flex-start",
-    marginBottom: 20,
+    alignItems: "center",
+    marginBottom: 24,
   },
   infoSection: {
     width: "100%",

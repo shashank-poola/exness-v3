@@ -23,6 +23,7 @@ interface ProfileAvatarProps {
   avatarIndex?: number;
   userId?: string;
   size?: number;
+  rounded?: boolean;
 }
 
 const styles = StyleSheet.create({
@@ -38,6 +39,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
   avatarIndex,
   userId = "",
   size = 64,
+  rounded = true,
 }) => {
   const index =
     avatarIndex != null && avatarIndex >= 0 && avatarIndex < AVATAR_COUNT
@@ -47,7 +49,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
   const dimensionStyle = {
     width: size,
     height: size,
-    borderRadius: size / 2,
+    ...(rounded ? { borderRadius: size / 2 } : null),
   };
 
   return (

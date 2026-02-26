@@ -71,6 +71,8 @@ export default function PortfolioScreen() {
   const totalEquity = totalMargin + totalPnl;
   const totalPnlPercent = totalMargin > 0 ? (totalPnl / totalMargin) * 100 : 0;
   const hasPositions = enriched.length > 0;
+  const numericBalance = typeof balance === "number" ? balance : 0;
+  const liveBalance = numericBalance - totalMargin;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom", "left", "right"]}>
@@ -88,7 +90,7 @@ export default function PortfolioScreen() {
               </ThemedText>
               <ThemedText size="xl" variant="primary" style={styles.portfolioBalance}>
                 {showValues
-                  ? `$${typeof balance === "number" ? balance.toFixed(2) : "0.00"}`
+                  ? `$${liveBalance.toFixed(2)}`
                   : "••••••"}
               </ThemedText>
               <ThemedText

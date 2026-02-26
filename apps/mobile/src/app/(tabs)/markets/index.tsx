@@ -3,7 +3,7 @@ import { Image, Pressable, ScrollView, StatusBar, StyleSheet, TouchableOpacity, 
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ActionButtons from "@/src/components/trading/ActionButtons";
-import HoldingsSection from "@/src/components/trading/HoldingsSection";
+import PositionsSection from "@/src/components/trading/PositionsSection";
 import MarketHeader from "@/src/components/trading/MarketHeader";
 import PriceChart from "@/src/components/trading/PriceChart";
 import TimeframeSelector from "@/src/components/trading/TimeframeSelector";
@@ -133,7 +133,7 @@ export default function MarketsScreen() {
           onSellPress={() => orderSheetRef.current?.open("SELL")}
         />
 
-        <HoldingsSection symbol={selectedSymbol} />
+        <PositionsSection />
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
