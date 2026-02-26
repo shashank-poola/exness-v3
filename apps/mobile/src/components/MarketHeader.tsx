@@ -3,7 +3,7 @@ import { Image, ImageSourcePropType, StyleSheet, View } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 
-import ThemedText from "../common/ThemedText";
+import ThemedText from "./common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
 
 interface MarketHeaderProps {

@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 
-import CardContainer from "@/src/components/common/CardContainer";
+import CardContainer from "@/src/components/CardContainer";
 import ThemedText from "@/src/components/common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
 import { useOpenTrades } from "@/src/hooks/useTrade";

@@ -7,7 +7,7 @@ import Feather from "@expo/vector-icons/Feather";
 import ScreenHeader from "@/src/components/common/ScreenHeader";
 import ThemedText from "@/src/components/common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
-import CardContainer from "@/src/components/common/CardContainer";
+import CardContainer from "@/src/components/CardContainer";
 import { useCloseTrades, useOpenTrades } from "@/src/hooks/useTrade";
 import { useMarketPrices } from "@/src/hooks/useMarketPrices";
 import { useUserBalance } from "@/src/hooks/useUserBalance";

@@ -7,7 +7,7 @@ import { useAuth } from "@/src/context/auth-context";
 import ProfileAvatar from "@/src/components/ProfileAvatar";
 import ProfileInfoCard from "@/src/components/ProfileInfoCard";
 import ThemedText from "@/src/components/common/ThemedText";
-import CardContainer from "@/src/components/common/CardContainer";
+import CardContainer from "@/src/components/CardContainer";
 import { ThemeColor } from "@/src/constants/theme";
 
 export default function ProfileScreen() {

@@ -4,10 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import ScreenHeader from "@/src/components/common/ScreenHeader";
 import { ThemeColor } from "@/src/constants/theme";
-import PriceMarquee from "@/src/components/home/PriceMarquee";
+import PriceMarquee from "@/src/components/PriceMarquee";
 import HomePortfolioCard from "@/src/components/home/HomePortfolioCard";
 import HomePositionsSection from "@/src/components/home/HomePositionsSection";
-import HomeMarketsSection from "@/src/components/home/HomeMarketsSection";
+import HomeMarketsSection from "@/src/components/HomeMarketsSection";
 
 export default function HomeScreen() {
   const router = useRouter();

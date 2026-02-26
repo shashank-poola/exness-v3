@@ -2,7 +2,7 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 
-import CardContainer from "./common/CardContainer";
+import CardContainer from "./CardContainer";
 import ThemedText from "./common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
 

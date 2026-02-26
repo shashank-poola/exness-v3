@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Image, StyleSheet, View } from "react-native";
 
-import CardContainer from "@/src/components/common/CardContainer";
+import CardContainer from "@/src/components/CardContainer";
 import ThemedText from "@/src/components/common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
 import {

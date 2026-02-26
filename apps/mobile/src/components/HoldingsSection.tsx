@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Image, ImageStyle, StyleSheet, View, ViewStyle, TextStyle } from "react-native";
-import CardContainer from "../common/CardContainer";
-import ThemedText from "../common/ThemedText";
+import CardContainer from "./CardContainer";
+import ThemedText from "./common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
 import { useOpenTrades } from "@/src/hooks/useTrade";
 import { SYMBOL_ICON_MAP, type SupportedSymbol } from "@/src/constants/markets";
