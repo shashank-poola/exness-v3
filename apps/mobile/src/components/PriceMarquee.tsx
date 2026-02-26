@@ -3,24 +3,12 @@ import { Animated, Easing, Image, LayoutChangeEvent, Pressable, StyleSheet, View
 import { useRouter } from "expo-router";
 import ThemedText from "@/src/components/common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
-import {
-  SUPPORTED_SYMBOLS,
-  SYMBOL_ICON_MAP,
-  SYMBOL_TO_WS_SYMBOL,
-  type SupportedSymbol,
-} from "@/src/constants/markets";
+import { SUPPORTED_SYMBOLS, SYMBOL_ICON_MAP, SYMBOL_TO_WS_SYMBOL, type SupportedSymbol } from "@/src/constants/markets";
 import { useMarketPrices } from "@/src/hooks/useMarketPrices";
 import { useCandlesticks } from "@/src/hooks/useCandlesticks";
+import { TickerInfo } from "../types/utils.type";
 
-type TickerInfo = {
-  symbol: SupportedSymbol;
-  wsSymbol: string;
-};
-
-const TICKERS: TickerInfo[] = SUPPORTED_SYMBOLS.map((symbol) => ({
-  symbol,
-  wsSymbol: SYMBOL_TO_WS_SYMBOL[symbol],
-}));
+const TICKERS: TickerInfo[] = SUPPORTED_SYMBOLS.map((symbol) => ({ symbol, wsSymbol: SYMBOL_TO_WS_SYMBOL[symbol] }));
 
 const PriceMarquee: React.FC = () => {
   const router = useRouter();
@@ -120,10 +108,7 @@ const PriceMarquee: React.FC = () => {
   );
 };
 
-function useSymbolStats(): {
-  changeBySymbol: Record<SupportedSymbol, number | undefined>;
-  fallbackPriceBySymbol: Record<SupportedSymbol, number | undefined>;
-} {
+function useSymbolStats(): { changeBySymbol: Record<SupportedSymbol, number | undefined>; fallbackPriceBySymbol: Record<SupportedSymbol, number | undefined>; } {
   const { data: btcData } = useCandlesticks(SYMBOL_TO_WS_SYMBOL.BTC, "1h");
   const { data: ethData } = useCandlesticks(SYMBOL_TO_WS_SYMBOL.ETH, "1h");
   const { data: solData } = useCandlesticks(SYMBOL_TO_WS_SYMBOL.SOL, "1h");

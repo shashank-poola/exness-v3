@@ -18,3 +18,8 @@ export type OrderBottomSheetProps = {
     symbol: SupportedSymbol;
     currentPrice?: number;
 };
+
+export type TickerInfo = {
+    symbol: SupportedSymbol;
+    wsSymbol: string;
+};
