@@ -9,27 +9,21 @@ interface ThemedTextProps extends TextProps {
   style?: StyleProp<TextStyle>;
 }
 
-const ThemedText: React.FC<ThemedTextProps> = ({
-  children,
-  size = "md",
-  variant = "primary",
-  style,
-  ...rest
-}) => {
-  const getColor = () => {
-    switch (variant) {
-      case "primary":
-        return ThemeColor.text.primary;
-      case "secondary":
-        return ThemeColor.text.secondary;
-      case "tertiary":
-        return ThemeColor.text.tertiary;
-      case "success":
-        return ThemeColor.status.success;
-      case "error":
-        return ThemeColor.status.error;
-      default:
-        return ThemeColor.text.primary;
+const ThemedText: React.FC<ThemedTextProps> = ({ children, size = "md", variant = "primary", style, ...rest }) => {
+    const getColor = () => {
+      switch (variant) {
+        case "primary":
+          return ThemeColor.text.primary;
+        case "secondary":
+          return ThemeColor.text.secondary;
+        case "tertiary":
+          return ThemeColor.text.tertiary;
+        case "success":
+          return ThemeColor.status.success;
+        case "error":
+          return ThemeColor.status.error;
+        default:
+          return ThemeColor.text.primary;
     }
   };
 

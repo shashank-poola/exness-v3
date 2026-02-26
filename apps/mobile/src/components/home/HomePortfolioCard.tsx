@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
-
 import CardContainer from "@/src/components/CardContainer";
 import ThemedText from "@/src/components/common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
@@ -10,18 +9,7 @@ import { useMarketPrices } from "@/src/hooks/useMarketPrices";
 import { useUserBalance } from "@/src/hooks/useUserBalance";
 import type { OpenOrder } from "@/src/types/order.type";
 import type { SupportedSymbol } from "@/src/constants/markets";
-
-const ASSET_TO_SYMBOL: Record<string, SupportedSymbol> = {
-  BTC_USDC: "BTC",
-  ETH_USDC: "ETH",
-  SOL_USDC: "SOL",
-};
-
-const ASSET_TO_WS_SYMBOL: Record<string, string> = {
-  BTC_USDC: "BTCUSDT",
-  ETH_USDC: "ETHUSDT",
-  SOL_USDC: "SOLUSDT",
-};
+import { ASSET_TO_SYMBOL, ASSET_TO_WS_SYMBOL } from "@/src/constants/markets";
 
 const HomePortfolioCard: React.FC = () => {
   const [showValues, setShowValues] = useState(true);

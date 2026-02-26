@@ -3,15 +3,7 @@ import { StyleSheet, View, Pressable, TextInput, Platform } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ThemedText from "./ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
-
-type ScreenHeaderProps = {
-  activeSearch?: boolean;
-  searchValue?: string;
-  onChangeSearchText?: (value: string) => void;
-  onBackPress?: () => void;
-  onSearchPress?: () => void;
-  onInfoPress?: () => void;
-};
+import { ScreenHeaderProps } from "@/src/cache";
 
 const ScreenHeader: React.FC<ScreenHeaderProps> = ({ activeSearch = false, searchValue, onChangeSearchText, onBackPress, onSearchPress, onInfoPress }) => {
   return (
@@ -135,4 +127,3 @@ const styles = StyleSheet.create({
 });
 
 export default ScreenHeader;
-

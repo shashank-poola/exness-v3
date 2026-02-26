@@ -31,3 +31,6 @@ export const SYMBOL_ICON_MAP: Record<SupportedSymbol, any> = {
   SOL: require("../../assets/images/exness/solana.png"),
 };
 
+export const CHART_DEFAULT_HEIGHT = 260;
+export const MERGE_INTERVAL_MS = 1000;
+

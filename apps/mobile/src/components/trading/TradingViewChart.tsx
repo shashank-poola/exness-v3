@@ -1,8 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import { WebView } from "react-native-webview";
-
-import type { Candlestick } from "@/src/types/candle.type";
+import type { Candlestick, TradingViewChartProps } from "@/src/types/candle.type";
 
 const LIGHTWEIGHT_CHARTS_CDN =
   "https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js";
@@ -76,17 +75,7 @@ const CHART_HTML = `
 </html>
 `;
 
-interface TradingViewChartProps {
-  candles: Candlestick[];
-  width: number;
-  height: number;
-}
-
-const TradingViewChart: React.FC<TradingViewChartProps> = ({
-  candles,
-  width,
-  height,
-}) => {
+const TradingViewChart: React.FC<TradingViewChartProps> = ({ candles, width, height }) => {
   const webViewRef = useRef<WebView>(null);
   const lastCandlesRef = useRef<string>("");
 

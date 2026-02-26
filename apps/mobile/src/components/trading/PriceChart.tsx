@@ -1,38 +1,23 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import Svg, { Rect } from "react-native-svg";
-
 import { ThemeColor } from "@/src/constants/theme";
 import { useCandlesticks } from "@/src/hooks/useCandlesticks";
 import { getCandlesticks } from "@/src/lib/candlestick-store";
 import type { Candlestick } from "@/src/types/candle.type";
-
 import TradingViewChart from "./TradingViewChart";
+import { PriceChartProps } from "@/src/types/candle.type";
+import { CHART_DEFAULT_HEIGHT, MERGE_INTERVAL_MS } from "@/src/constants/markets";
 
-interface PriceChartProps {
-  symbol: string;
-  timeframe: string;
-  height?: number;
-}
-
-const CHART_DEFAULT_HEIGHT = 260;
-const MERGE_INTERVAL_MS = 1000;
-
-function mergeCandles(
-  backend: Candlestick[],
-  live: Candlestick[]
-): Candlestick[] {
+function mergeCandles( backend: Candlestick[], live: Candlestick[] ): Candlestick[] {
   const byTime = new Map<number, Candlestick>();
   backend.forEach((c) => byTime.set(c.time, c));
   live.forEach((c) => byTime.set(c.time, c));
+
   return Array.from(byTime.values()).sort((a, b) => a.time - b.time).slice(-500);
 }
 
-const PriceChart: React.FC<PriceChartProps> = ({
-  symbol,
-  timeframe,
-  height = CHART_DEFAULT_HEIGHT,
-}) => {
+const PriceChart: React.FC<PriceChartProps> = ({ symbol, timeframe, height = CHART_DEFAULT_HEIGHT }) => {
   const width = Dimensions.get("window").width - 32;
   const { data: backendCandles, isLoading } = useCandlesticks(symbol, timeframe);
   const [mergedCandles, setMergedCandles] = useState<Candlestick[]>([]);
