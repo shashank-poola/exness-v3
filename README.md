@@ -14,6 +14,12 @@ TradeX simulates a live crypto trading experience where users can:
 ## System architecture
 ![Architecture](apps/web/src/assets/architecture.png)
 
+## Exness(Web)
+![Exness-WEB](apps/web/src/assets/demo.png)
+
+## Exness(Mobile)
+![Exness-MOBILE](apps/mobile/assets/videos/video.mp4)
+
 ## Feature Overview
 
 | Feature | Implementation | Details |
@@ -22,17 +28,12 @@ TradeX simulates a live crypto trading experience where users can:
 | **Interactive Charts** | Yes | Lightweight Charts library with 7 timeframes (1m, 5m, 30m, 1h, 6h, 1d, 3d). Green/red candlesticks for bullish/bearish moves. |
 | **Order Management** | Yes | `createOrder()`, `closeOrder()`, `getOpenOrders()` hooks handle LONG/SHORT positions with real-time updates via React Query. |
 | **Leverage Trading** | Yes | 1x to 100x leverage with visual slider. Margin calculation: `(quantity × price) / leverage`. |
-| **Dark/Light Theme** | Yes | Full UI theme support using TailwindCSS `dark:` variants. Theme persisted to localStorage. Logo swaps (black/white) automatically. |
-| **Persistent State** | Yes | Candlestick data saved to localStorage every 5 seconds (throttled). Auto-loads on page refresh. |
-| **Auto-reconnection** | Yes | WebSocket handles `visibilitychange` events. Reconnects on laptop sleep/wake, network interruptions. |
 | **JWT Authentication** | Yes | Secure signup/signin with bcrypt password hashing. JWT tokens in Authorization headers. |
 | **Balance Tracking** | Yes | Real-time balance updates on order create/close. Displays available margin and locked funds. |
 | **Order History** | Yes | Separate tabs for Open Orders (current positions) and All Orders (OPEN + CLOSED + CANCELLED). |
 | **Price Store** | Yes | In-memory cache (`price-store.ts`) for O(1) price lookups. Updated by WebSocket messages. |
-| **Candlestick Builder** | Yes | `candlestick-store.ts` processes price ticks into OHLC data across all timeframes simultaneously. |
 | **Redis Pub/Sub** | Yes | `ws` service publishes prices to Redis channel. Engine consumes via Redis Streams for order execution. |
 | **Snapshot/Restore** | Yes | Engine dumps in-memory state to MongoDB every 15s. Replays missed messages on restart. |
-| **Responsive UI** | Yes | Fixed-height orders section with scroll. Chart never shrinks when orders increase. |
 
 ## Tech Stack
 
@@ -90,12 +91,6 @@ exness-v3/
 │   │
 │   └── web/                    # Frontend (React + TypeScript)
 │       ├── src/
-│       │   ├── components/     # React components
-│       │   │   ├── ui/         # Shadcn UI components
-│       │   ├── contexts/       # React contexts (Theme)
-│       │   ├── hooks/          # Custom hooks
-│       │   ├── lib/            # Utilities
-│       │   ├── pages/          # Page components
 │       │   ├── App.tsx
 │       │   └── main.tsx
 │       ├── .env.example
@@ -180,126 +175,6 @@ bun run dev
 Frontend: http://localhost:5173
 API: http://localhost:3000
 WebSocket: ws://localhost:8080
-
-### Live Preview
-![Livepreview](apps/web/src/assets/demoimage.png)
-
-## API Endpoints
-
-### Authentication
-
-**Signup**
-```http
-POST /api/v1/signup
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
-
-Response:
-{
-  "user": { "id": "...", "email": "...", "balance": 5000 },
-  "token": "eyJhbGc..."
-}
-```
-
-**Signin**
-```http
-POST /api/v1/signin
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
-
-Response:
-{
-  "user": { ... },
-  "token": "eyJhbGc..."
-}
-```
-
-### Trading
-
-**Create Order**
-```http
-POST /api/v1/trade/create-order
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "asset": "BTC_USDC",
-  "side": "LONG",
-  "quantity": 0.02,
-  "leverage": 10,
-  "tradeOpeningPrice": 91780.80,
-  "slippage": 1
-}
-
-Response:
-{
-  "message": "Order placed",
-  "trade": { "id": "...", "asset": "BTC_USDC", ... }
-}
-```
-
-**Get Open Orders**
-```http
-GET /api/v1/trade/get-open-orders
-Authorization: Bearer <token>
-
-Response:
-{
-  "orders": [
-    { "id": "...", "asset": "BTC_USDC", "side": "LONG", ... }
-  ]
-}
-```
-
-**Get Closed Orders**
-```http
-GET /api/v1/trade/get-close-orders
-Authorization: Bearer <token>
-
-Response:
-{
-  "orders": [
-    { "id": "...", "status": "CLOSED", "pnl": 37.50, ... }
-  ]
-}
-```
-
-**Close Order**
-```http
-POST /api/v1/trade/close-order
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "orderId": "uuid-here"
-}
-
-Response:
-{
-  "message": "Order closed"
-}
-```
-
-### Balance
-
-**Get Balance**
-```http
-GET /api/v1/balance/me
-Authorization: Bearer <token>
-
-Response:
-{
-  "balance": 8053.60
-}
-```
 
 ## Environment Variables
 
