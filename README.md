@@ -14,10 +14,10 @@ TradeX simulates a live crypto trading experience where users can:
 ## System architecture
 ![Architecture](apps/web/src/assets/architecture.png)
 
-## Exness(Web)
+## TradeX(Web)
 ![Exness-WEB](apps/web/src/assets/demo.png)
 
-## Exness(Mobile)
+## TradeX(Mobile)
 https://github.com/user-attachments/assets/a0c64dd7-5200-4fed-a5d0-146487eff85c
 
 
