@@ -3,7 +3,6 @@ import { Image, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import Feather from "@expo/vector-icons/Feather";
-
 import ScreenHeader from "@/src/components/common/ScreenHeader";
 import ThemedText from "@/src/components/common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
@@ -13,18 +12,7 @@ import { useMarketPrices } from "@/src/hooks/useMarketPrices";
 import { useUserBalance } from "@/src/hooks/useUserBalance";
 import type { OpenOrder } from "@/src/types/order.type";
 import { SYMBOL_ICON_MAP, type SupportedSymbol } from "@/src/constants/markets";
-
-const ASSET_TO_SYMBOL: Record<string, SupportedSymbol> = {
-  BTC_USDC: "BTC",
-  ETH_USDC: "ETH",
-  SOL_USDC: "SOL",
-};
-
-const ASSET_TO_WS_SYMBOL: Record<string, string> = {
-  BTC_USDC: "BTCUSDT",
-  ETH_USDC: "ETHUSDT",
-  SOL_USDC: "SOLUSDT",
-};
+import { ASSET_TO_SYMBOL, ASSET_TO_WS_SYMBOL } from "@/src/constants/markets";
 
 export default function PortfolioScreen() {
   const router = useRouter();

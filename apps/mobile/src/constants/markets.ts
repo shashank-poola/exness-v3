@@ -13,6 +13,18 @@ export const SYMBOL_TO_WS_SYMBOL: Record<SupportedSymbol, string> = {
   SOL: "SOLUSDT",
 };
 
+export const ASSET_TO_SYMBOL: Record<string, SupportedSymbol> = {
+  BTC_USDC: "BTC",
+  ETH_USDC: "ETH",
+  SOL_USDC: "SOL",
+};
+
+export const ASSET_TO_WS_SYMBOL: Record<string, string> = {
+  BTC_USDC: "BTCUSDT",
+  ETH_USDC: "ETHUSDT",
+  SOL_USDC: "SOLUSDT",
+};
+
 export const SYMBOL_ICON_MAP: Record<SupportedSymbol, any> = {
   BTC: require("../../assets/images/exness/btc.png"),
   ETH: require("../../assets/images/exness/eth.png"),
