@@ -18,7 +18,9 @@ TradeX simulates a live crypto trading experience where users can:
 ![Exness-WEB](apps/web/src/assets/demo.png)
 
 ## Exness(Mobile)
-<video src="apps/mobile/assets/videos/video.mp4" controls width="300"></video>
+
+https://github.com/user-attachments/assets/a0c64dd7-5200-4fed-a5d0-146487eff85c
+
 
 ## Feature Overview
 
