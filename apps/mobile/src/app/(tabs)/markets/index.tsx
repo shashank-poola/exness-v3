@@ -6,17 +6,14 @@ import ActionButtons from "@/src/components/ActionButtons";
 import PositionsSection from "@/src/components/PositionsSection";
 import MarketHeader from "@/src/components/MarketHeader";
 import PriceChart from "@/src/components/trading/PriceChart";
-import TimeframeSelector from "@/src/components/trading/TimeframeSelector";
+import TimeframeSelector from "@/src/components/TimeframeSelector";
 import ThemedText from "@/src/components/common/ThemedText";
 import ScreenHeader from "@/src/components/common/ScreenHeader";
 import { ThemeColor } from "@/src/constants/theme";
 import { useMarketPrices } from "@/src/hooks/useMarketPrices";
 import { useCandlestickChangePercent, useCandlesticks } from "@/src/hooks/useCandlesticks";
 import { processPriceTick } from "@/src/lib/candlestick-store";
-import {
-  SUPPORTED_SYMBOLS,
-  SYMBOL_ICON_MAP,
-  SYMBOL_TO_PAIR,
+import { SUPPORTED_SYMBOLS, SYMBOL_ICON_MAP, SYMBOL_TO_PAIR,
   SYMBOL_TO_WS_SYMBOL,
   type SupportedSymbol,
 } from "@/src/constants/markets";
