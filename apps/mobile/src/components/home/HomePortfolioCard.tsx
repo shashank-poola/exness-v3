@@ -105,19 +105,6 @@ const HomePortfolioCard: React.FC = () => {
               <Feather name="arrow-up" size={18} color="#A1A1AA" />
             </Pressable>
           </View>
-          <ThemedText
-            size="sm"
-            style={[
-              styles.change,
-              totalPnl >= 0 ? styles.positive : styles.negative,
-            ]}
-          >
-            {hasPositions
-              ? `${totalPnl >= 0 ? "+" : ""}${totalPnlPercent.toFixed(
-                  2
-                )}% (${totalPnl >= 0 ? "+" : "-"}$${Math.abs(totalPnl).toFixed(2)})`
-              : "No open positions"}
-          </ThemedText>
         </View>
 
         <Pressable
