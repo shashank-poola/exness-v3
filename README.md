@@ -18,7 +18,6 @@ TradeX simulates a live crypto trading experience where users can:
 ![Exness-WEB](apps/web/src/assets/demo.png)
 
 ## Exness(Mobile)
-
 https://github.com/user-attachments/assets/a0c64dd7-5200-4fed-a5d0-146487eff85c
 
 
@@ -43,7 +42,7 @@ https://github.com/user-attachments/assets/a0c64dd7-5200-4fed-a5d0-146487eff85c
 - React + TypeScript
 - TailwindCSS (dark mode)
 - React Query (state management)
-- Lightweight Charts (candlestick visualization)
+- Lightweight Charts TradingView(candlestick visualization)
 - WebSocket (real-time data)
 
 **Backend:**
@@ -136,6 +135,7 @@ bun install
 # Setup environment files
 cp apps/api/.env.example apps/api/.env
 cp apps/engine/.env.example apps/engine/.env
+cp apps/mobile/.env.example apps/mobile/.env
 cp apps/pooler/.env.example apps/pooler/.env
 cp apps/web/.env.example apps/web/.env
 
