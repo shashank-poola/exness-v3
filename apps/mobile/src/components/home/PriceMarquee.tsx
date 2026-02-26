@@ -11,7 +11,7 @@ import {
   type SupportedSymbol,
 } from "@/src/constants/markets";
 import { useMarketPrices } from "@/src/hooks/useMarketPrices";
-import { useCandlestickChangePercent, useCandlesticks } from "@/src/hooks/useCandlesticks";
+import { useCandlesticks } from "@/src/hooks/useCandlesticks";
 
 type TickerInfo = {
   symbol: SupportedSymbol;
@@ -30,27 +30,7 @@ const PriceMarquee: React.FC = () => {
   const [contentWidth, setContentWidth] = useState(0);
   const translateX = useRef(new Animated.Value(0)).current;
 
-  const { btcChange, btcLast } = useSymbolStats("BTC");
-  const { ethChange, ethLast } = useSymbolStats("ETH");
-  const { solChange, solLast } = useSymbolStats("SOL");
-
-  const changeBySymbol: Record<SupportedSymbol, number | undefined> = useMemo(
-    () => ({
-      BTC: btcChange,
-      ETH: ethChange,
-      SOL: solChange,
-    }),
-    [btcChange, ethChange, solChange]
-  );
-
-  const fallbackPriceBySymbol: Record<SupportedSymbol, number | undefined> = useMemo(
-    () => ({
-      BTC: btcLast,
-      ETH: ethLast,
-      SOL: solLast,
-    }),
-    [btcLast, ethLast, solLast]
-  );
+  const { changeBySymbol, fallbackPriceBySymbol } = useSymbolStats();
 
   useEffect(() => {
     if (!containerWidth || !contentWidth) return;
@@ -96,7 +76,7 @@ const PriceMarquee: React.FC = () => {
       >
         {([...TICKERS, ...TICKERS] as TickerInfo[]).map((item, index) => {
           const priceEntry = prices[item.wsSymbol];
-          const wsPrice = priceEntry ? priceEntry.ask : undefined;
+          const wsPrice = priceEntry ? priceEntry.bid : undefined;
           const fallback = fallbackPriceBySymbol[item.symbol];
           const price = wsPrice ?? fallback;
           const change = changeBySymbol[item.symbol];
@@ -141,17 +121,72 @@ const PriceMarquee: React.FC = () => {
   );
 };
 
-function useSymbolStats(symbol: SupportedSymbol) {
-  const wsSymbol = SYMBOL_TO_WS_SYMBOL[symbol];
-  const { changePercent, data } = useCandlestickChangePercent(wsSymbol, "1h");
-  const lastClose = useMemo(() => {
-    if (!data || !data.length) return undefined;
-    return data[data.length - 1]?.close;
-  }, [data]);
+function useSymbolStats(): {
+  changeBySymbol: Record<SupportedSymbol, number | undefined>;
+  fallbackPriceBySymbol: Record<SupportedSymbol, number | undefined>;
+} {
+  const { data: btcData } = useCandlesticks(SYMBOL_TO_WS_SYMBOL.BTC, "1h");
+  const { data: ethData } = useCandlesticks(SYMBOL_TO_WS_SYMBOL.ETH, "1h");
+  const { data: solData } = useCandlesticks(SYMBOL_TO_WS_SYMBOL.SOL, "1h");
 
-  if (symbol === "BTC") return { btcChange: changePercent, btcLast: lastClose };
-  if (symbol === "ETH") return { ethChange: changePercent, ethLast: lastClose };
-  return { solChange: changePercent, solLast: lastClose };
+  const { btcChange, btcLast } = useMemo(() => {
+    if (!btcData || btcData.length < 2) {
+      const last = btcData && btcData.length ? btcData[btcData.length - 1]?.close : undefined;
+      return { btcChange: 0, btcLast: last };
+    }
+    const first = btcData[0];
+    const last = btcData[btcData.length - 1];
+    if (!first.open) return { btcChange: 0, btcLast: last.close };
+    const diff = last.close - first.open;
+    const change = (diff / first.open) * 100;
+    return { btcChange: change, btcLast: last.close };
+  }, [btcData]);
+
+  const { ethChange, ethLast } = useMemo(() => {
+    if (!ethData || ethData.length < 2) {
+      const last = ethData && ethData.length ? ethData[ethData.length - 1]?.close : undefined;
+      return { ethChange: 0, ethLast: last };
+    }
+    const first = ethData[0];
+    const last = ethData[ethData.length - 1];
+    if (!first.open) return { ethChange: 0, ethLast: last.close };
+    const diff = last.close - first.open;
+    const change = (diff / first.open) * 100;
+    return { ethChange: change, ethLast: last.close };
+  }, [ethData]);
+
+  const { solChange, solLast } = useMemo(() => {
+    if (!solData || solData.length < 2) {
+      const last = solData && solData.length ? solData[solData.length - 1]?.close : undefined;
+      return { solChange: 0, solLast: last };
+    }
+    const first = solData[0];
+    const last = solData[solData.length - 1];
+    if (!first.open) return { solChange: 0, solLast: last.close };
+    const diff = last.close - first.open;
+    const change = (diff / first.open) * 100;
+    return { solChange: change, solLast: last.close };
+  }, [solData]);
+
+  const changeBySymbol: Record<SupportedSymbol, number | undefined> = useMemo(
+    () => ({
+      BTC: btcChange,
+      ETH: ethChange,
+      SOL: solChange,
+    }),
+    [btcChange, ethChange, solChange]
+  );
+
+  const fallbackPriceBySymbol: Record<SupportedSymbol, number | undefined> = useMemo(
+    () => ({
+      BTC: btcLast,
+      ETH: ethLast,
+      SOL: solLast,
+    }),
+    [btcLast, ethLast, solLast]
+  );
+
+  return { changeBySymbol, fallbackPriceBySymbol };
 }
 
 function formatPrice(price: number | undefined): string {

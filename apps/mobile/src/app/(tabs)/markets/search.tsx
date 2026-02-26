@@ -13,6 +13,7 @@ import ScreenHeader from "@/src/components/common/ScreenHeader";
 import ThemedText from "@/src/components/common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
 import { useMarketPrices } from "@/src/hooks/useMarketPrices";
+import { useCandlesticks } from "@/src/hooks/useCandlesticks";
 import {
   SUPPORTED_SYMBOLS,
   SYMBOL_ICON_MAP,
@@ -25,6 +26,18 @@ export default function MarketsSearchScreen() {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const prices = useMarketPrices();
+  const { data: btcCandles } = useCandlesticks(SYMBOL_TO_WS_SYMBOL.BTC, "1h");
+  const { data: ethCandles } = useCandlesticks(SYMBOL_TO_WS_SYMBOL.ETH, "1h");
+  const { data: solCandles } = useCandlesticks(SYMBOL_TO_WS_SYMBOL.SOL, "1h");
+
+  const lastCloseBySymbol: Record<SupportedSymbol, number | undefined> = useMemo(
+    () => ({
+      BTC: btcCandles && btcCandles.length ? btcCandles[btcCandles.length - 1]?.close : undefined,
+      ETH: ethCandles && ethCandles.length ? ethCandles[ethCandles.length - 1]?.close : undefined,
+      SOL: solCandles && solCandles.length ? solCandles[solCandles.length - 1]?.close : undefined,
+    }),
+    [btcCandles, ethCandles, solCandles]
+  );
 
   const filteredSymbols = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -58,14 +71,13 @@ export default function MarketsSearchScreen() {
         renderItem={({ item }) => {
           const wsSymbol = SYMBOL_TO_WS_SYMBOL[item];
           const priceInfo = prices[wsSymbol];
-          const midPrice =
-            priceInfo && (priceInfo.ask || priceInfo.bid)
-              ? (priceInfo.ask + priceInfo.bid) / 2
-              : undefined;
+          const sellPrice = priceInfo ? priceInfo.bid : undefined;
+          const fallback = lastCloseBySymbol[item];
+          const price = sellPrice ?? fallback;
 
           const formattedPrice =
-            midPrice != null
-              ? midPrice.toLocaleString(undefined, {
+            price != null
+              ? price.toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })

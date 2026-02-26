@@ -152,7 +152,7 @@ const PositionsSection: React.FC = () => {
                     Avg. Entry Price
                   </ThemedText>
                   <ThemedText size="md" variant="primary">
-                    {position.openPrice.toFixed(6)}
+                    {position.tradeOpeningPrice.toFixed(6)}
                   </ThemedText>
                 </View>
                 <View style={styles.detailRow}>
@@ -162,6 +162,24 @@ const PositionsSection: React.FC = () => {
                   <ThemedText size="md" variant="primary">
                     ${position.margin.toFixed(2)}
                   </ThemedText>
+                </View>
+                <View style={styles.detailRow}>
+                  <ThemedText size="md" variant="secondary">
+                    Leverage
+                  </ThemedText>
+                  <ThemedText size="md" variant="primary">
+                    {position.leverage.toFixed(2)}x
+                  </ThemedText>
+                </View>
+                <View style={styles.detailRow}>
+                  <ThemedText size="md" variant="secondary">
+                    Slippage
+                  </ThemedText>
+                  <ThemedText size="md" variant="primary">
+                    {(position.slippage * 100).toFixed(2)}%
+                  </ThemedText>
+                </View>
+                <View style={styles.detailRow}>
                 </View>
               </View>
 

@@ -49,7 +49,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
   const dimensionStyle = {
     width: size,
     height: size,
-    ...(rounded ? { borderRadius: size / 2 } : null),
+    ...(rounded ? { borderRadius: size / 4 } : null),
   };
 
   return (

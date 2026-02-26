@@ -20,9 +20,11 @@ export async function handleGetUserBalance(
       return;
     }
 
+    console.log('[ENGINE BALANCE] User:', email, 'balance:', user.balance.amount);
+
     await sendAcknowledgement(requestId, 'GET_BALANCE_ACKNOWLEDGEMENT', {
       status: 'success',
-      balance: user.balance,
+      balance: user.balance.amount,
     });
   } catch (err) {
     console.error('Error in getting user balance:', err);

@@ -29,12 +29,13 @@ const HomePortfolioCard: React.FC = () => {
   const prices = useMarketPrices();
   const { data: balance } = useUserBalance();
 
-  const { totalEquity, totalPnl, totalPnlPercent, hasPositions } = useMemo(() => {
+  const { cashBalance, totalPnl, totalPnlPercent, hasPositions } = useMemo(() => {
+    const numericBalance = typeof balance === "number" ? balance : 0;
+
     if (!openOrders) {
       return {
-        totalMargin: 0,
+        cashBalance: numericBalance,
         totalPnl: 0,
-        totalEquity: 0,
         totalPnlPercent: 0,
         hasPositions: false,
       };
@@ -55,46 +56,55 @@ const HomePortfolioCard: React.FC = () => {
         }
       }
 
-      const equity = order.margin + (pnl ?? 0);
       const pnlPercent = order.margin > 0 && pnl != null ? (pnl / order.margin) * 100 : 0;
       const symbol = ASSET_TO_SYMBOL[order.asset] ?? "BTC";
 
       return {
         ...order,
         symbol,
-        currentPrice,
         pnl,
         pnlPercent,
-        equity,
       };
     });
 
     const totalMargin = enriched.reduce((sum, p) => sum + p.margin, 0);
     const totalPnl = enriched.reduce((sum, p) => sum + (p.pnl ?? 0), 0);
-    const totalEquity = totalMargin + totalPnl;
     const totalPnlPercent = totalMargin > 0 ? (totalPnl / totalMargin) * 100 : 0;
 
     return {
-      totalMargin,
+      cashBalance: numericBalance,
       totalPnl,
-      totalEquity,
       totalPnlPercent,
       hasPositions: enriched.length > 0,
     };
-  }, [openOrders, prices]);
+  }, [openOrders, prices, balance]);
 
   return (
     <CardContainer style={styles.card}>
       <View style={styles.row}>
         <View>
-          <ThemedText size="sm" variant="secondary">
-            Portfolio
+          <ThemedText size="md" variant="primary">
+            Account
           </ThemedText>
           <ThemedText size="xl" variant="primary" style={styles.balance}>
             {showValues
-              ? `$${typeof balance === "number" ? balance.toFixed(2) : "0.00"}`
+              ? `$${cashBalance.toFixed(2)}`
               : "••••••"}
           </ThemedText>
+          <ThemedText size="xs" variant="secondary">
+            TradeX as USD
+          </ThemedText>
+          <View style={styles.actionRow}>
+            <Pressable style={[styles.actionButton, styles.actionButtonPrimary]}>
+              <Feather name="plus" size={18} color="#000000" />
+            </Pressable>
+            <Pressable style={[styles.actionButton, styles.actionButtonSecondary]}>
+              <Feather name="arrow-down" size={18} color="#FFFFFF" />
+            </Pressable>
+            <Pressable style={[styles.actionButton, styles.actionButtonTertiary]}>
+              <Feather name="arrow-up" size={18} color="#A1A1AA" />
+            </Pressable>
+          </View>
           <ThemedText
             size="sm"
             style={[
@@ -141,6 +151,27 @@ const styles = StyleSheet.create({
   },
   change: {
     marginTop: 4,
+  },
+  actionRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 10,
+  },
+  actionButton: {
+    flex: 1,
+    borderRadius: 999,
+    paddingVertical: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  actionButtonPrimary: {
+    backgroundColor: "#FFFFFF",
+  },
+  actionButtonSecondary: {
+    backgroundColor: "#3F3F46",
+  },
+  actionButtonTertiary: {
+    backgroundColor: "#18181B",
   },
   positive: {
     color: ThemeColor.status.success,

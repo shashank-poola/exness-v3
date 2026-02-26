@@ -11,7 +11,7 @@ const ProfileInfoCard: React.FC<ProfileInfoCardProps> = ({ email }) => {
   return (
     <CardContainer>
       <View style={styles.content}>
-        <ThemedText variant="tertiary" size="sm">
+        <ThemedText variant="tertiary" size="lg">
           Email
         </ThemedText>
         <ThemedText variant="primary" size="md" style={styles.email}>

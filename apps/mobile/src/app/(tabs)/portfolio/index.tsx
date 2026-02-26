@@ -8,7 +8,7 @@ import ScreenHeader from "@/src/components/common/ScreenHeader";
 import ThemedText from "@/src/components/common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
 import CardContainer from "@/src/components/common/CardContainer";
-import { useOpenTrades } from "@/src/hooks/useTrade";
+import { useCloseTrades, useOpenTrades } from "@/src/hooks/useTrade";
 import { useMarketPrices } from "@/src/hooks/useMarketPrices";
 import { useUserBalance } from "@/src/hooks/useUserBalance";
 import type { OpenOrder } from "@/src/types/order.type";
@@ -30,6 +30,7 @@ export default function PortfolioScreen() {
   const router = useRouter();
   const [showValues, setShowValues] = useState(true);
   const { data: openOrders, isLoading } = useOpenTrades();
+  const { data: closedOrders } = useCloseTrades();
   const prices = useMarketPrices();
   const { data: balance } = useUserBalance();
 
@@ -66,11 +67,23 @@ export default function PortfolioScreen() {
     });
   }, [openOrders, prices]);
 
+  const closedEnriched = useMemo(() => {
+    if (!closedOrders) return [];
+
+    return closedOrders.map((order) => {
+      const symbol = ASSET_TO_SYMBOL[order.asset] ?? "BTC";
+      return {
+        ...order,
+        symbol,
+      };
+    });
+  }, [closedOrders]);
+
   const totalMargin = enriched.reduce((sum, p) => sum + p.margin, 0);
   const totalPnl = enriched.reduce((sum, p) => sum + (p.pnl ?? 0), 0);
   const totalEquity = totalMargin + totalPnl;
   const totalPnlPercent = totalMargin > 0 ? (totalPnl / totalMargin) * 100 : 0;
-  const hasPositions = enriched.length > 0;
+  const hasPositions = enriched.length > 0 || closedEnriched.length > 0;
   const numericBalance = typeof balance === "number" ? balance : 0;
   const liveBalance = numericBalance - totalMargin;
 
@@ -134,10 +147,11 @@ export default function PortfolioScreen() {
             </ThemedText>
           ) : !hasPositions ? (
             <ThemedText size="sm" variant="secondary">
-              You do not have any open positions yet.
+              You do not have any open or closed positions yet.
             </ThemedText>
           ) : (
-            enriched.map((position) => {
+          <>
+          {enriched.map((position) => {
               const symbol = position.symbol as SupportedSymbol;
               const iconSource = SYMBOL_ICON_MAP[symbol];
               const isLong = position.side === "LONG";
@@ -149,10 +163,10 @@ export default function PortfolioScreen() {
                   <View style={styles.positionLeft}>
                     <Image source={iconSource} style={styles.assetIcon} />
                     <View style={styles.positionTitleBlock}>
-                      <ThemedText size="sm" variant="primary">
+                      <ThemedText size="lg" variant="primary">
                         {symbol}
                       </ThemedText>
-                      <ThemedText size="xs" variant="secondary">
+                      <ThemedText size="sm" variant="secondary">
                         {isLong ? "Long" : "Short"} • {position.leverage}x
                       </ThemedText>
                     </View>
@@ -182,7 +196,48 @@ export default function PortfolioScreen() {
                   </View>
                 </View>
               );
-            })
+            })}
+
+            {closedEnriched.map((position) => {
+              const symbol = position.symbol as SupportedSymbol;
+              const iconSource = SYMBOL_ICON_MAP[symbol];
+              const pnl = position.pnl ?? 0;
+              const pnlPositive = pnl >= 0;
+
+              return (
+                <View style={styles.positionRow} key={position.id}>
+                  <View style={styles.positionLeft}>
+                    <Image source={iconSource} style={styles.assetIcon} />
+                    <View style={styles.positionTitleBlock}>
+                      <ThemedText size="sm" variant="primary">
+                        {symbol}
+                      </ThemedText>
+                      <ThemedText size="xs" variant="secondary">
+                        Closed • {position.leverage}x
+                      </ThemedText>
+                    </View>
+                  </View>
+
+                  <View style={styles.positionRight}>
+                    <ThemedText size="sm" variant="secondary">
+                      Entry {position.openPrice.toFixed(2)}
+                    </ThemedText>
+                    <ThemedText size="xs" variant="secondary">
+                      Close {position.closePrice.toFixed(2)}
+                    </ThemedText>
+                    <ThemedText
+                      size="sm"
+                      style={[styles.pnlText, pnlPositive ? styles.positive : styles.negative]}
+                    >
+                      {showValues
+                        ? `${pnlPositive ? "+" : "-"}$${Math.abs(pnl).toFixed(2)}`
+                        : "•••••"}
+                    </ThemedText>
+                  </View>
+                </View>
+              );
+            })}
+          </>
           )}
         </CardContainer>
       </ScrollView>

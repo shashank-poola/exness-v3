@@ -227,38 +227,43 @@ export async function handleCloseTrade(
     tradeToClose.closedAt = new Date();
 
     console.log(`Successfully closed trade ${orderId}. PnL: ${pnl}`);
-
-    await prisma.existingTrade.create({
-      data: {
-        userId: user.id,
-        asset: asset,
-        openPrice: openPrice,
-        closePrice: closePrice,
-        leverage: leverage,
-        pnl: tradeToClose.pnl,
-        liquidated: false,
-        createdAt: new Date(),
-        slippage: slippage,
-        side: side,
-        reason: 'Closed by user',
-        quantity: quantity,
-      },
-    });
-
-    await prisma.user.update({
-      where: {
-        email: user.email,
-      },
-      data: {
-        balance: user.balance.amount,
-      },
-    });
+    console.log('User balance after close:', user.balance.amount);
 
     user.trades = user.trades.filter((trade: any) => trade.id !== orderId);
 
     await sendAcknowledgement(requestId, 'TRADE_CLOSE_ACKNOWLEDGEMENT', {
       status: 'success',
     });
+
+    try {
+      await prisma.existingTrade.create({
+        data: {
+          userId: user.id,
+          asset: asset,
+          openPrice: openPrice,
+          closePrice: closePrice,
+          leverage: leverage,
+          pnl: tradeToClose.pnl,
+          liquidated: false,
+          createdAt: new Date(),
+          slippage: slippage,
+          side: side,
+          reason: 'Closed by user',
+          quantity: quantity,
+        },
+      });
+
+      await prisma.user.update({
+        where: {
+          email: user.email,
+        },
+        data: {
+          balance: user.balance.amount,
+        },
+      });
+    } catch (dbErr) {
+      console.error('Error persisting closed trade or updating user balance:', dbErr);
+    }
   } catch (err) {
     console.error('Error in closing trade:', err);
     await sendAcknowledgement(requestId, 'TRADE_CLOSE_ERROR', {

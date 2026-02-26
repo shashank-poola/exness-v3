@@ -218,9 +218,9 @@ const OrderBottomSheet = forwardRef<OrderBottomSheetRef, OrderBottomSheetProps>(
             >
               <View style={styles.submitContent}>
                 {side === "BUY" ? (
-                  <Octicons name="feed-plus" size={18} color="#16A34A" />
+                  <Octicons name="feed-plus" size={18} color="#000000" />
                 ) : (
-                  <FontAwesome5 name="money-bill-wave" size={18} color="#DC2626" />
+                  <FontAwesome5 name="money-bill-wave" size={18} color="#000000" />
                 )}
                 <ThemedText
                   size="button"

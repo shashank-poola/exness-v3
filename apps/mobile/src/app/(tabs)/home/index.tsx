@@ -1,11 +1,13 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import ScreenHeader from "@/src/components/common/ScreenHeader";
 import { ThemeColor } from "@/src/constants/theme";
 import PriceMarquee from "@/src/components/home/PriceMarquee";
 import HomePortfolioCard from "@/src/components/home/HomePortfolioCard";
+import HomePositionsSection from "@/src/components/home/HomePositionsSection";
+import HomeMarketsSection from "@/src/components/home/HomeMarketsSection";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -17,10 +19,12 @@ export default function HomeScreen() {
         onSearchPress={() => router.push("/(tabs)/markets/search")}
       />
 
-      <View style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <PriceMarquee />
         <HomePortfolioCard />
-      </View>
+        <HomePositionsSection />
+        <HomeMarketsSection />
+      </ScrollView>
     </SafeAreaView>
   );
 }
