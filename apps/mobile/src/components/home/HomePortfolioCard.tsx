@@ -96,7 +96,7 @@ const HomePortfolioCard: React.FC = () => {
           </ThemedText>
           <View style={styles.actionRow}>
             <Pressable style={[styles.actionButton, styles.actionButtonPrimary]}>
-              <Feather name="plus" size={22} color="#727CF5" />
+              <Feather name="plus" size={22} color="#000000" />
             </Pressable>
             <Pressable style={[styles.actionButton, styles.actionButtonSecondary]}>
               <Feather name="arrow-down" size={22} color="#FFFFFF" />
@@ -145,10 +145,10 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   actionButton: {
-    flex: 1,
     borderRadius: 999,
-    paddingVertical: 12,
-    paddingHorizontal: 50,
+    width: 95,
+    paddingVertical: 10,
+    paddingHorizontal: 0,
     alignItems: "center",
     justifyContent: "center",
   },

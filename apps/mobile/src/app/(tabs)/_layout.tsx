@@ -18,9 +18,9 @@ function IconPill({ children, focused }: { children: React.ReactNode; focused: b
   return (
     <View
       style={{
-        paddingHorizontal: 26,
+        paddingHorizontal: 23,
         paddingVertical: 8,
-        borderRadius: 999,
+        borderRadius: 16,
         backgroundColor: GREY_CARD,
       }}
     >
@@ -42,12 +42,12 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: ThemeColor.background.app,
           paddingBottom: insets.bottom > 0 ? insets.bottom : 12,
-          paddingTop: 8,
+          paddingTop: 4,
           height: 56 + (insets.bottom > 0 ? insets.bottom : 12),
         },
         tabBarItemStyle: { marginHorizontal: 4, marginVertical: 4 },
         tabBarShowLabel: true,
-        tabBarLabelStyle: { fontWeight: "600", fontSize: 12 },
+        tabBarLabelStyle: { fontWeight: "800", fontSize: 12 },
       }}
     >
       <Tabs.Screen
