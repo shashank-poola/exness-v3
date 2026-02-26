@@ -2,17 +2,9 @@ import React from "react";
 import { Image, ImageSourcePropType, StyleSheet, View } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-
 import ThemedText from "./common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
-
-interface MarketHeaderProps {
-  baseSymbol: string;
-  pair: string;
-  price?: number;
-  changePercent?: number;
-  iconSource?: ImageSourcePropType;
-}
+import { MarketHeaderProps } from "../types/utils.type";
 
 const MarketHeader: React.FC<MarketHeaderProps> = ({
   baseSymbol,

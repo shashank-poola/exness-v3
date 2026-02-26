@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Easing, Image, LayoutChangeEvent, Pressable, StyleSheet, View } from "react-native";
 import { useRouter } from "expo-router";
-
 import ThemedText from "@/src/components/common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
 import {

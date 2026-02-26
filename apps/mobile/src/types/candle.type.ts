@@ -1,3 +1,5 @@
+import {type SupportedSymbol } from "@/src/constants/markets";
+
 export interface Candlestick {
     time: number;
     open: number;
@@ -5,6 +7,8 @@ export interface Candlestick {
     low: number;
     close: number;
 };
+
+export type Side = "BUY" | "SELL";
 
 export interface CandlesticksResponse {
     candlesticks: Candlestick[];
@@ -27,4 +31,10 @@ export type LeverageSliderProps = {
     onChange: (val: number) => void;
     min?: number;
     max?: number;
-  };
+};
+
+export const SYMBOL_TO_ASSET: Record<SupportedSymbol, string> = {
+    BTC: "BTC_USDC",
+    ETH: "ETH_USDC",
+    SOL: "SOL_USDC",
+};

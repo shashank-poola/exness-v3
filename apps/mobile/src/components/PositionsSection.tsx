@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
 import { Image, Pressable, StyleSheet, View } from "react-native";
-
 import CardContainer from "@/src/components/CardContainer";
 import ThemedText from "@/src/components/common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
@@ -8,18 +7,7 @@ import { SYMBOL_ICON_MAP, type SupportedSymbol } from "@/src/constants/markets";
 import { useMarketPrices } from "@/src/hooks/useMarketPrices";
 import { useCloseTrade, useOpenTrades } from "@/src/hooks/useTrade";
 import type { OpenOrder } from "@/src/types/order.type";
-
-const ASSET_TO_SYMBOL: Record<string, SupportedSymbol> = {
-  BTC_USDC: "BTC",
-  ETH_USDC: "ETH",
-  SOL_USDC: "SOL",
-};
-
-const ASSET_TO_WS_SYMBOL: Record<string, string> = {
-  BTC_USDC: "BTCUSDT",
-  ETH_USDC: "ETHUSDT",
-  SOL_USDC: "SOLUSDT",
-};
+import { ASSET_TO_SYMBOL, ASSET_TO_WS_SYMBOL } from "@/src/constants/markets";
 
 const PositionsSection: React.FC = () => {
   const { data: openOrders, isLoading } = useOpenTrades();

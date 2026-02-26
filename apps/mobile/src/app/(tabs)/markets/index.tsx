@@ -14,9 +14,8 @@ import { useMarketPrices } from "@/src/hooks/useMarketPrices";
 import { useCandlestickChangePercent, useCandlesticks } from "@/src/hooks/useCandlesticks";
 import { processPriceTick } from "@/src/lib/candlestick-store";
 import { SUPPORTED_SYMBOLS, SYMBOL_ICON_MAP, SYMBOL_TO_PAIR, SYMBOL_TO_WS_SYMBOL, type SupportedSymbol } from "@/src/constants/markets";
-import OrderBottomSheet, {
-  type OrderBottomSheetRef,
-} from "@/src/components/OrderBottomSheet";
+import OrderBottomSheet from "@/src/components/OrderBottomSheet";
+import { OrderBottomSheetRef } from "@/src/types/utils.type";
 
 const TIMEFRAMES = ["1m", "5m", "30m", "1h", "6h", "1d", "3d"];
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
