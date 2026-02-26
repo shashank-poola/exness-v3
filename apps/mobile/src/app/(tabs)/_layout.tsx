@@ -6,7 +6,6 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import React from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
 import { ThemeColor } from "@/src/constants/theme";
 
 export default function TabLayout() {
