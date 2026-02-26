@@ -1,8 +1,7 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity, View, ViewStyle, TextStyle } from "react-native";
-
-import ThemedText from "../common/ThemedText";
-import { ThemeColor } from "@/src/constants/theme";
+import ThemedText from "./common/ThemedText";
+import { TimeframeStyles } from "../types/candle.type";
 
 interface TimeframeSelectorProps {
   options: string[];
@@ -10,11 +9,7 @@ interface TimeframeSelectorProps {
   onChange?: (value: string) => void;
 }
 
-const TimeframeSelector: React.FC<TimeframeSelectorProps> = ({
-  options,
-  selected,
-  onChange,
-}) => {
+const TimeframeSelector: React.FC<TimeframeSelectorProps> = ({ options, selected, onChange }) => {
   return (
     <View style={styles.container}>
       {options.map((option) => {
@@ -39,14 +34,6 @@ const TimeframeSelector: React.FC<TimeframeSelectorProps> = ({
     </View>
   );
 };
-
-interface TimeframeStyles {
-  container: ViewStyle;
-  chip: ViewStyle;
-  chipActive: ViewStyle;
-  label: TextStyle;
-  labelActive: TextStyle;
-}
 
 const styles = StyleSheet.create({
   container: {

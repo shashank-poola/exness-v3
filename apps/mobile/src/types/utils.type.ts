@@ -23,3 +23,8 @@ export type TickerInfo = {
     symbol: SupportedSymbol;
     wsSymbol: string;
 };
+
+export interface ProfileInfoCardProps {
+    email: string;
+    uid: string;
+};

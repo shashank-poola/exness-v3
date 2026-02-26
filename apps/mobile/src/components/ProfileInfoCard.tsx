@@ -1,15 +1,10 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-
 import CardContainer from "./CardContainer";
 import ThemedText from "./common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
-
-interface ProfileInfoCardProps {
-  email: string;
-  uid: string;
-}
+import { ProfileInfoCardProps } from "../types/utils.type";
 
 const ProfileInfoCard: React.FC<ProfileInfoCardProps> = ({ email, uid }) => {
   return (

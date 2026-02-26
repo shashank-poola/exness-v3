@@ -4,14 +4,7 @@ import { getToken, removeToken, storeToken } from '../storage/auth.storage';
 import { getUserProfile } from '../services/auth.service';
 import { logger } from '../services/logger.service';
 import type { AuthUser } from '../types/auth.type';
-
-type AuthContextType = {
-  user: AuthUser | null;
-  login: (user: AuthUser, token: string) => void;
-  logout: () => void;
-  getCurrentUser: () => Promise<void>;
-  isLoading: boolean;
-};
+import { AuthContextType } from '../types/auth.type';
 
 const AuthContext = createContext<AuthContextType | null>(null);
 

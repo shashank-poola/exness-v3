@@ -1,4 +1,5 @@
 import {type SupportedSymbol } from "@/src/constants/markets";
+import { ViewStyle, TextStyle } from "react-native";
 
 export interface Candlestick {
     time: number;
@@ -38,3 +39,11 @@ export const SYMBOL_TO_ASSET: Record<SupportedSymbol, string> = {
     ETH: "ETH_USDC",
     SOL: "SOL_USDC",
 };
+
+export interface TimeframeStyles {
+    container: ViewStyle;
+    chip: ViewStyle;
+    chipActive: ViewStyle;
+    label: TextStyle;
+    labelActive: TextStyle;
+}
