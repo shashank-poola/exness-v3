@@ -1,26 +1,13 @@
 import React, { useMemo, useState } from "react";
-import {
-  FlatList,
-  Image,
-  Pressable,
-  StyleSheet,
-  View,
-} from "react-native";
+import { FlatList, Image, Pressable, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-
 import ScreenHeader from "@/src/components/common/ScreenHeader";
 import ThemedText from "@/src/components/common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
 import { useMarketPrices } from "@/src/hooks/useMarketPrices";
 import { useCandlesticks } from "@/src/hooks/useCandlesticks";
-import {
-  SUPPORTED_SYMBOLS,
-  SYMBOL_ICON_MAP,
-  SYMBOL_TO_PAIR,
-  SYMBOL_TO_WS_SYMBOL,
-  type SupportedSymbol,
-} from "@/src/constants/markets";
+import { SUPPORTED_SYMBOLS, SYMBOL_ICON_MAP, SYMBOL_TO_PAIR, SYMBOL_TO_WS_SYMBOL, type SupportedSymbol } from "@/src/constants/markets";
 
 export default function MarketsSearchScreen() {
   const router = useRouter();

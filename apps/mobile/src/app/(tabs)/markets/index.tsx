@@ -13,10 +13,7 @@ import { ThemeColor } from "@/src/constants/theme";
 import { useMarketPrices } from "@/src/hooks/useMarketPrices";
 import { useCandlestickChangePercent, useCandlesticks } from "@/src/hooks/useCandlesticks";
 import { processPriceTick } from "@/src/lib/candlestick-store";
-import { SUPPORTED_SYMBOLS, SYMBOL_ICON_MAP, SYMBOL_TO_PAIR,
-  SYMBOL_TO_WS_SYMBOL,
-  type SupportedSymbol,
-} from "@/src/constants/markets";
+import { SUPPORTED_SYMBOLS, SYMBOL_ICON_MAP, SYMBOL_TO_PAIR, SYMBOL_TO_WS_SYMBOL, type SupportedSymbol } from "@/src/constants/markets";
 import OrderBottomSheet, {
   type OrderBottomSheetRef,
 } from "@/src/components/OrderBottomSheet";
