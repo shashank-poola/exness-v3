@@ -10,6 +10,7 @@ const PORT = process.env.PORT;
 const app = express();
 
 const ALLOWED_ORIGINS = [
+  "http://localhost:5173",
   "https://exness-v3-web.vercel.app",
   "https://tradex.foo",
   "https://www.tradex.foo",
@@ -30,6 +31,6 @@ app.use(cookieParser());
 
 app.use('/api/v1', mainRouter);
 
-app.listen(3000, "0.0.0.0", () => {
+app.listen(PORT, () => {
   console.log('Server started on PORT: 3000',);
 });
