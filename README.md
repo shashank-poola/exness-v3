@@ -17,6 +17,13 @@ TradeX simulates a live crypto trading experience where users can:
 ## TradeX(Web)
 ![Exness-WEB](apps/web/src/assets/demo.png)
 
+<p align="center">
+  <img src="./assets/demo/exness-home.jpeg" alt="Home screen" width="220" />
+  <img src="./assets/demo/exness-markets.jpeg" alt="Markets screen" width="220" />
+  <img src="./assets/demo/exness-portfolio.jpeg" alt="Portfolio screen" width="220" />
+  <img src="./assets/demo/exness-profile.jpeg" alt="Profile screen" width="220" />
+</p>
+
 ## TradeX(Mobile)
 https://github.com/user-attachments/assets/a0c64dd7-5200-4fed-a5d0-146487eff85c
 
