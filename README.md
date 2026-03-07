@@ -24,10 +24,10 @@ https://github.com/user-attachments/assets/a0c64dd7-5200-4fed-a5d0-146487eff85c
 ## Demo Screenshots
 
 <p align="center">
-  <img src="./apps/mobile/assets/demo/exness-home.jpeg" alt="Home screen" width="220" />
-  <img src="./apps/mobile/assets/demo/exness-markets.jpeg" alt="Markets screen" width="220" />
-  <img src="./apps/mobile/assets/demo/exness-portfolio.jpeg" alt="Portfolio screen" width="220" />
-  <img src="./apps/mobile/assets/demo/exness-profile.jpeg" alt="Profile screen" width="220" />
+  <img src="./apps/mobile/assets/demo/exness-home.jpeg" alt="Home screen" width="200" />
+  <img src="./apps/mobile/assets/demo/exness-markets.jpeg" alt="Markets screen" width="200" />
+  <img src="./apps/mobile/assets/demo/exness-portfolio.jpeg" alt="Portfolio screen" width="200" />
+  <img src="./apps/mobile/assets/demo/exness-profile.jpeg" alt="Profile screen" width="200" />
 </p>
 
 
