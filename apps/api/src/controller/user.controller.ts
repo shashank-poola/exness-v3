@@ -45,7 +45,8 @@ export async function getUserBalance(req: Request, res: Response) {
 
       return res.status(200).json({
         success: true,
-        message: Number(engineBalance),
+        message: 'BALANCE_FETCHED',
+        balance: Number(engineBalance),
         error: null,
       });
     } catch (engineErr) {
@@ -53,7 +54,8 @@ export async function getUserBalance(req: Request, res: Response) {
 
       return res.status(200).json({
         success: true,
-        message: Number(user.balance) || 0,
+        message: 'BALANCE_FETCHED_FROM_DB',
+        balance: Number(user.balance) || 0,
         error: null,
       });
     }

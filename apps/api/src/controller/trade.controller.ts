@@ -139,7 +139,8 @@ export async function fetchCloseOrders(req: Request, res: Response) {
 
     return res.status(200).json({
       success: true,
-      message: orders,
+      message: 'CLOSED_ORDERS_FETCHED',
+      orders,
       error: null,
     });
 
@@ -176,7 +177,8 @@ export async function fetchOpenOrders(req: Request, res: Response) {
 
     return res.status(200).json({
       success: true, 
-      message: orders,
+      message: 'OPEN_ORDERS_FETCHED',
+      orders,
       error: null,
     });
 

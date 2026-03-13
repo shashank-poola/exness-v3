@@ -2,7 +2,7 @@ import { subscriber } from '@exness-v3/redis/pubsub';
 import { WebSocketServer, WebSocket } from 'ws';
 import 'dotenv/config';
 
-const PORT = Number(process.env.WS_PORT);
+const PORT = Number(process.env.WS_PORT || 8080);
 
 const PRICE_UPDATE_CHANNEL = 'ws:price:update';
 
