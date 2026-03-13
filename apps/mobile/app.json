@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "mobile",
+    "name": "tradex-mobile",
     "slug": "mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/exness/whitelogo.png",
     "scheme": "mobile",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -24,7 +24,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/exness/whitelogo.png"
     },
     "plugins": [
       "expo-router",
