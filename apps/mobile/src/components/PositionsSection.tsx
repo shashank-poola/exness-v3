@@ -5,6 +5,7 @@ import ThemedText from "@/src/components/common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
 import { SYMBOL_ICON_MAP, type SupportedSymbol } from "@/src/constants/markets";
 import { useMarketPrices } from "@/src/hooks/useMarketPrices";
+import { useCandlesticks } from "@/src/hooks/useCandlesticks";
 import { useCloseTrade, useOpenTrades } from "@/src/hooks/useTrade";
 import type { OpenOrder } from "@/src/types/order.type";
 import { ASSET_TO_SYMBOL, ASSET_TO_WS_SYMBOL } from "@/src/constants/markets";
@@ -14,21 +15,37 @@ const PositionsSection: React.FC = () => {
   const prices = useMarketPrices();
   const closeTrade = useCloseTrade();
 
-  const enriched = useMemo(() => {
-    if (!openOrders) return [];
+  const { data: btcCandles } = useCandlesticks("BTCUSDT", "1h");
+  const { data: ethCandles } = useCandlesticks("ETHUSDT", "1h");
+  const { data: solCandles } = useCandlesticks("SOLUSDT", "1h");
 
-    return (openOrders as OpenOrder[]).map((order) => {
+  const lastCloseBySymbol = useMemo(() => {
+    const map: Record<string, number> = {};
+    if (btcCandles?.length) map["BTCUSDT"] = btcCandles[btcCandles.length - 1].close;
+    if (ethCandles?.length) map["ETHUSDT"] = ethCandles[ethCandles.length - 1].close;
+    if (solCandles?.length) map["SOLUSDT"] = solCandles[solCandles.length - 1].close;
+    return map;
+  }, [btcCandles, ethCandles, solCandles]);
+
+  const enriched = useMemo(() => {
+    const orders = Array.isArray(openOrders) ? openOrders : [];
+    return orders.map((order: OpenOrder) => {
       const wsSymbol = ASSET_TO_WS_SYMBOL[order.asset] ?? "";
       const priceEntry = wsSymbol ? prices[wsSymbol] : undefined;
-      const currentPrice = priceEntry ? priceEntry.ask || priceEntry.bid || 0 : undefined;
+      const livePrice = priceEntry ? priceEntry.ask || priceEntry.bid || 0 : undefined;
+      const fallbackPrice = wsSymbol ? lastCloseBySymbol[wsSymbol] : undefined;
+      const currentPrice =
+        (livePrice != null && isFinite(livePrice) ? livePrice : undefined) ??
+        (fallbackPrice != null && isFinite(fallbackPrice) ? fallbackPrice : undefined);
       const side = order.side;
 
+      const entryPrice = order.tradeOpeningPrice ?? order.openPrice;
       let pnl: number | undefined;
       if (currentPrice != null && isFinite(currentPrice)) {
         if (side === "LONG") {
-          pnl = (currentPrice - order.openPrice) * order.quantity * order.leverage;
+          pnl = (currentPrice - entryPrice) * order.quantity * order.leverage;
         } else if (side === "SHORT") {
-          pnl = (order.openPrice - currentPrice) * order.quantity * order.leverage;
+          pnl = (entryPrice - currentPrice) * order.quantity * order.leverage;
         }
       }
 
@@ -45,7 +62,7 @@ const PositionsSection: React.FC = () => {
         equity,
       };
     });
-  }, [openOrders, prices]);
+  }, [openOrders, prices, lastCloseBySymbol]);
 
   const handleClose = (id: string) => {
     closeTrade.mutate(id);
@@ -114,22 +131,26 @@ const PositionsSection: React.FC = () => {
 
                 <View style={styles.columnRight}>
                   <ThemedText size="xl" variant="secondary">
-                    P&amp;L
+                    P&L
                   </ThemedText>
                   <ThemedText
                     size="lg"
                     style={[
                       styles.emphasis,
-                      pnlPositive ? styles.positive : styles.negative,
+                      currentPrice != null ? (pnlPositive ? styles.positive : styles.negative) : undefined,
                     ]}
                   >
-                    {`${pnlPositive ? "" : "-"}$${Math.abs(pnl).toFixed(2)}`}
+                    {currentPrice != null
+                      ? `${pnlPositive ? "" : "-"}$${Math.abs(pnl).toFixed(2)}`
+                      : "--"}
                   </ThemedText>
                   <ThemedText
                     size="md"
-                    style={pnlPositive ? styles.positive : styles.negative}
+                    style={currentPrice != null ? (pnlPositive ? styles.positive : styles.negative) : undefined}
                   >
-                    {`${pnlPositive ? "" : "-"}${Math.abs(pnlPercent).toFixed(2)}%`}
+                    {currentPrice != null
+                      ? `${pnlPositive ? "" : "-"}${Math.abs(pnlPercent).toFixed(2)}%`
+                      : ""}
                   </ThemedText>
                 </View>
               </View>

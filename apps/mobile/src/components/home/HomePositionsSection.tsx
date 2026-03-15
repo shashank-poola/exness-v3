@@ -5,6 +5,7 @@ import ThemedText from "@/src/components/common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
 import { SYMBOL_ICON_MAP, type SupportedSymbol } from "@/src/constants/markets";
 import { useMarketPrices } from "@/src/hooks/useMarketPrices";
+import { useCandlesticks } from "@/src/hooks/useCandlesticks";
 import { useOpenTrades } from "@/src/hooks/useTrade";
 import type { OpenOrder } from "@/src/types/order.type";
 import { ASSET_TO_SYMBOL, ASSET_TO_WS_SYMBOL } from "@/src/constants/markets";
@@ -12,22 +13,37 @@ import { ASSET_TO_SYMBOL, ASSET_TO_WS_SYMBOL } from "@/src/constants/markets";
 const HomePositionsSection: React.FC = () => {
   const { data: openOrders, isLoading } = useOpenTrades();
   const prices = useMarketPrices();
+  const { data: btcCandles } = useCandlesticks("BTCUSDT", "1h");
+  const { data: ethCandles } = useCandlesticks("ETHUSDT", "1h");
+  const { data: solCandles } = useCandlesticks("SOLUSDT", "1h");
+
+  const lastCloseBySymbol = useMemo(() => {
+    const map: Record<string, number> = {};
+    if (btcCandles?.length) map["BTCUSDT"] = btcCandles[btcCandles.length - 1].close;
+    if (ethCandles?.length) map["ETHUSDT"] = ethCandles[ethCandles.length - 1].close;
+    if (solCandles?.length) map["SOLUSDT"] = solCandles[solCandles.length - 1].close;
+    return map;
+  }, [btcCandles, ethCandles, solCandles]);
 
   const enriched = useMemo(() => {
-    if (!openOrders) return [];
-
-    return (openOrders as OpenOrder[]).map((order) => {
+    const orders = Array.isArray(openOrders) ? openOrders : [];
+    return orders.map((order: OpenOrder) => {
       const wsSymbol = ASSET_TO_WS_SYMBOL[order.asset] ?? "";
       const priceEntry = wsSymbol ? prices[wsSymbol] : undefined;
-      const currentPrice = priceEntry ? priceEntry.ask || priceEntry.bid || 0 : undefined;
+      const livePrice = priceEntry ? priceEntry.ask || priceEntry.bid || 0 : undefined;
+      const fallbackPrice = wsSymbol ? lastCloseBySymbol[wsSymbol] : undefined;
+      const currentPrice =
+        (livePrice != null && isFinite(livePrice) ? livePrice : undefined) ??
+        (fallbackPrice != null && isFinite(fallbackPrice) ? fallbackPrice : undefined);
       const side = order.side;
 
+      const entryPrice = order.tradeOpeningPrice ?? order.openPrice;
       let pnl: number | undefined;
       if (currentPrice != null && isFinite(currentPrice)) {
         if (side === "LONG") {
-          pnl = (currentPrice - order.openPrice) * order.quantity * order.leverage;
+          pnl = (currentPrice - entryPrice) * order.quantity * order.leverage;
         } else if (side === "SHORT") {
-          pnl = (order.openPrice - currentPrice) * order.quantity * order.leverage;
+          pnl = (entryPrice - currentPrice) * order.quantity * order.leverage;
         }
       }
 
@@ -39,7 +55,7 @@ const HomePositionsSection: React.FC = () => {
         pnl,
       };
     });
-  }, [openOrders, prices]);
+  }, [openOrders, prices, lastCloseBySymbol]);
 
   const hasPositions = enriched.length > 0;
 
@@ -90,9 +106,11 @@ const HomePositionsSection: React.FC = () => {
                   </ThemedText>
                   <ThemedText
                     size="sm"
-                    style={pnlPositive ? styles.positive : styles.negative}
+                    style={position.pnl != null ? (pnlPositive ? styles.positive : styles.negative) : undefined}
                   >
-                    {`${pnlPositive ? "" : "-"}$${Math.abs(pnl).toFixed(2)}`}
+                    {position.pnl != null
+                      ? `${pnlPositive ? "" : "-"}$${Math.abs(pnl).toFixed(2)}`
+                      : "--"}
                   </ThemedText>
                 </View>
               </View>

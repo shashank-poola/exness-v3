@@ -6,7 +6,14 @@ import ThemedText from "./common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
 import { ProfileInfoCardProps } from "../types/utils.type";
 
+function maskUid(uid: string): string {
+  if (!uid || uid.length <= 10) return uid;
+  return uid.slice(0, 5) + "....." + uid.slice(-5);
+}
+
 const ProfileInfoCard: React.FC<ProfileInfoCardProps> = ({ email, uid }) => {
+  const displayUid = maskUid(uid ?? "");
+
   return (
     <CardContainer>
       <View style={styles.verifiedRow}>
@@ -18,7 +25,7 @@ const ProfileInfoCard: React.FC<ProfileInfoCardProps> = ({ email, uid }) => {
 
       <View style={styles.uidRow}>
         <ThemedText variant="secondary" size="sm">
-          UID: {uid}
+          UID: {displayUid}
         </ThemedText>
       </View>
 

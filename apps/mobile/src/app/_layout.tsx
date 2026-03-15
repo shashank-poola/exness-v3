@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AuthProvider, useAuth } from "@/src/context/auth-context";
+import { MarketPricesProvider } from "@/src/context/market-prices-context";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -64,10 +65,12 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <BottomSheetModalProvider>
           <QueryClientProvider client={queryClient}>
-            <AuthProvider>
-              <StatusBar style="light" />
-              <RootLayoutNav />
-            </AuthProvider>
+            <MarketPricesProvider>
+              <AuthProvider>
+                <StatusBar style="light" />
+                <RootLayoutNav />
+              </AuthProvider>
+            </MarketPricesProvider>
           </QueryClientProvider>
         </BottomSheetModalProvider>
       </SafeAreaProvider>

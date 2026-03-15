@@ -4,9 +4,10 @@ import CardContainer from "./CardContainer";
 import ThemedText from "./common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
 import { useOpenTrades } from "@/src/hooks/useTrade";
+import { useMarketPrices } from "@/src/hooks/useMarketPrices";
 import { SYMBOL_ICON_MAP, type SupportedSymbol } from "@/src/constants/markets";
 import type { OpenOrder } from "@/src/types/order.type";
-import { ASSET_TO_SYMBOL } from "@/src/constants/markets";
+import { ASSET_TO_SYMBOL, ASSET_TO_WS_SYMBOL } from "@/src/constants/markets";
 
 interface HoldingsSectionProps {
   symbol: SupportedSymbol;
@@ -21,14 +22,31 @@ const getSidePillStyle = (isBuy: boolean): ViewStyle => ({
 
 const HoldingsSection: React.FC<HoldingsSectionProps> = ({ symbol }) => {
   const { data: openOrders, isLoading } = useOpenTrades();
+  const prices = useMarketPrices();
 
   const positions = useMemo(
     () =>
-      (openOrders ?? []).filter((order: OpenOrder) => {
-        const mapped = ASSET_TO_SYMBOL[order.asset];
-        return mapped === symbol;
-      }),
-    [openOrders, symbol]
+      (Array.isArray(openOrders) ? openOrders : [])
+        .filter((order: OpenOrder) => {
+          const mapped = ASSET_TO_SYMBOL[order.asset];
+          return mapped === symbol;
+        })
+        .map((order: OpenOrder) => {
+          const wsSymbol = ASSET_TO_WS_SYMBOL[order.asset] ?? "";
+          const priceEntry = wsSymbol ? prices[wsSymbol] : undefined;
+          const currentPrice = priceEntry ? priceEntry.ask || priceEntry.bid || 0 : undefined;
+          const entryPrice = order.tradeOpeningPrice ?? order.openPrice;
+          let pnl: number | undefined;
+          if (currentPrice != null && isFinite(currentPrice)) {
+            if (order.side === "LONG") {
+              pnl = (currentPrice - entryPrice) * order.quantity * order.leverage;
+            } else if (order.side === "SHORT") {
+              pnl = (entryPrice - currentPrice) * order.quantity * order.leverage;
+            }
+          }
+          return { ...order, livePnl: pnl ?? 0, hasLivePrice: currentPrice != null && isFinite(currentPrice) };
+        }),
+    [openOrders, symbol, prices]
   );
 
   return (
@@ -59,6 +77,10 @@ const HoldingsSection: React.FC<HoldingsSectionProps> = ({ symbol }) => {
               const mappedSymbol = ASSET_TO_SYMBOL[position.asset] ?? symbol;
               const iconSource = SYMBOL_ICON_MAP[mappedSymbol];
               const isLong = position.side === "LONG";
+              const extended = position as OpenOrder & { livePnl: number; hasLivePrice?: boolean };
+              const livePnl = extended.livePnl;
+              const hasLivePrice = extended.hasLivePrice ?? false;
+              const pnlPositive = livePnl >= 0;
 
               return (
                 <View style={styles.positionRow} key={position.id}>
@@ -83,6 +105,15 @@ const HoldingsSection: React.FC<HoldingsSectionProps> = ({ symbol }) => {
                     <ThemedText size="sm" variant="primary">
                       {position.tradeOpeningPrice.toFixed(2)}
                     </ThemedText>
+                    <ThemedText size="xs" variant="secondary" style={styles.pnlLabel}>
+                      Live PnL
+                    </ThemedText>
+                    <ThemedText
+                      size="sm"
+                      style={hasLivePrice ? (pnlPositive ? styles.positive : styles.negative) : undefined}
+                    >
+                      {hasLivePrice ? `${pnlPositive ? "" : "-"}$${Math.abs(livePnl).toFixed(2)}` : "--"}
+                    </ThemedText>
                   </View>
                 </View>
               );
@@ -105,6 +136,9 @@ interface HoldingsStyles {
   assetIcon: ImageStyle;
   subLabel: TextStyle;
   positionRight: ViewStyle;
+  pnlLabel: TextStyle;
+  positive: TextStyle;
+  negative: TextStyle;
   row: ViewStyle;
 }
 
@@ -148,6 +182,15 @@ const styles = StyleSheet.create({
   positionRight: {
     alignItems: "flex-end",
     gap: 2,
+  },
+  pnlLabel: {
+    marginTop: 6,
+  },
+  positive: {
+    color: ThemeColor.status.success,
+  },
+  negative: {
+    color: ThemeColor.status.error,
   },
   row: {
     flexDirection: "row",

@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
-import { Image, StyleSheet, View } from "react-native";
+import { Image, Pressable, StyleSheet, View } from "react-native";
+import { useRouter } from "expo-router";
 import CardContainer from "@/src/components/CardContainer";
 import ThemedText from "@/src/components/common/ThemedText";
 import { ThemeColor } from "@/src/constants/theme";
@@ -16,8 +17,8 @@ const SYMBOL_LABEL: Record<SupportedSymbol, string> = {
 };
 
 const HomeMarketsSection: React.FC = () => {
+  const router = useRouter();
   const prices = useMarketPrices();
-
   const stats = useSymbolStats();
 
   return (
@@ -42,7 +43,11 @@ const HomeMarketsSection: React.FC = () => {
             : ThemeColor.status.error;
 
           return (
-            <View key={symbol} style={styles.row}>
+            <Pressable
+              key={symbol}
+              style={styles.row}
+              onPress={() => router.push(`/(tabs)/markets/${symbol}`)}
+            >
               <View style={styles.left}>
                 <Image source={SYMBOL_ICON_MAP[symbol]} style={styles.icon} />
                 <View>
@@ -65,7 +70,7 @@ const HomeMarketsSection: React.FC = () => {
                   </ThemedText>
                 )}
               </View>
-            </View>
+            </Pressable>
           );
         })}
       </CardContainer>

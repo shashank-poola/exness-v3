@@ -23,20 +23,20 @@ export default function PortfolioScreen() {
   const { data: balance } = useUserBalance();
 
   const enriched = useMemo(() => {
-    if (!openOrders) return [];
-
-    return (openOrders as OpenOrder[]).map((order) => {
+    const orders = Array.isArray(openOrders) ? openOrders : [];
+    return orders.map((order: OpenOrder) => {
       const wsSymbol = ASSET_TO_WS_SYMBOL[order.asset] ?? "";
       const priceEntry = wsSymbol ? prices[wsSymbol] : undefined;
       const currentPrice = priceEntry ? priceEntry.ask || priceEntry.bid || 0 : undefined;
       const side = order.side;
 
+      const entryPrice = order.tradeOpeningPrice ?? order.openPrice;
       let pnl: number | undefined;
       if (currentPrice != null && isFinite(currentPrice)) {
         if (side === "LONG") {
-          pnl = (currentPrice - order.openPrice) * order.quantity * order.leverage;
+          pnl = (currentPrice - entryPrice) * order.quantity * order.leverage;
         } else if (side === "SHORT") {
-          pnl = (order.openPrice - currentPrice) * order.quantity * order.leverage;
+          pnl = (entryPrice - currentPrice) * order.quantity * order.leverage;
         }
       }
 
@@ -56,9 +56,8 @@ export default function PortfolioScreen() {
   }, [openOrders, prices]);
 
   const closedEnriched = useMemo(() => {
-    if (!closedOrders) return [];
-
-    return closedOrders.map((order) => {
+    const orders = Array.isArray(closedOrders) ? closedOrders : [];
+    return orders.map((order) => {
       const symbol = ASSET_TO_SYMBOL[order.asset] ?? "BTC";
       return {
         ...order,
@@ -73,7 +72,6 @@ export default function PortfolioScreen() {
   const totalPnlPercent = totalMargin > 0 ? (totalPnl / totalMargin) * 100 : 0;
   const hasPositions = enriched.length > 0 || closedEnriched.length > 0;
   const numericBalance = typeof balance === "number" ? balance : 0;
-  const liveBalance = numericBalance - totalMargin;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom", "left", "right"]}>
@@ -91,7 +89,7 @@ export default function PortfolioScreen() {
               </ThemedText>
               <ThemedText size="xl" variant="primary" style={styles.portfolioBalance}>
                 {showValues
-                  ? `$${liveBalance.toFixed(2)}`
+                  ? `$${numericBalance.toFixed(2)}`
                   : "••••••"}
               </ThemedText>
               <ThemedText
@@ -173,12 +171,17 @@ export default function PortfolioScreen() {
                     <ThemedText size="xs" variant="secondary">
                       Margin ${position.margin.toFixed(2)}
                     </ThemedText>
+                    <ThemedText size="xs" variant="secondary">
+                      P&L
+                    </ThemedText>
                     <ThemedText
                       size="sm"
-                      style={[styles.pnlText, pnlPositive ? styles.positive : styles.negative]}
+                      style={[styles.pnlText, position.pnl != null ? (pnlPositive ? styles.positive : styles.negative) : undefined]}
                     >
                       {showValues
-                        ? `${pnlPositive ? "+" : "-"}$${Math.abs(pnl).toFixed(2)}`
+                        ? position.pnl != null
+                          ? `${pnlPositive ? "+" : "-"}$${Math.abs(pnl).toFixed(2)}`
+                          : "--"
                         : "•••••"}
                     </ThemedText>
                   </View>

@@ -15,12 +15,13 @@ const HomePortfolioCard: React.FC = () => {
   const [showValues, setShowValues] = useState(true);
   const { data: openOrders } = useOpenTrades();
   const prices = useMarketPrices();
-  const { data: balance } = useUserBalance();
+  const { data: balance, isLoading: balanceLoading, isError: balanceError } = useUserBalance();
 
   const { cashBalance } = useMemo(() => {
     const numericBalance = typeof balance === "number" ? balance : 0;
+    const orders = Array.isArray(openOrders) ? openOrders : [];
 
-    if (!openOrders) {
+    if (orders.length === 0) {
       return {
         cashBalance: numericBalance,
         totalPnl: 0,
@@ -29,18 +30,19 @@ const HomePortfolioCard: React.FC = () => {
       };
     }
 
-    const enriched = (openOrders as OpenOrder[]).map((order) => {
+    const enriched = orders.map((order: OpenOrder) => {
       const wsSymbol = ASSET_TO_WS_SYMBOL[order.asset] ?? "";
       const priceEntry = wsSymbol ? prices[wsSymbol] : undefined;
       const currentPrice = priceEntry ? priceEntry.ask || priceEntry.bid || 0 : undefined;
       const side = order.side;
 
+      const entryPrice = order.tradeOpeningPrice ?? order.openPrice;
       let pnl: number | undefined;
       if (currentPrice != null && isFinite(currentPrice)) {
         if (side === "LONG") {
-          pnl = (currentPrice - order.openPrice) * order.quantity * order.leverage;
+          pnl = (currentPrice - entryPrice) * order.quantity * order.leverage;
         } else if (side === "SHORT") {
-          pnl = (order.openPrice - currentPrice) * order.quantity * order.leverage;
+          pnl = (entryPrice - currentPrice) * order.quantity * order.leverage;
         }
       }
 
@@ -75,9 +77,13 @@ const HomePortfolioCard: React.FC = () => {
             Account
           </ThemedText>
           <ThemedText size="xl" variant="primary" style={styles.balance}>
-            {showValues
-              ? `$${cashBalance.toFixed(2)}`
-              : "••••••"}
+            {!showValues
+              ? "••••••"
+              : balanceLoading
+                ? "Loading..."
+                : balanceError
+                  ? "Error"
+                  : `$${cashBalance.toFixed(2)}`}
           </ThemedText>
           <ThemedText size="xs" variant="secondary">
             TradeX as USD
