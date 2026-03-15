@@ -9,6 +9,7 @@ import { ThemeColor } from "@/src/constants/theme";
 import CardContainer from "@/src/components/CardContainer";
 import { useCloseTrades, useOpenTrades } from "@/src/hooks/useTrade";
 import { useMarketPrices } from "@/src/hooks/useMarketPrices";
+import { useCandlesticks } from "@/src/hooks/useCandlesticks";
 import { useUserBalance } from "@/src/hooks/useUserBalance";
 import type { OpenOrder } from "@/src/types/order.type";
 import { SYMBOL_ICON_MAP, type SupportedSymbol } from "@/src/constants/markets";
@@ -22,12 +23,28 @@ export default function PortfolioScreen() {
   const prices = useMarketPrices();
   const { data: balance } = useUserBalance();
 
+  const { data: btcCandles } = useCandlesticks("BTCUSDT", "1h");
+  const { data: ethCandles } = useCandlesticks("ETHUSDT", "1h");
+  const { data: solCandles } = useCandlesticks("SOLUSDT", "1h");
+
+  const lastCloseBySymbol = useMemo(() => {
+    const map: Record<string, number> = {};
+    if (btcCandles?.length) map["BTCUSDT"] = btcCandles[btcCandles.length - 1].close;
+    if (ethCandles?.length) map["ETHUSDT"] = ethCandles[ethCandles.length - 1].close;
+    if (solCandles?.length) map["SOLUSDT"] = solCandles[solCandles.length - 1].close;
+    return map;
+  }, [btcCandles, ethCandles, solCandles]);
+
   const enriched = useMemo(() => {
     const orders = Array.isArray(openOrders) ? openOrders : [];
     return orders.map((order: OpenOrder) => {
       const wsSymbol = ASSET_TO_WS_SYMBOL[order.asset] ?? "";
       const priceEntry = wsSymbol ? prices[wsSymbol] : undefined;
-      const currentPrice = priceEntry ? priceEntry.ask || priceEntry.bid || 0 : undefined;
+      const livePrice = priceEntry ? priceEntry.ask || priceEntry.bid || 0 : undefined;
+      const fallbackPrice = wsSymbol ? lastCloseBySymbol[wsSymbol] : undefined;
+      const currentPrice =
+        (livePrice != null && isFinite(livePrice) ? livePrice : undefined) ??
+        (fallbackPrice != null && isFinite(fallbackPrice) ? fallbackPrice : undefined);
       const side = order.side;
 
       const entryPrice = order.tradeOpeningPrice ?? order.openPrice;
@@ -53,7 +70,7 @@ export default function PortfolioScreen() {
         equity,
       };
     });
-  }, [openOrders, prices]);
+  }, [openOrders, prices, lastCloseBySymbol]);
 
   const closedEnriched = useMemo(() => {
     const orders = Array.isArray(closedOrders) ? closedOrders : [];
@@ -71,7 +88,8 @@ export default function PortfolioScreen() {
   const totalEquity = totalMargin + totalPnl;
   const totalPnlPercent = totalMargin > 0 ? (totalPnl / totalMargin) * 100 : 0;
   const hasPositions = enriched.length > 0 || closedEnriched.length > 0;
-  const numericBalance = typeof balance === "number" ? balance : 0;
+  const totalBalance = typeof balance === "number" ? balance : 0;
+  const availableBalance = Math.max(0, totalBalance - totalMargin);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom", "left", "right"]}>
@@ -89,7 +107,7 @@ export default function PortfolioScreen() {
               </ThemedText>
               <ThemedText size="xl" variant="primary" style={styles.portfolioBalance}>
                 {showValues
-                  ? `$${numericBalance.toFixed(2)}`
+                  ? `$${availableBalance.toFixed(2)}`
                   : "••••••"}
               </ThemedText>
               <ThemedText
@@ -261,8 +279,11 @@ const styles = StyleSheet.create({
   portfolioBalance: {
     marginTop: 4,
   },
+  portfolioPnlLabel: {
+    marginTop: 6,
+  },
   portfolioChange: {
-    marginTop: 4,
+    marginTop: 2,
   },
   positive: {
     color: ThemeColor.status.success,

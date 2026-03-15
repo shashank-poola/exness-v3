@@ -17,13 +17,13 @@ const HomePortfolioCard: React.FC = () => {
   const prices = useMarketPrices();
   const { data: balance, isLoading: balanceLoading, isError: balanceError } = useUserBalance();
 
-  const { cashBalance } = useMemo(() => {
-    const numericBalance = typeof balance === "number" ? balance : 0;
+  const { displayBalance } = useMemo(() => {
+    const totalBalance = typeof balance === "number" ? balance : 0;
     const orders = Array.isArray(openOrders) ? openOrders : [];
 
     if (orders.length === 0) {
       return {
-        cashBalance: numericBalance,
+        displayBalance: totalBalance,
         totalPnl: 0,
         totalPnlPercent: 0,
         hasPositions: false,
@@ -60,9 +60,10 @@ const HomePortfolioCard: React.FC = () => {
     const totalMargin = enriched.reduce((sum, p) => sum + p.margin, 0);
     const totalPnl = enriched.reduce((sum, p) => sum + (p.pnl ?? 0), 0);
     const totalPnlPercent = totalMargin > 0 ? (totalPnl / totalMargin) * 100 : 0;
+    const availableBalance = Math.max(0, totalBalance - totalMargin);
 
     return {
-      cashBalance: numericBalance,
+      displayBalance: availableBalance,
       totalPnl,
       totalPnlPercent,
       hasPositions: enriched.length > 0,
@@ -83,7 +84,7 @@ const HomePortfolioCard: React.FC = () => {
                 ? "Loading..."
                 : balanceError
                   ? "Error"
-                  : `$${cashBalance.toFixed(2)}`}
+                  : `$${displayBalance.toFixed(2)}`}
           </ThemedText>
           <ThemedText size="xs" variant="secondary">
             TradeX as USD
