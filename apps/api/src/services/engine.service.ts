@@ -1,11 +1,12 @@
 import type { User } from "@prisma/client";
+import { randomUUID } from "crypto";
 import { RedisSubscriber } from "./redis.service.js" ;
 import { httpPusher } from "@exness-v3/redis/streams";
 
 const redisSub = RedisSubscriber.getInstance();
 
 export async function createUserInEngine(user: User) {
-    const requestId = Date.now().toString();
+    const requestId = randomUUID();
     
     const payload = {
         type: 'USER_CREATED',
@@ -18,16 +19,20 @@ export async function createUserInEngine(user: User) {
         }),
     };
 
-    await httpPusher.xAdd('stream:engine', '*', payload);
+    const pending = redisSub.waitForMessage(requestId);
+    try {
+      await httpPusher.xAdd('stream:engine', '*', payload);
+    } catch (e) {
+      redisSub.cancelWait(requestId);
+      throw e;
+    }
 
-    const res = await redisSub.waitForMessage(requestId);
-
-    return res;
+    return await pending;
 }
 
 export async function getUserBalanceFromEngine(email: string, password: string) {
 
-    const requestId = Date.now().toString();
+    const requestId = randomUUID();
 
     const payload = {
         type: 'GET_USER_BALANCE',
@@ -38,10 +43,16 @@ export async function getUserBalanceFromEngine(email: string, password: string) 
         }),
     };  
 
-    const res1 = await httpPusher.xAdd('stream:engine', '*', payload);
-    console.log(res1);
+    const balancePending = redisSub.waitForMessage<{ balance: number }>(requestId);
+    try {
+      const res1 = await httpPusher.xAdd('stream:engine', '*', payload);
+      console.log(res1);
+    } catch (e) {
+      redisSub.cancelWait(requestId);
+      throw e;
+    }
 
-    const res = await redisSub.waitForMessage<{ balance: number }>(requestId);
+    const res = await balancePending;
     console.log(res);
 
     return res.balance;

@@ -220,50 +220,67 @@ export async function handleCloseTrade(
 
     const pnl = calculatePnl(tradeToClose, closePrice);
 
-    user.balance.amount += margin + pnl;
+    const dbUser = await prisma.user.findUnique({
+      where: { email: user.email },
+    });
+
+    if (!dbUser) {
+      console.error('[handleCloseTrade] No DB user for email:', user.email);
+      await sendAcknowledgement(requestId, 'TRADE_CLOSE_FAILED', {
+        reason: 'User not found in database',
+      });
+      return;
+    }
+
+    const newBalance = Math.round(user.balance.amount + margin + pnl);
+
+    try {
+      await prisma.$transaction([
+        prisma.existingTrade.create({
+          data: {
+            userId: dbUser.id,
+            asset,
+            openPrice,
+            closePrice,
+            leverage,
+            pnl,
+            liquidated: false,
+            createdAt: new Date(),
+            slippage,
+            side,
+            reason: 'Closed by user',
+            quantity,
+          },
+        }),
+        prisma.user.update({
+          where: { id: dbUser.id },
+          data: { balance: newBalance },
+        }),
+      ]);
+    } catch (dbErr: unknown) {
+      const message = dbErr instanceof Error ? dbErr.message : String(dbErr);
+      console.error('[handleCloseTrade] DB persist failed:', message, dbErr);
+      await sendAcknowledgement(requestId, 'TRADE_CLOSE_FAILED', {
+        reason: 'Failed to persist closed trade',
+        detail: message,
+      });
+      return;
+    }
+
+    user.balance.amount = newBalance;
+
     tradeToClose.status = 'CLOSED';
     tradeToClose.closePrice = closePrice;
     tradeToClose.pnl = pnl;
     tradeToClose.closedAt = new Date();
+    user.trades = user.trades.filter((trade: any) => trade.id !== orderId);
 
     console.log(`Successfully closed trade ${orderId}. PnL: ${pnl}`);
     console.log('User balance after close:', user.balance.amount);
 
-    user.trades = user.trades.filter((trade: any) => trade.id !== orderId);
-
     await sendAcknowledgement(requestId, 'TRADE_CLOSE_ACKNOWLEDGEMENT', {
       status: 'success',
     });
-
-    try {
-      await prisma.existingTrade.create({
-        data: {
-          userId: user.id,
-          asset: asset,
-          openPrice: openPrice,
-          closePrice: closePrice,
-          leverage: leverage,
-          pnl: tradeToClose.pnl,
-          liquidated: false,
-          createdAt: new Date(),
-          slippage: slippage,
-          side: side,
-          reason: 'Closed by user',
-          quantity: quantity,
-        },
-      });
-
-      await prisma.user.update({
-        where: {
-          email: user.email,
-        },
-        data: {
-          balance: user.balance.amount,
-        },
-      });
-    } catch (dbErr) {
-      console.error('Error persisting closed trade or updating user balance:', dbErr);
-    }
   } catch (err) {
     console.error('Error in closing trade:', err);
     await sendAcknowledgement(requestId, 'TRADE_CLOSE_ERROR', {

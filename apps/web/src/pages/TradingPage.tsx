@@ -172,8 +172,6 @@ const TradingPage = () => {
         slippage: parseFloat(slippage),
       });
 
-      alert(`${side} order placed successfully!`);
-      // Reset form
       setTakeProfit('');
       setStopLoss('');
     } catch (error: any) {
@@ -323,7 +321,7 @@ const TradingPage = () => {
                   <p className="text-gray-400 dark:text-gray-500 text-sm text-center py-8">No open orders found</p>
                 ) : (
                   <div className="space-y-2">
-                    {openOrders.map((order: any) => {
+                    {openOrders.map((order: any, index: number) => {
                       const unrealizedPnl = computeUnrealizedPnl(order);
                       const pnlColor =
                         unrealizedPnl === null
@@ -333,7 +331,7 @@ const TradingPage = () => {
                             : 'text-red-600';
 
                       return (
-                        <div key={order.id} className="border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded p-3">
+                        <div key={`open-${order.id ?? 'unknown'}-${index}`} className="border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded p-3">
                           <div className="flex items-center justify-between">
                             <div className="flex-1 grid grid-cols-8 gap-3 text-sm">
                               <div>
@@ -415,7 +413,7 @@ const TradingPage = () => {
                   <p className="text-gray-400 dark:text-gray-500 text-sm text-center py-8">No orders found</p>
                 ) : (
                   <div className="space-y-2">
-                    {allOrders.map((order: any) => {
+                    {allOrders.map((order: any, index: number) => {
                       // Determine if this is a closed order (from database) or open order (from engine)
                       const isClosedOrder = order.closePrice !== undefined || order.liquidated !== undefined || order.reason !== undefined;
                       const status = isClosedOrder ? 'CLOSED' : (order.status || 'OPEN');
@@ -430,7 +428,7 @@ const TradingPage = () => {
                             : 'text-red-600';
 
                       return (
-                        <div key={order.id} className="border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded p-3">
+                        <div key={`all-${order.id ?? 'unknown'}-${index}`} className="border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded p-3">
                           <div className="grid grid-cols-8 gap-3 text-sm">
                             <div>
                               <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Asset</span>

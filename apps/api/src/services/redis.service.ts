@@ -3,7 +3,7 @@ import type { CallbackEntry, EngineMessage, StreamResponse } from '../types/inde
 
 export const ACKNOWLEDGEMENT_QUEUE = 'stream:engine:acknowledgement';
 
-const RESPONSE_TIMEOUT_MS = 5000;
+const RESPONSE_TIMEOUT_MS = 15_000;
 
 const SUCCESS_RESPONSE_TYPES = new Set([
   'USER_CREATED_SUCCESS',
@@ -69,35 +69,43 @@ export class RedisSubscriber {                                   //Redis subscri
 
   private handleMessage(response: [StreamResponse]): void {
     const stream = response[0];
-    const firstMessage = stream?.messages?.[0]?.message;
+    const messages = stream?.messages;
+    if (!messages?.length) return;
 
-    if (!firstMessage) return;
+    for (const entry of messages) {
+      const firstMessage = entry?.message;
+      if (!firstMessage) continue;
 
-    const { type, requestId, payload } = firstMessage;
-    const callback = this.callbacks[requestId];
+      const { type, requestId, payload } = firstMessage as EngineMessage;
+      const callback = this.callbacks[requestId];
 
-    if (!callback) return;
+      if (!callback) continue;
 
-    delete this.callbacks[requestId];
+      delete this.callbacks[requestId];
 
-    let parsedPayload: unknown;
-    try {
-      parsedPayload = JSON.parse(payload);
-    } catch {
-      callback.reject(new Error('Invalid JSON in engine response'));
-      return;
-    }
+      const payloadStr =
+        typeof payload === 'string'
+          ? payload
+          : Buffer.isBuffer(payload)
+            ? payload.toString('utf8')
+            : String(payload);
 
-    if (SUCCESS_RESPONSE_TYPES.has(type)) {
-      callback.resolve(parsedPayload);
+      let parsedPayload: unknown;
+      try {
+        parsedPayload = JSON.parse(payloadStr);
+      } catch {
+        callback.reject(new Error('Invalid JSON in engine response'));
+        continue;
+      }
 
-    } else if (FAILURE_RESPONSE_TYPES.has(type)) {
-      callback.reject(parsedPayload);
-
-    } else {
-      console.warn('[RedisSubscriber] Unknown response type:', type);
-      
-      callback.reject(new Error(`Unknown response type: ${type}`));
+      if (SUCCESS_RESPONSE_TYPES.has(type)) {
+        callback.resolve(parsedPayload);
+      } else if (FAILURE_RESPONSE_TYPES.has(type)) {
+        callback.reject(parsedPayload);
+      } else {
+        console.warn('[RedisSubscriber] Unknown response type:', type);
+        callback.reject(new Error(`Unknown response type: ${type}`));
+      }
     }
   }
 
@@ -115,5 +123,14 @@ export class RedisSubscriber {                                   //Redis subscri
         }
       }, RESPONSE_TIMEOUT_MS);
     });
+  }
+
+  /** Call if xAdd fails after waitForMessage was started, to avoid a dangling pending promise. */
+  cancelWait(requestId: string): void {
+    const callback = this.callbacks[requestId];
+    if (callback) {
+      delete this.callbacks[requestId];
+      callback.reject(new Error('Engine request was not dispatched'));
+    }
   }
 }

@@ -24,37 +24,43 @@ export async function closeOrder(
       ? currentPrice.sellPrice / 10 ** currentPrice.decimal
       : currentPrice.buyPrice / 10 ** currentPrice.decimal;
 
-  user.balance.amount += margin + realizedPnl;
+  const newBalance = Math.round(user.balance.amount + margin + realizedPnl);
+
+  const dbUser = await prisma.user.findUnique({
+    where: { email: user.email },
+  });
+  if (!dbUser) {
+    throw new Error(`Liquidation: no DB user for ${user.email}`);
+  }
+
+  await prisma.$transaction([
+    prisma.existingTrade.create({
+      data: {
+        quantity,
+        side,
+        userId: dbUser.id,
+        asset,
+        openPrice,
+        closePrice,
+        leverage,
+        pnl: realizedPnl,
+        liquidated: reason === 'Liquidation',
+        createdAt: new Date(),
+        slippage,
+        reason,
+      },
+    }),
+    prisma.user.update({
+      where: { id: dbUser.id },
+      data: { balance: newBalance },
+    }),
+  ]);
+
+  user.balance.amount = newBalance;
   closedTrade.status = 'CLOSED';
   closedTrade.closePrice = closePrice;
   closedTrade.pnl = realizedPnl;
   closedTrade.closedAt = new Date();
-
-  await prisma.existingTrade.create({
-    data: {
-      quantity,
-      side,
-      userId: user.id,
-      asset,
-      openPrice,
-      closePrice,
-      leverage,
-      pnl: realizedPnl,
-      liquidated: reason === 'Liquidation',
-      createdAt: new Date(),
-      slippage,
-      reason,
-    },
-  });
-
-  await prisma.user.update({
-    where: {
-      email: user.email,
-    },
-    data: {
-      balance: user.balance.amount,
-    },
-  });
 }
 
 export function calculatePnl(order: Trade, closePrice: number): number {

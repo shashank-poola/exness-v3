@@ -12,5 +12,5 @@ export const openOrderSchema = z.object({
 });
 
 export const closeOrderSchema = z.object({
-  orderId: z.string().min(1, 'ORDER_ID_REQUIRED')
+  orderId: z.string().trim().min(1, 'ORDER_ID_REQUIRED'),
 });
