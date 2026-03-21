@@ -90,6 +90,8 @@ const PositionsSection: React.FC = () => {
           const pnlPositive = pnl >= 0;
           const pnlPercent = position.pnlPercent ?? 0;
           const currentPrice = position.currentPrice;
+          const isClosingThis =
+            closeTrade.isPending && closeTrade.variables === position.id;
           const notional =
             currentPrice != null && isFinite(currentPrice)
               ? currentPrice * position.quantity
@@ -195,10 +197,10 @@ const PositionsSection: React.FC = () => {
               <Pressable
                 style={styles.closeButton}
                 onPress={() => handleClose(position.id)}
-                disabled={closeTrade.isPending}
+                disabled={isClosingThis}
               >
                 <ThemedText size="button" style={styles.closeButtonLabel}>
-                  {closeTrade.isPending ? "Closing..." : "Close Position"}
+                  {isClosingThis ? "Closing..." : "Close Position"}
                 </ThemedText>
               </Pressable>
             </CardContainer>
