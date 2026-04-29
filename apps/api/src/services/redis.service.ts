@@ -83,12 +83,7 @@ export class RedisSubscriber {                                   //Redis subscri
 
       delete this.callbacks[requestId];
 
-      const payloadStr =
-        typeof payload === 'string'
-          ? payload
-          : Buffer.isBuffer(payload)
-            ? payload.toString('utf8')
-            : String(payload);
+      const payloadStr = String(payload);
 
       let parsedPayload: unknown;
       try {
