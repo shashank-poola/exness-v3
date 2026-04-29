@@ -185,20 +185,20 @@ const TradingPage = () => {
   return (
     <div className="h-screen bg-white dark:bg-gray-900 flex flex-col overflow-hidden transition-colors">
       {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-700 px-6 py-3 bg-white dark:bg-gray-900">
+      <header className="border-b border-gray-200 dark:border-gray-700 px-3 lg:px-6 py-3 bg-white dark:bg-gray-900">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <img src={theme === 'dark' ? whiteLogo : tradexLogo} alt="TradeX" className="h-8" />
+            <img src={theme === 'dark' ? whiteLogo : tradexLogo} alt="TradeX" className="h-6 lg:h-8" />
           </Link>
-          
-          <nav className="flex items-center gap-8">
+
+          <nav className="hidden lg:flex items-center gap-8">
             <Link to="/" className="text-sm font-extrabold hover:opacity-70 dark:text-white">HOME</Link>
             <Link to="/docs" className="text-sm font-extrabold hover:opacity-70 dark:text-white">DOCS</Link>
             <Link to="/trade" className="text-sm font-extrabold hover:opacity-70 dark:text-white">TRADE</Link>
           </nav>
 
-          <div className="flex items-center gap-4">
-            <span className="text-sm font-extrabold dark:text-white">
+          <div className="flex items-center gap-2 lg:gap-4">
+            <span className="text-xs lg:text-sm font-extrabold dark:text-white">
               BALANCE: ${balance?.balance ? Number(balance.balance).toFixed(2) : '0.00'}
             </span>
 
@@ -239,7 +239,7 @@ const TradingPage = () => {
       </header>
 
       {/* Ticker Bar */}
-      <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-3 flex items-center gap-8 bg-gray-50 dark:bg-gray-800">
+      <div className="border-b border-gray-200 dark:border-gray-700 px-3 lg:px-6 py-2 lg:py-3 flex items-center gap-4 lg:gap-8 bg-gray-50 dark:bg-gray-800 overflow-x-auto flex-nowrap">
         {cryptoPrices.map((crypto) => {
           const price = prices[crypto.binanceSymbol];
           return (
@@ -270,12 +270,12 @@ const TradingPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         {/* Chart Area */}
-        <div className="flex-1 flex flex-col p-6">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500 dark:text-gray-400">Timeframe:</span>
+        <div className="flex-1 flex flex-col p-2 lg:p-6 min-h-0">
+          <div className="flex items-center justify-between mb-2 gap-2">
+            <div className="flex items-center gap-1 lg:gap-2 overflow-x-auto flex-nowrap">
+              <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">Timeframe:</span>
               {["1m", "5m", "30m", "1h", "6h", "1d", "3d"].map((tf) => (
                 <button
                   key={tf}
@@ -290,16 +290,16 @@ const TradingPage = () => {
                 </button>
               ))}
             </div>
-            <span className="text-sm font-extrabold dark:text-white">TRADING {selectedCrypto}/USD</span>
+            <span className="text-xs lg:text-sm font-extrabold dark:text-white hidden sm:block">TRADING {selectedCrypto}/USD</span>
           </div>
 
           {/* TradingView Chart */}
-          <Card className="flex-1 p-0 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <Card className="flex-1 p-0 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 overflow-hidden min-h-[200px] lg:min-h-0">
             <TradingChart symbol={`${selectedCrypto}USDT`} interval={selectedTimeframe} />
           </Card>
 
           {/* Orders Section - Fixed Height Container */}
-          <div className="mt-4 h-40 flex flex-col">
+          <div className="mt-2 lg:mt-4 h-36 lg:h-40 flex flex-col flex-shrink-0">
             <Tabs value={ordersTab} onValueChange={setOrdersTab} className="flex flex-col h-full">
               <TabsList className="bg-transparent border-b border-gray-200 dark:border-gray-700 rounded-none w-full justify-start h-auto p-0 flex-shrink-0">
                 <TabsTrigger
@@ -333,7 +333,7 @@ const TradingPage = () => {
                       return (
                         <div key={`open-${order.id ?? 'unknown'}-${index}`} className="border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded p-3">
                           <div className="flex items-center justify-between">
-                            <div className="flex-1 grid grid-cols-8 gap-3 text-sm">
+                            <div className="flex-1 grid grid-cols-4 lg:grid-cols-8 gap-2 lg:gap-3 text-sm">
                               <div>
                                 <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Asset</span>
                                 <p className="font-extrabold dark:text-white">{order.asset.replace('_', '/')}</p>
@@ -429,7 +429,7 @@ const TradingPage = () => {
 
                       return (
                         <div key={`all-${order.id ?? 'unknown'}-${index}`} className="border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded p-3">
-                          <div className="grid grid-cols-8 gap-3 text-sm">
+                          <div className="grid grid-cols-4 lg:grid-cols-8 gap-2 lg:gap-3 text-sm">
                             <div>
                               <span className="text-gray-500 dark:text-gray-400 text-xs font-bold">Asset</span>
                               <p className="font-extrabold dark:text-white">{order.asset.replace('_', '/')}</p>
@@ -516,7 +516,7 @@ const TradingPage = () => {
         </div>
 
         {/* Right Sidebar */}
-        <div className="w-80 border-l border-gray-200 dark:border-gray-700 flex flex-col bg-white dark:bg-gray-900">
+        <div className="w-full lg:w-80 border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-gray-700 flex flex-col bg-white dark:bg-gray-900 flex-shrink-0 overflow-y-auto lg:overflow-y-hidden">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-full">
             <TabsList className="grid grid-cols-2 bg-white dark:bg-gray-900 rounded-none border-b border-gray-200 dark:border-gray-700 h-auto">
               <TabsTrigger
