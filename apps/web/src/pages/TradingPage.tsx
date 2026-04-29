@@ -30,6 +30,7 @@ const TradingPage = () => {
   const [stopLoss, setStopLoss] = useState("");
   const [slippage, setSlippage] = useState("1");
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [mobileSheet, setMobileSheet] = useState<'buy' | 'sell' | 'orders' | null>(null);
 
   // Check authentication
   useEffect(() => {
@@ -270,7 +271,7 @@ const TradingPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden pb-14 lg:pb-0">
         {/* Chart Area */}
         <div className="flex-1 flex flex-col p-2 lg:p-6 min-h-0">
           <div className="flex items-center justify-between mb-2 gap-2">
@@ -294,12 +295,12 @@ const TradingPage = () => {
           </div>
 
           {/* TradingView Chart */}
-          <Card className="flex-1 p-0 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 overflow-hidden min-h-[200px] lg:min-h-0">
+          <Card className="flex-1 p-0 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 overflow-hidden min-h-[250px] lg:min-h-0">
             <TradingChart symbol={`${selectedCrypto}USDT`} interval={selectedTimeframe} />
           </Card>
 
-          {/* Orders Section - Fixed Height Container */}
-          <div className="mt-2 lg:mt-4 h-36 lg:h-40 flex flex-col flex-shrink-0">
+          {/* Orders Section - desktop only */}
+          <div className="mt-2 lg:mt-4 h-36 lg:h-40 hidden lg:flex flex-col flex-shrink-0">
             <Tabs value={ordersTab} onValueChange={setOrdersTab} className="flex flex-col h-full">
               <TabsList className="bg-transparent border-b border-gray-200 dark:border-gray-700 rounded-none w-full justify-start h-auto p-0 flex-shrink-0">
                 <TabsTrigger
@@ -515,8 +516,8 @@ const TradingPage = () => {
           </div>
         </div>
 
-        {/* Right Sidebar */}
-        <div className="w-full lg:w-80 border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-gray-700 flex flex-col bg-white dark:bg-gray-900 flex-shrink-0 overflow-y-auto lg:overflow-y-hidden">
+        {/* Right Sidebar - desktop only */}
+        <div className="hidden lg:flex w-80 border-l border-gray-200 dark:border-gray-700 flex-col bg-white dark:bg-gray-900 flex-shrink-0">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-full">
             <TabsList className="grid grid-cols-2 bg-white dark:bg-gray-900 rounded-none border-b border-gray-200 dark:border-gray-700 h-auto">
               <TabsTrigger
@@ -657,6 +658,188 @@ const TradingPage = () => {
           </Tabs>
         </div>
       </div>
+
+      {/* Mobile Bottom Bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 flex border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 z-40">
+        <button
+          onClick={() => setMobileSheet('orders')}
+          className="flex-1 py-3 text-xs font-extrabold dark:text-white border-r border-gray-200 dark:border-gray-700"
+        >
+          ORDERS ({openOrders.length})
+        </button>
+        <button
+          onClick={() => setMobileSheet('buy')}
+          className="flex-1 py-3 text-sm font-extrabold bg-black dark:bg-white text-white dark:text-black"
+        >
+          BUY
+        </button>
+        <button
+          onClick={() => setMobileSheet('sell')}
+          className="flex-1 py-3 text-sm font-extrabold border-l border-gray-200 dark:border-gray-700 text-black dark:text-white"
+        >
+          SELL
+        </button>
+      </div>
+
+      {/* Mobile Bottom Sheet */}
+      {mobileSheet && (
+        <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setMobileSheet(null)} />
+          <div className="relative bg-white dark:bg-gray-900 rounded-t-2xl max-h-[85vh] flex flex-col">
+            {/* Sheet Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+              <h3 className="text-sm font-extrabold dark:text-white">
+                {mobileSheet === 'buy' ? 'BUY' : mobileSheet === 'sell' ? 'SELL' : `ORDERS (${openOrders.length} open)`}
+              </h3>
+              <button onClick={() => setMobileSheet(null)} className="text-gray-500 dark:text-gray-400 text-lg font-bold px-2">✕</button>
+            </div>
+
+            <div className="overflow-y-auto flex-1 p-4">
+              {/* Orders Sheet */}
+              {mobileSheet === 'orders' && (
+                <div className="space-y-3">
+                  <Tabs value={ordersTab} onValueChange={setOrdersTab}>
+                    <TabsList className="bg-transparent border-b border-gray-200 dark:border-gray-700 rounded-none w-full justify-start h-auto p-0 mb-3">
+                      <TabsTrigger value="open" className="rounded-none border-b-2 border-transparent data-[state=active]:border-black dark:data-[state=active]:border-white data-[state=active]:bg-transparent px-4 py-2 dark:text-gray-300 text-xs font-bold">
+                        Open ({openOrders.length})
+                      </TabsTrigger>
+                      <TabsTrigger value="all" className="rounded-none border-b-2 border-transparent data-[state=active]:border-black dark:data-[state=active]:border-white data-[state=active]:bg-transparent px-4 py-2 dark:text-gray-300 text-xs font-bold">
+                        All ({allOrders.length})
+                      </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="open">
+                      {openOrders.length === 0 ? (
+                        <p className="text-gray-400 text-sm text-center py-8">No open orders</p>
+                      ) : (
+                        <div className="space-y-3">
+                          {openOrders.map((order: any, index: number) => {
+                            const unrealizedPnl = computeUnrealizedPnl(order);
+                            const pnlColor = unrealizedPnl === null ? 'text-gray-400' : unrealizedPnl >= 0 ? 'text-green-600' : 'text-red-600';
+                            return (
+                              <div key={`mob-open-${order.id ?? index}`} className="border border-gray-200 dark:border-gray-700 rounded p-3 space-y-2">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-extrabold dark:text-white text-sm">{order.asset.replace('_', '/')}</span>
+                                  <span className={`font-extrabold text-sm ${order.side === 'LONG' ? 'text-green-600' : 'text-red-600'}`}>{order.side}</span>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2 text-xs">
+                                  <div><p className="text-gray-500 font-bold">Size</p><p className="font-extrabold dark:text-white">{order.quantity}</p></div>
+                                  <div><p className="text-gray-500 font-bold">Entry</p><p className="font-extrabold dark:text-white">{getEntryPrice(order) !== null ? `$${getEntryPrice(order)!.toFixed(2)}` : 'N/A'}</p></div>
+                                  <div><p className="text-gray-500 font-bold">Leverage</p><p className="font-extrabold dark:text-white">{order.leverage}x</p></div>
+                                  <div><p className="text-gray-500 font-bold">P&L</p><p className={`font-extrabold ${pnlColor}`}>{unrealizedPnl === null ? 'N/A' : `${unrealizedPnl >= 0 ? '+' : ''}$${unrealizedPnl.toFixed(2)}`}</p></div>
+                                  <div><p className="text-gray-500 font-bold">Slippage</p><p className="font-extrabold dark:text-white">{order.slippage ? `${(order.slippage * 100).toFixed(2)}%` : 'Default'}</p></div>
+                                </div>
+                                <button
+                                  onClick={() => { closeOrder.mutate({ orderId: order.id }); setMobileSheet(null); }}
+                                  disabled={closeOrder.isPending}
+                                  className="w-full bg-red-500 text-white py-2 rounded text-xs font-bold hover:bg-red-600 disabled:opacity-50"
+                                >
+                                  {closeOrder.isPending ? 'CLOSING...' : 'CLOSE POSITION'}
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </TabsContent>
+                    <TabsContent value="all">
+                      {allOrders.length === 0 ? (
+                        <p className="text-gray-400 text-sm text-center py-8">No orders</p>
+                      ) : (
+                        <div className="space-y-3">
+                          {allOrders.map((order: any, index: number) => {
+                            const isClosedOrder = order.closePrice !== undefined || order.liquidated !== undefined;
+                            const effectivePnl = isClosedOrder ? order.pnl ?? null : computeUnrealizedPnl(order);
+                            const pnlColor = effectivePnl === null ? 'text-gray-400' : effectivePnl >= 0 ? 'text-green-600' : 'text-red-600';
+                            return (
+                              <div key={`mob-all-${order.id ?? index}`} className="border border-gray-200 dark:border-gray-700 rounded p-3 space-y-2">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-extrabold dark:text-white text-sm">{order.asset.replace('_', '/')}</span>
+                                  <div className="flex gap-2">
+                                    <span className={`font-extrabold text-xs ${order.side === 'LONG' ? 'text-green-600' : 'text-red-600'}`}>{order.side}</span>
+                                    <span className={`font-extrabold text-xs ${isClosedOrder ? 'text-gray-500' : 'text-green-600'}`}>{isClosedOrder ? 'CLOSED' : 'OPEN'}</span>
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2 text-xs">
+                                  <div><p className="text-gray-500 font-bold">Size</p><p className="font-extrabold dark:text-white">{order.quantity}</p></div>
+                                  <div><p className="text-gray-500 font-bold">Entry</p><p className="font-extrabold dark:text-white">{getEntryPrice(order) !== null ? `$${getEntryPrice(order)!.toFixed(2)}` : 'N/A'}</p></div>
+                                  <div><p className="text-gray-500 font-bold">P&L</p><p className={`font-extrabold ${pnlColor}`}>{effectivePnl === null ? 'N/A' : `${effectivePnl >= 0 ? '+' : ''}$${effectivePnl.toFixed(2)}`}</p></div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </TabsContent>
+                  </Tabs>
+                </div>
+              )}
+
+              {/* Buy/Sell Order Form Sheet */}
+              {(mobileSheet === 'buy' || mobileSheet === 'sell') && (
+                <div className="space-y-4">
+                  {/* BID/ASK */}
+                  <div className="flex gap-2">
+                    <div className="flex-1 bg-green-100 dark:bg-green-900/30 border-2 border-green-300 dark:border-green-600 rounded p-2 text-center">
+                      <div className="text-[10px] font-extrabold text-gray-600 dark:text-gray-400 mb-1">BID</div>
+                      <div className="text-sm font-extrabold text-green-600 dark:text-green-400">{formatPrice(selectedPrice.bid)}</div>
+                    </div>
+                    <div className="flex-1 bg-red-100 dark:bg-red-900/30 border-2 border-red-300 dark:border-red-600 rounded p-2 text-center">
+                      <div className="text-[10px] font-extrabold text-gray-600 dark:text-gray-400 mb-1">ASK</div>
+                      <div className="text-sm font-extrabold text-red-600 dark:text-red-400">{formatPrice(selectedPrice.ask)}</div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-extrabold mb-1 block dark:text-white">Volume/Quantity</label>
+                    <input type="number" value={volume} onChange={(e) => setVolume(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded text-sm font-bold" step="0.01" />
+                    <p className="text-[10px] text-gray-500 mt-1 font-bold">Range: 0.01 - 100.00</p>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-extrabold mb-1 block dark:text-white">Leverage: {leverage}x</label>
+                    <input type="range" min="1" max="100" value={leverage} onChange={(e) => setLeverage(Number(e.target.value))} className="w-full" />
+                    <div className="flex justify-between text-[10px] text-gray-500 mt-1 font-bold">
+                      <span>1x</span><span>5x</span><span>10x</span><span>50x</span><span>100x</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-extrabold mb-1 block dark:text-white">Slippage (%)</label>
+                    <input type="number" value={slippage} onChange={(e) => setSlippage(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded text-sm font-bold" />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-extrabold mb-1 block dark:text-white">Take Profit (Optional)</label>
+                    <input type="number" value={takeProfit} onChange={(e) => setTakeProfit(e.target.value)} placeholder="Not set"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded text-sm font-bold" />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-extrabold mb-1 block dark:text-white">Stop Loss (Optional)</label>
+                    <input type="number" value={stopLoss} onChange={(e) => setStopLoss(e.target.value)} placeholder="Not set"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded text-sm font-bold" />
+                  </div>
+
+                  <button
+                    onClick={async () => {
+                      await handleTrade(mobileSheet === 'buy' ? 'LONG' : 'SHORT');
+                      setMobileSheet(null);
+                    }}
+                    disabled={createOrder.isPending}
+                    className={`w-full py-3 text-white text-sm font-extrabold rounded-full disabled:opacity-50 ${
+                      mobileSheet === 'buy' ? 'bg-black dark:bg-white dark:text-black' : 'bg-red-600 hover:bg-red-700'
+                    }`}
+                  >
+                    {createOrder.isPending ? (mobileSheet === 'buy' ? 'BUYING...' : 'SELLING...') : (mobileSheet === 'buy' ? 'CONFIRM BUY' : 'CONFIRM SELL')}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
