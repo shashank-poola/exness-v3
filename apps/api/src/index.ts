@@ -18,7 +18,6 @@ const ALLOWED_ORIGINS = [
   "http://64.227.182.171"
 ];
 
-// Connect Redis once at starting up
 await httpPusher.connect();
 
 app.use(express.json());
