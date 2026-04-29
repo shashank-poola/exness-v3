@@ -79,20 +79,27 @@ async function startEngine() {
       await enginePuller.xAck(STREAM_KEY, GROUP_NAME, lastItemReadId);
     }
 
-    const response = (await enginePuller.xReadGroup(
-      GROUP_NAME,
-      CONSUMER_NAME,
-      { key: STREAM_KEY, id: '>' },
-      { BLOCK: 0, COUNT: 1 }
-    )) as any[];
+    try {
+      const response = (await enginePuller.xReadGroup(
+        GROUP_NAME,
+        CONSUMER_NAME,
+        { key: STREAM_KEY, id: '>' },
+        { COUNT: 1 }
+      )) as any[];
 
-    if (response) {
-      const msg = response[0].messages[0];
-      lastItemReadId = msg.id;
+      if (response) {
+        const msg = response[0].messages[0];
+        lastItemReadId = msg.id;
 
-      console.log('message', msg.message);
-      await processMessage(msg);
-      await saveSnapshot();
+        console.log('message', msg.message);
+        await processMessage(msg);
+        await saveSnapshot();
+      } else {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    } catch (err) {
+      console.error('xReadGroup error, retrying in 1s:', err);
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
 }
