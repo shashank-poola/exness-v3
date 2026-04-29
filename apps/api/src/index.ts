@@ -14,7 +14,8 @@ const ALLOWED_ORIGINS = [
   "https://exness-v3-web.vercel.app",
   "https://tradex.foo",
   "https://www.tradex.foo",
-  "http://192.168.0.116:3000"
+  "http://192.168.0.116:3000",
+  "http://64.227.182.171"
 ];
 
 // Connect Redis once at starting up
