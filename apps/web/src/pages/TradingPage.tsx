@@ -271,36 +271,91 @@ const TradingPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden pb-14 lg:pb-0">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         {/* Chart Area */}
-        <div className="flex-1 flex flex-col p-2 lg:p-6 min-h-0">
-          <div className="flex items-center justify-between mb-2 gap-2">
-            <div className="flex items-center gap-1 lg:gap-2 overflow-x-auto flex-nowrap">
+        <div className="flex-1 flex flex-col lg:p-6 min-h-0">
+
+          {/* Timeframe bar - desktop only */}
+          <div className="hidden lg:flex items-center justify-between mb-2 gap-2">
+            <div className="flex items-center gap-2 overflow-x-auto flex-nowrap">
               <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">Timeframe:</span>
               {["1m", "5m", "30m", "1h", "6h", "1d", "3d"].map((tf) => (
-                <button
-                  key={tf}
-                  onClick={() => setSelectedTimeframe(tf)}
-                  className={`px-3 py-1 text-xs font-medium rounded ${
-                    selectedTimeframe === tf
-                      ? "bg-black dark:bg-white text-white dark:text-black"
-                      : "bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-white"
-                  }`}
-                >
+                <button key={tf} onClick={() => setSelectedTimeframe(tf)}
+                  className={`px-3 py-1 text-xs font-medium rounded ${selectedTimeframe === tf ? "bg-black dark:bg-white text-white dark:text-black" : "bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-white"}`}>
                   {tf}
                 </button>
               ))}
             </div>
-            <span className="text-xs lg:text-sm font-extrabold dark:text-white hidden sm:block">TRADING {selectedCrypto}/USD</span>
+            <span className="text-sm font-extrabold dark:text-white">TRADING {selectedCrypto}/USD</span>
           </div>
 
-          {/* TradingView Chart */}
-          <Card className="flex-1 p-0 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 overflow-hidden min-h-[250px] lg:min-h-0">
+          {/* Mobile: timeframe bar compact */}
+          <div className="lg:hidden flex items-center gap-1 px-2 pt-2 pb-1 overflow-x-auto flex-nowrap">
+            {["1m", "5m", "30m", "1h", "6h", "1d", "3d"].map((tf) => (
+              <button key={tf} onClick={() => setSelectedTimeframe(tf)}
+                className={`px-2 py-1 text-xs font-medium rounded flex-shrink-0 ${selectedTimeframe === tf ? "bg-black dark:bg-white text-white dark:text-black" : "bg-gray-100 dark:bg-gray-700 dark:text-white"}`}>
+                {tf}
+              </button>
+            ))}
+            <span className="ml-auto text-xs font-extrabold dark:text-white flex-shrink-0 pr-2">{selectedCrypto}/USD</span>
+          </div>
+
+          {/* TradingView Chart - rectangle on mobile, flex on desktop */}
+          <Card className="h-[260px] lg:h-auto lg:flex-1 p-0 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 overflow-hidden mx-2 lg:mx-0 rounded-lg">
             <TradingChart symbol={`${selectedCrypto}USDT`} interval={selectedTimeframe} />
           </Card>
 
+          {/* Mobile: Action bar + inline orders */}
+          <div className="lg:hidden flex flex-col flex-1 overflow-hidden">
+            {/* ORDERS / BUY / SELL bar */}
+            <div className="flex border-t border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+              <button onClick={() => setMobileSheet('orders')}
+                className="flex-1 py-3 text-xs font-extrabold dark:text-white border-r border-gray-200 dark:border-gray-700">
+                ORDERS ({openOrders.length})
+              </button>
+              <button onClick={() => setMobileSheet('buy')}
+                className="flex-1 py-3 text-sm font-extrabold bg-black dark:bg-white text-white dark:text-black">
+                BUY
+              </button>
+              <button onClick={() => setMobileSheet('sell')}
+                className="flex-1 py-3 text-sm font-extrabold border-l border-gray-200 dark:border-gray-700 text-black dark:text-white">
+                SELL
+              </button>
+            </div>
+
+            {/* Mobile inline orders list */}
+            <div className="flex-1 overflow-y-auto p-2 space-y-2">
+              {openOrders.length === 0 ? (
+                <p className="text-gray-400 dark:text-gray-500 text-xs text-center py-4">No open orders</p>
+              ) : (
+                openOrders.map((order: any, index: number) => {
+                  const unrealizedPnl = computeUnrealizedPnl(order);
+                  const pnlColor = unrealizedPnl === null ? 'text-gray-400' : unrealizedPnl >= 0 ? 'text-green-600' : 'text-red-600';
+                  return (
+                    <div key={`mob-inline-${order.id ?? index}`} className="border border-gray-200 dark:border-gray-700 dark:bg-gray-800 rounded p-2">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-extrabold dark:text-white">{order.asset.replace('_', '/')}</span>
+                        <span className={`text-xs font-extrabold ${order.side === 'LONG' ? 'text-green-600' : 'text-red-600'}`}>{order.side}</span>
+                      </div>
+                      <div className="grid grid-cols-4 gap-1 text-xs mb-2">
+                        <div><p className="text-gray-500 font-bold">Size</p><p className="font-extrabold dark:text-white">{order.quantity}</p></div>
+                        <div><p className="text-gray-500 font-bold">Entry</p><p className="font-extrabold dark:text-white">{getEntryPrice(order) !== null ? `$${getEntryPrice(order)!.toFixed(0)}` : 'N/A'}</p></div>
+                        <div><p className="text-gray-500 font-bold">Lev</p><p className="font-extrabold dark:text-white">{order.leverage}x</p></div>
+                        <div><p className="text-gray-500 font-bold">P&L</p><p className={`font-extrabold ${pnlColor}`}>{unrealizedPnl === null ? 'N/A' : `${unrealizedPnl >= 0 ? '+' : ''}$${unrealizedPnl.toFixed(0)}`}</p></div>
+                      </div>
+                      <button onClick={() => closeOrder.mutate({ orderId: order.id })} disabled={closeOrder.isPending}
+                        className="w-full bg-red-500 text-white py-1 rounded text-xs font-bold hover:bg-red-600 disabled:opacity-50">
+                        {closeOrder.isPending ? 'CLOSING...' : 'CLOSE'}
+                      </button>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
           {/* Orders Section - desktop only */}
-          <div className="mt-2 lg:mt-4 h-36 lg:h-40 hidden lg:flex flex-col flex-shrink-0">
+          <div className="mt-4 h-40 hidden lg:flex flex-col flex-shrink-0">
             <Tabs value={ordersTab} onValueChange={setOrdersTab} className="flex flex-col h-full">
               <TabsList className="bg-transparent border-b border-gray-200 dark:border-gray-700 rounded-none w-full justify-start h-auto p-0 flex-shrink-0">
                 <TabsTrigger
@@ -657,28 +712,6 @@ const TradingPage = () => {
             </TabsContent>
           </Tabs>
         </div>
-      </div>
-
-      {/* Mobile Bottom Bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 flex border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 z-40">
-        <button
-          onClick={() => setMobileSheet('orders')}
-          className="flex-1 py-3 text-xs font-extrabold dark:text-white border-r border-gray-200 dark:border-gray-700"
-        >
-          ORDERS ({openOrders.length})
-        </button>
-        <button
-          onClick={() => setMobileSheet('buy')}
-          className="flex-1 py-3 text-sm font-extrabold bg-black dark:bg-white text-white dark:text-black"
-        >
-          BUY
-        </button>
-        <button
-          onClick={() => setMobileSheet('sell')}
-          className="flex-1 py-3 text-sm font-extrabold border-l border-gray-200 dark:border-gray-700 text-black dark:text-white"
-        >
-          SELL
-        </button>
       </div>
 
       {/* Mobile Bottom Sheet */}
