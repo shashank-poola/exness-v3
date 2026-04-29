@@ -83,7 +83,7 @@ async function startEngine() {
       GROUP_NAME,
       CONSUMER_NAME,
       { key: STREAM_KEY, id: '>' },
-      { BLOCK: 0 }
+      { BLOCK: 0, COUNT: 1 }
     )) as any[];
 
     if (response) {
